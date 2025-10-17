@@ -1,37 +1,87 @@
-# Gestor de Citas - Frontend
+# 🗓️ Gestor de Citas - Frontend
 
-## Tecnologías
-- Next.js 14+
-- TypeScript
-- Tailwind CSS
+Sistema de gestión de citas para negocios con sistema de suscripciones basado en códigos.
 
-## Estructura del Proyecto
+## 🚀 Tecnologías
 
-```
-frontend/
-├── src/
-│   ├── app/           # App Router de Next.js
-│   ├── components/    # Componentes reutilizables
-│   ├── services/      # Servicios para conectarse al backend
-│   ├── interfaces/    # Tipos e interfaces TypeScript
-│   └── utils/         # Utilidades
-└── public/            # Archivos estáticos
-```
+- **Next.js 14** (App Router)
+- **TypeScript**
+- **TailwindCSS**
+- **React Context API**
+- **Axios**
 
-## Instalación
+## 📋 Características
+
+### ✅ Sistema de Autenticación
+- Login unificado para SuperAdmin y Usuarios
+- JWT tokens
+- Protección de rutas
+- Context API para estado global
+
+### ✅ Registro de Usuarios
+- Formulario completo con datos del negocio
+- Validaciones en tiempo real
+- Creación automática de usuario + negocio
+
+### ✅ Sistema de Suscripciones
+- Activación mediante códigos
+- Verificación automática de expiración
+- Dashboard con estado de suscripción
+
+### ✅ Panel SuperAdmin
+- Gestión de códigos de suscripción
+- Crear códigos individuales o múltiples
+- Estadísticas en tiempo real
+
+## 🛠️ Instalación
 
 ```bash
+# Clonar repositorio
+git clone https://github.com/Edison02m/gestor_citas_fronted.git
+cd gestor_citas_fronted
+
+# Instalar dependencias
 npm install
+
+# Configurar variables de entorno
+echo "NEXT_PUBLIC_API_URL=http://localhost:3000/api" > .env.local
+
+# Iniciar en desarrollo
+npm run dev
 ```
 
-## Configuración
+## 📁 Estructura
 
-1. Copia el archivo `.env.local.example` a `.env.local`
-2. Configura la URL del backend
+```
+src/
+├── app/                    # Pages (Next.js 14 App Router)
+├── components/             # Componentes reutilizables
+├── contexts/              # Context API
+├── interfaces/            # TypeScript types
+├── services/              # API services
+└── utils/                 # Utilidades
+```
 
-## Scripts
+## 🔐 Variables de Entorno
 
-- `npm run dev` - Modo desarrollo (http://localhost:3000)
-- `npm run build` - Compilar para producción
-- `npm start` - Iniciar servidor en producción
-- `npm run lint` - Ejecutar linter
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
+
+## 🎨 Páginas
+
+- `/` - Landing page
+- `/login` - Login
+- `/register` - Registro
+- `/activar-codigo` - Activar código
+- `/dashboard` - SuperAdmin
+- `/dashboard-usuario` - Usuario
+
+## 👤 Autor
+
+**Edison Morales**
+- GitHub: [@Edison02m](https://github.com/Edison02m)
+
+---
+
+⚡ Desarrollado con Next.js 14 y TailwindCSS
