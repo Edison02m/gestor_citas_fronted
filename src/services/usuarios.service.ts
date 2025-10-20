@@ -5,7 +5,8 @@ import api from './api';
 export interface RegisterUsuarioDto {
   email: string;
   password: string;
-  nombre: string;
+  nombre: string; // Nombre del usuario/administrador
+  nombreNegocio: string; // Nombre del negocio
   telefono: string;
   logo?: string;
   descripcion?: string;
@@ -14,6 +15,7 @@ export interface RegisterUsuarioDto {
 export interface UsuarioResponse {
   id: string;
   email: string;
+  nombre: string; // Nombre del usuario
   rol: string;
   primerLogin: boolean;
   activo: boolean;

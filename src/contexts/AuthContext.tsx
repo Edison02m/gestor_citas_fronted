@@ -54,20 +54,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(response.data.user);
       setRequiereCodigoActivacion(response.data.requiereCodigoActivacion || false);
 
-      // Redirigir según el tipo de usuario
-      if (response.data.user.rol === 'SUPER_ADMIN') {
-        // SuperAdmin va al dashboard principal
+      // 🔍 FLUJO DE DECISIÓN
+      const user = response.data.user;
+
+      // Caso 1: SuperAdmin → Dashboard principal
+      if (user.rol === 'SUPER_ADMIN') {
         router.push('/dashboard');
-      } else {
-        // Usuario/Negocio
-        if (response.data.requiereCodigoActivacion) {
-          // Necesita activar código primero
-          router.push('/activar-codigo');
-        } else {
-          // Ya tiene suscripción activa
-          router.push('/dashboard-usuario');
-        }
+        return;
       }
+
+      // Caso 2: Usuario sin suscripción o vencida → Activar código
+      if (response.data.requiereCodigoActivacion) {
+        router.push('/activar-codigo');
+        return;
+      }
+
+      // Caso 3: Primer login → Onboarding (solo para usuarios, no super admin)
+      if ('primerLogin' in user && user.primerLogin) {
+        router.push('/onboarding');
+        return;
+      }
+
+      // Caso 4: Usuario normal → Dashboard
+      router.push('/dashboard-usuario');
     } catch (error: any) {
       throw new Error(error.message || 'Error al iniciar sesión');
     }
@@ -78,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     setUser(null);
     setRequiereCodigoActivacion(false);
-    router.push('/login');
+    router.push('/auth');
   };
 
   const refreshUser = async () => {

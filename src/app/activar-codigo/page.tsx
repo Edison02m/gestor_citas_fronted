@@ -22,17 +22,26 @@ export default function ActivarCodigoPage() {
   useEffect(() => {
     // Redirigir si no está autenticado
     if (!isLoading && !user) {
-      router.push('/login');
+      router.push('/auth');
+      return;
     }
 
     // Redirigir si es SuperAdmin
     if (user?.rol === 'SUPER_ADMIN') {
       router.push('/dashboard');
+      return;
+    }
+
+    // 🔒 VALIDACIÓN CRÍTICA: Si aún no completó el onboarding, redirigir
+    if (isUsuario(user) && user.primerLogin) {
+      router.push('/onboarding');
+      return;
     }
 
     // Redirigir si ya tiene suscripción activa
     if (isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA') {
       router.push('/dashboard-usuario');
+      return;
     }
   }, [user, isLoading, router]);
 

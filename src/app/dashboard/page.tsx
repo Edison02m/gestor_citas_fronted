@@ -13,7 +13,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        router.push('/login');
+        router.push('/auth');
       } else if (user && user.rol !== 'SUPER_ADMIN') {
         // Si no es SuperAdmin, redirigir a dashboard de usuario
         router.push('/dashboard-usuario');
@@ -42,7 +42,7 @@ export default function DashboardPage() {
   }
 
   // Verificar si user tiene nombre (SuperAdmin) o usar email como fallback
-  const displayName = 'nombre' in user ? user.nombre : user.email;
+  const displayName = ('nombre' in user && user.nombre) ? user.nombre : 'Super Admin';
 
   return (
     <div className="min-h-screen bg-gray-50" suppressHydrationWarning>

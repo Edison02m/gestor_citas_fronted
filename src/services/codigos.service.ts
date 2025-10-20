@@ -63,45 +63,6 @@ const codigosService = {
   },
 
   /**
-   * Obtener código por ID
-   */
-  async obtenerPorId(id: string): Promise<CodigoSuscripcion> {
-    const response = await api.get<{ success: boolean; data: CodigoSuscripcion }>(
-      `/codigos-suscripcion/${id}`
-    );
-    return response.data;
-  },
-
-  /**
-   * Buscar código por texto
-   */
-  async buscarPorCodigo(codigo: string): Promise<CodigoSuscripcion> {
-    const response = await api.get<{ success: boolean; data: CodigoSuscripcion }>(
-      `/codigos-suscripcion/codigo/${codigo}`
-    );
-    return response.data;
-  },
-
-  /**
-   * Validar disponibilidad de un código
-   */
-  async validarDisponibilidad(codigo: string): Promise<{
-    disponible: boolean;
-    motivo?: string;
-    detalles?: any;
-  }> {
-    const response = await api.post<{
-      success: boolean;
-      data: {
-        disponible: boolean;
-        motivo?: string;
-        detalles?: any;
-      };
-    }>('/codigos-suscripcion/validar', { codigo });
-    return response.data;
-  },
-
-  /**
    * Obtener estadísticas
    */
   async obtenerEstadisticas(): Promise<EstadisticasCodigos> {

@@ -36,7 +36,7 @@ function handleSubscriptionError(error: any): void {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('auth_user');
-          window.location.href = '/login?blocked=true';
+          window.location.href = '/auth?blocked=true';
         }
         break;
     }

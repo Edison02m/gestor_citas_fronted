@@ -15,6 +15,7 @@ export interface SuperAdmin {
 export interface Usuario {
   id: string;
   email: string;
+  nombre: string; // Nombre del usuario
   rol: string;
   primerLogin: boolean;
   activo: boolean;
@@ -48,6 +49,88 @@ export interface LoginResponse {
     requiereCodigoActivacion?: boolean;
   };
   message: string;
+}
+
+export interface LoginResponse {
+  success: true;
+  data: {
+    token: string;
+    user: User;
+    requiereCodigoActivacion?: boolean;
+  };
+  message: string;
+}
+
+// ============================================================================
+// ONBOARDING
+// ============================================================================
+
+export interface OnboardingStatus {
+  completado: boolean;
+  pasoActual: number;
+  pasos: OnboardingPaso[];
+  negocio: {
+    tieneSucursales: boolean;
+    tieneServicios: boolean;
+    tieneEmpleados: boolean;
+  };
+}
+
+export interface OnboardingPaso {
+  paso: number;
+  nombre: string;
+  completado: boolean;
+  opcional: boolean;
+}
+
+export interface HorarioInput {
+  diaSemana: number;
+  horaInicio: string;
+  horaFin: string;
+  tieneDescanso: boolean;
+  descansoInicio: string | null;
+  descansoFin: string | null;
+}
+
+export interface CreateSucursalDto {
+  nombre: string;
+  direccion: string;
+  telefono: string;
+  horarios: HorarioInput[];
+}
+
+export interface ServicioExtraInput {
+  nombre: string;
+  precio: number;
+}
+
+export interface CreateServicioDto {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  duracion: number;
+  color: string;
+  sucursalIds: string[];
+  extras?: ServicioExtraInput[];
+}
+
+export interface CreateEmpleadoDto {
+  nombre: string;
+  cargo: string;
+  telefono: string;
+  email?: string;
+  foto?: string;
+  color: string;
+  sucursalIds: string[];
+  horarios?: HorarioInput[];
+}
+
+export interface Sucursal {
+  id: string;
+  nombre: string;
+  direccion: string;
+  telefono: string;
+  estado: string;
 }
 
 export interface AuthContextType {

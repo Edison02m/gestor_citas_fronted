@@ -18,13 +18,19 @@ export default function DashboardUsuarioPage() {
   useEffect(() => {
     // Redirigir si no está autenticado
     if (!isLoading && !user) {
-      router.push('/login');
+      router.push('/auth');
       return;
     }
 
     // Redirigir si es SuperAdmin
     if (user?.rol === 'SUPER_ADMIN') {
       router.push('/dashboard');
+      return;
+    }
+
+    // 🔒 VALIDACIÓN CRÍTICA: Si aún no completó el onboarding, redirigir
+    if (isUsuario(user) && user.primerLogin) {
+      router.push('/onboarding');
       return;
     }
 

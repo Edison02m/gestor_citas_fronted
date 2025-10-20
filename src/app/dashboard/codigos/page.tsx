@@ -27,7 +27,7 @@ export default function CodigosPage() {
   // Proteger ruta
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push('/auth');
     }
   }, [isAuthenticated, authLoading, router]);
 

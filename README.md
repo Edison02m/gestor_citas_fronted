@@ -70,12 +70,12 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
 ## 🎨 Páginas
 
-- `/` - Landing page
-- `/login` - Login
-- `/register` - Registro
-- `/activar-codigo` - Activar código
-- `/dashboard` - SuperAdmin
-- `/dashboard-usuario` - Usuario
+- `/` - Landing page (redirige a `/auth`)
+- `/auth` - Login y Registro unificados
+- `/activar-codigo` - Activar código de suscripción
+- `/dashboard` - Panel SuperAdmin
+- `/dashboard/codigos` - Gestión de códigos (SuperAdmin)
+- `/dashboard-usuario` - Panel de Usuario/Negocio
 
 ## 👤 Autor
 
