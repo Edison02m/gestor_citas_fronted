@@ -85,24 +85,41 @@ const api = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    console.log('🌐 API POST Request:', {
+      url: `${API_URL}${endpoint}`,
+      headers: headers,
+      body: data
+    });
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
     });
 
+    console.log('📡 API Response Status:', response.status);
+    console.log('📡 API Response OK:', response.ok);
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Error en la petición' }));
+      
+      console.error('❌ API Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: error
+      });
       
       // 🔥 Interceptar errores de suscripción
       if (response.status === 403) {
         handleSubscriptionError(error);
       }
       
-      throw { response: { data: error } };
+      throw { response: { data: error, status: response.status } };
     }
 
-    return response.json();
+    const result = await response.json();
+    console.log('✅ API Success Response:', result);
+    return result;
   },
 
   async put<T>(endpoint: string, data: unknown): Promise<T> {

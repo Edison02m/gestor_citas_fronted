@@ -9,6 +9,15 @@ export function formatDateTime(date: string | Date): string {
   });
 }
 
+export function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  return d.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 export function formatearFecha(date: string | Date): string {
   const d = new Date(date);
   return d.toLocaleDateString('es-ES', {

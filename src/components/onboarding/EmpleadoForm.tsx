@@ -193,195 +193,156 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Agregar empleados</h2>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
-          Agrega los miembros de tu equipo. <span className="font-medium text-[#0490C8]">Este paso es opcional</span>, puedes hacerlo después.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Nombre completo *
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Nombre completo
             </label>
             <input
               type="text"
               required
               value={formData.nombre}
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="Ej: Carlos Martínez"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Cargo *
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Cargo
             </label>
             <input
               type="text"
               required
               value={formData.cargo}
               onChange={(e) => setFormData({ ...formData, cargo: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="Ej: Estilista"
               disabled={loading}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Teléfono *
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Teléfono
             </label>
             <input
               type="tel"
               required
               value={formData.telefono}
               onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="+593 999 888 777"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Email *
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Email
             </label>
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="correo@ejemplo.com"
               disabled={loading}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
-            Foto (URL - opcional)
-          </label>
-          <input
-            type="url"
-            value={formData.foto}
-            onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
-            className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
-            placeholder="https://ejemplo.com/foto.jpg"
-            disabled={loading}
-          />
-        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Foto (URL - opcional)
+            </label>
+            <input
+              type="url"
+              value={formData.foto}
+              onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              placeholder="https://ejemplo.com/foto.jpg"
+              disabled={loading}
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
-            Color (para el calendario)
-          </label>
-          <div className="flex items-center gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Color
+            </label>
             <input
               type="color"
               value={formData.color}
               onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-14 h-14 border-2 border-gray-200 rounded-xl cursor-pointer"
+              className="w-full h-[38px] border border-gray-200 rounded-xl cursor-pointer"
               disabled={loading}
             />
-            <span className="text-sm text-gray-600">{formData.color}</span>
           </div>
         </div>
+      </div>
 
-        {/* Sucursales */}
-        <div className="border border-gray-200 rounded-2xl p-5 bg-gradient-to-br from-gray-50 to-white">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Sucursales donde trabaja *
-          </h3>
-          <div className="space-y-2">
-            {sucursales.map((sucursal) => (
-              <label 
-                key={sucursal.id} 
-                className={`flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${
-                  formData.sucursalIds.includes(sucursal.id)
-                    ? 'border-[#0490C8] bg-blue-50/50'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={formData.sucursalIds.includes(sucursal.id)}
-                  onChange={() => toggleSucursal(sucursal.id)}
-                  className="mr-3 w-4 h-4 text-[#0490C8] rounded"
-                  disabled={loading}
-                />
-                <div>
-                  <div className="font-medium text-gray-900 text-sm">{sucursal.nombre}</div>
-                </div>
-              </label>
-            ))}
-          </div>
+      {/* Sucursales */}
+      <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+        <label className="block text-xs font-medium text-gray-700 mb-2">
+          Sucursales donde trabaja
+        </label>
+        <div className="space-y-1.5">
+          {sucursales.map((sucursal) => (
+            <label 
+              key={sucursal.id} 
+              className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all text-xs ${
+                formData.sucursalIds.includes(sucursal.id)
+                  ? 'border-[#0490C8] bg-blue-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={formData.sucursalIds.includes(sucursal.id)}
+                onChange={() => toggleSucursal(sucursal.id)}
+                className="w-3.5 h-3.5 text-[#0490C8] rounded"
+                disabled={loading}
+              />
+              <div className="flex-1">
+                <div className="font-medium text-gray-900">{sucursal.nombre}</div>
+              </div>
+            </label>
+          ))}
         </div>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm flex items-center gap-2">
-            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={handleSkipClick}
-            disabled={loading}
-            className="flex-1 border-2 border-gray-200 text-gray-700 font-semibold py-4 px-6 rounded-2xl hover:bg-gray-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Omitir paso</span>
-          </button>
-          
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-4 px-6 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Creando...</span>
-              </>
-            ) : (
-              <>
-                <span>Agregar empleado</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </>
-            )}
-          </button>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs">
+          {error}
         </div>
-      </form>
-    </div>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={handleSkipClick}
+          disabled={loading}
+          className="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50"
+        >
+          Omitir paso
+        </button>
+        
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Creando...' : 'Continuar'}
+        </button>
+      </div>
+    </form>
   );
 }

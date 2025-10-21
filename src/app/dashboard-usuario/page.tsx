@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Usuario } from '@/interfaces';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 // Helper para verificar si es Usuario (no SuperAdmin)
 const isUsuario = (user: any): user is Usuario => {
@@ -11,7 +12,7 @@ const isUsuario = (user: any): user is Usuario => {
 };
 
 export default function DashboardUsuarioPage() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const [diasRestantes, setDiasRestantes] = useState<number | null>(null);
 
@@ -89,29 +90,8 @@ export default function DashboardUsuarioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {user.negocio?.nombre || 'Dashboard'}
-              </h1>
-              <p className="text-sm text-gray-600">{user.email}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-150"
-            >
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <DashboardLayout>
+      <div className="p-8">
         {/* Estado de Suscripción */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Card Estado */}
@@ -337,7 +317,7 @@ export default function DashboardUsuarioPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

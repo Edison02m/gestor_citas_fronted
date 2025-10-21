@@ -51,14 +51,109 @@ export interface LoginResponse {
   message: string;
 }
 
-export interface LoginResponse {
+// ============================================================================
+// CLIENTES
+// ============================================================================
+
+export interface Cliente {
+  id: string;
+  nombre: string;
+  cedula: string;
+  telefono: string;
+  email?: string;
+  notas?: string;
+  negocioId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateClienteDto {
+  nombre: string;
+  cedula: string;
+  telefono: string;
+  email?: string;
+  notas?: string;
+}
+
+export interface UpdateClienteDto {
+  nombre?: string;
+  cedula?: string;
+  telefono?: string;
+  email?: string;
+  notas?: string;
+}
+
+export interface ClientesListResponse {
   success: true;
   data: {
-    token: string;
-    user: User;
-    requiereCodigoActivacion?: boolean;
+    clientes: Cliente[];
+    total: number;
+    pagina: number;
+    totalPaginas: number;
   };
-  message: string;
+}
+
+// ============================================================================
+// SUCURSALES
+// ============================================================================
+
+export interface Sucursal {
+  id: string;
+  nombre: string;
+  direccion: string;
+  ciudad: string | null;
+  provincia: string | null;
+  telefono: string;
+  email: string | null;
+  estado: "ACTIVA" | "INACTIVA";
+  negocioId: string;
+  createdAt: string;
+  updatedAt: string;
+  horarios: HorarioSucursal[];
+}
+
+export interface HorarioSucursal {
+  id: string;
+  diaSemana: number;
+  abierto: boolean;
+  horaApertura: string | null;
+  horaCierre: string | null;
+  tieneDescanso?: boolean;
+  descansoInicio?: string | null;
+  descansoFin?: string | null;
+}
+
+export interface HorarioDto {
+  diaSemana: number;
+  abierto: boolean;
+  horaApertura?: string;
+  horaCierre?: string;
+  tieneDescanso?: boolean;
+  descansoInicio?: string;
+  descansoFin?: string;
+}
+
+export interface CrearSucursalDto {
+  nombre: string;
+  direccion: string;
+  ciudad?: string;
+  provincia?: string;
+  telefono: string;
+  email?: string;
+  horarios: HorarioDto[];
+}
+
+export interface ActualizarSucursalDto {
+  nombre?: string;
+  direccion?: string;
+  ciudad?: string | null;
+  provincia?: string | null;
+  telefono?: string;
+  email?: string | null;
+}
+
+export interface ActualizarHorariosDto {
+  horarios: HorarioDto[];
 }
 
 // ============================================================================
@@ -85,8 +180,9 @@ export interface OnboardingPaso {
 
 export interface HorarioInput {
   diaSemana: number;
-  horaInicio: string;
-  horaFin: string;
+  abierto: boolean;
+  horaApertura: string | null;
+  horaCierre: string | null;
   tieneDescanso: boolean;
   descansoInicio: string | null;
   descansoFin: string | null;
@@ -123,14 +219,6 @@ export interface CreateEmpleadoDto {
   color: string;
   sucursalIds: string[];
   horarios?: HorarioInput[];
-}
-
-export interface Sucursal {
-  id: string;
-  nombre: string;
-  direccion: string;
-  telefono: string;
-  estado: string;
 }
 
 export interface AuthContextType {

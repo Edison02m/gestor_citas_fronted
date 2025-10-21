@@ -102,53 +102,56 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ¡Bienvenido a CitaYA! 🎉
+    <div className="min-h-screen bg-white py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header minimalista */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            Bienvenido a CitaYA
           </h1>
-          <p className="text-gray-600">
-            Configura tu negocio en pocos pasos y comienza a gestionar tus citas
+          <p className="text-sm text-gray-600">
+            Configura tu negocio en pocos pasos
           </p>
-          <p className="text-sm text-[#0490C8] font-medium mt-2">
-            Tienes 30 días de prueba gratis
-          </p>
+          <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-200">
+            <svg className="w-3.5 h-3.5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs text-gray-700 font-medium">30 días de prueba gratis</span>
+          </div>
         </div>
 
-        {/* Barra de progreso */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
+        {/* Barra de progreso minimalista */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
             {status.pasos.map((paso, index) => (
               <div key={paso.paso} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                       paso.completado
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-[#0490C8] text-white'
                         : currentStep === paso.paso
                         ? 'bg-[#0490C8] text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        : 'bg-gray-100 text-gray-400'
                     }`}
                   >
                     {paso.completado ? '✓' : paso.paso}
                   </div>
                   <p
-                    className={`text-xs mt-2 text-center ${
-                      currentStep === paso.paso ? 'text-[#0490C8] font-medium' : 'text-gray-600'
+                    className={`text-[10px] mt-1.5 text-center leading-tight ${
+                      currentStep === paso.paso ? 'text-gray-900 font-medium' : 'text-gray-500'
                     }`}
                   >
                     {paso.nombre}
                   </p>
                   {paso.opcional && (
-                    <span className="text-xs text-gray-400 italic">(Opcional)</span>
+                    <span className="text-[9px] text-gray-400">(Opcional)</span>
                   )}
                 </div>
                 {index < status.pasos.length - 1 && (
                   <div
-                    className={`h-0.5 flex-1 transition-all ${
-                      paso.completado ? 'bg-green-500' : 'bg-gray-200'
+                    className={`h-px flex-1 mx-1 transition-all ${
+                      paso.completado ? 'bg-[#0490C8]' : 'bg-gray-200'
                     }`}
                   ></div>
                 )}
@@ -158,7 +161,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Contenido del paso actual */}
-        <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
           {currentStep === 2 && <SucursalForm onSuccess={handleNext} />}
           {currentStep === 3 && <ServicioForm onSuccess={handleNext} />}
           {currentStep === 4 && <EmpleadoForm onSuccess={handleNext} onSkip={handleSkip} />}
