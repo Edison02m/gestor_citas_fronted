@@ -22,7 +22,8 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
     ciudad: '',
     provincia: '',
     telefono: '',
-    email: ''
+    email: '',
+    estado: 'ACTIVA' as 'ACTIVA' | 'INACTIVA'
   });
 
   const [errors, setErrors] = useState<string>('');
@@ -35,7 +36,8 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
         ciudad: sucursal.ciudad || '',
         provincia: sucursal.provincia || '',
         telefono: sucursal.telefono,
-        email: sucursal.email || ''
+        email: sucursal.email || '',
+        estado: sucursal.estado || 'ACTIVA'
       });
     } else {
       setFormData({
@@ -44,7 +46,8 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
         ciudad: '',
         provincia: '',
         telefono: '',
-        email: ''
+        email: '',
+        estado: 'ACTIVA'
       });
     }
     setErrors('');
@@ -85,6 +88,11 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
       if (formData.ciudad) dataToSend.ciudad = formData.ciudad;
       if (formData.provincia) dataToSend.provincia = formData.provincia;
       if (formData.email) dataToSend.email = formData.email;
+
+      // Solo incluir estado si es edición
+      if (sucursal) {
+        dataToSend.estado = formData.estado;
+      }
 
       // Si es creación, agregar horarios por defecto (todos cerrados)
       if (!sucursal) {
@@ -243,6 +251,39 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
               />
             </div>
           </div>
+
+          {/* Estado - Solo al editar */}
+          {sucursal && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Estado
+              </label>
+              <div className="flex gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="ACTIVA"
+                    checked={formData.estado === 'ACTIVA'}
+                    onChange={(e) => setFormData({ ...formData, estado: 'ACTIVA' })}
+                    className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
+                    disabled={loading}
+                  />
+                  <span className="text-sm text-gray-700">Activa</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    value="INACTIVA"
+                    checked={formData.estado === 'INACTIVA'}
+                    onChange={(e) => setFormData({ ...formData, estado: 'INACTIVA' })}
+                    className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
+                    disabled={loading}
+                  />
+                  <span className="text-sm text-gray-700">Inactiva</span>
+                </label>
+              </div>
+            </div>
+          )}
 
           {!sucursal && (
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">

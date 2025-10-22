@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import EmpleadosService from '@/services/empleados.service';
 import { Empleado } from '@/interfaces';
 import EmpleadosTable from '@/components/empleados/EmpleadosTable';
@@ -9,9 +10,11 @@ import EmpleadoModal from '@/components/empleados/EmpleadoModal';
 import HorariosEmpleadoModal from '@/components/empleados/HorariosEmpleadoModal';
 import BloqueosEmpleadoModal from '@/components/empleados/BloqueosEmpleadoModal';
 import SucursalesEmpleadoModal from '@/components/empleados/SucursalesEmpleadoModal';
-import DeleteEmpleadoModal from '@/components/empleados/DeleteEmpleadoModal';
 
 export default function EmpleadosPage() {
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const router = useRouter();
+  
   const [empleados, setEmpleados] = useState<Empleado[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,15 +26,22 @@ export default function EmpleadosPage() {
   const [modalHorariosOpen, setModalHorariosOpen] = useState(false);
   const [modalBloqueosOpen, setModalBloqueosOpen] = useState(false);
   const [modalSucursalesOpen, setModalSucursalesOpen] = useState(false);
-  const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState<Empleado | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [deleteError, setDeleteError] = useState('');
+
+  // Proteger la ruta
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   // Cargar empleados
   useEffect(() => {
-    cargarEmpleados();
-  }, []);
+    if (isAuthenticated) {
+      cargarEmpleados();
+    }
+  }, [isAuthenticated]);
 
   const cargarEmpleados = async () => {
     setLoading(true);
@@ -39,12 +49,10 @@ export default function EmpleadosPage() {
     
     try {
       const data = await EmpleadosService.getAllEmpleados();
-      // Asegurarse de que data sea un array
-      setEmpleados(Array.isArray(data) ? data : []);
+      setEmpleados(data);
     } catch (error: any) {
       setError('Error al cargar empleados');
       console.error(error);
-      setEmpleados([]); // Establecer array vacío en caso de error
     } finally {
       setLoading(false);
     }
@@ -60,22 +68,9 @@ export default function EmpleadosPage() {
     setModalEmpleadoOpen(true);
   };
 
-  const handleEditarHorarios = async (empleado: Empleado) => {
-    try {
-      // Cargar los horarios del empleado antes de abrir el modal
-      const horarios = await EmpleadosService.getHorarios(empleado.id);
-      
-      // Actualizar el empleado con sus horarios
-      const empleadoConHorarios = {
-        ...empleado,
-        horarios: horarios
-      };
-      
-      setEmpleadoSeleccionado(empleadoConHorarios);
-      setModalHorariosOpen(true);
-    } catch (error) {
-      setError('Error al cargar los horarios del empleado');
-    }
+  const handleEditarHorarios = (empleado: Empleado) => {
+    setEmpleadoSeleccionado(empleado);
+    setModalHorariosOpen(true);
   };
 
   const handleEditarBloqueos = (empleado: Empleado) => {
@@ -97,10 +92,9 @@ export default function EmpleadosPage() {
         await EmpleadosService.updateEmpleado(empleadoSeleccionado.id, data);
         setSuccessMessage('Empleado actualizado exitosamente');
       } else {
-        // Crear empleado
         const nuevoEmpleado = await EmpleadosService.createEmpleado(data);
         
-        // Si hay sucursales seleccionadas, asignarlas
+        // Si se proporcionaron sucursales, asignarlas
         if (sucursalIds && sucursalIds.length > 0) {
           await EmpleadosService.asignarSucursales(nuevoEmpleado.id, { sucursalIds });
           setSuccessMessage(`Empleado creado y asignado a ${sucursalIds.length} sucursal(es) exitosamente`);
@@ -127,9 +121,17 @@ export default function EmpleadosPage() {
     setSubmitting(true);
     setError('');
 
+    console.log('🚀 [Page] Iniciando actualización de horarios...');
+    console.log('👤 [Page] Empleado ID:', empleadoSeleccionado.id);
+    console.log('📊 [Page] Horarios recibidos:', JSON.stringify(horarios, null, 2));
+
     try {
-      // Enviar array directamente, no envuelto en objeto
-      await EmpleadosService.updateHorarios(empleadoSeleccionado.id, horarios);
+      // Enviar array directo de horarios, no wrapper object
+      const resultado = await EmpleadosService.updateHorarios(empleadoSeleccionado.id, horarios);
+      
+      console.log('✅ [Page] Horarios actualizados exitosamente');
+      console.log('📦 [Page] Resultado:', resultado);
+      
       setSuccessMessage('Horarios actualizados exitosamente');
       setModalHorariosOpen(false);
       setEmpleadoSeleccionado(null);
@@ -137,54 +139,82 @@ export default function EmpleadosPage() {
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
+      console.error('❌ [Page] Error al actualizar horarios:', error);
+      console.error('❌ [Page] Error response:', error.response?.data);
+      console.error('❌ [Page] Error status:', error.response?.status);
+      console.error('❌ [Page] Error completo:', JSON.stringify(error, null, 2));
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Error al actualizar horarios';
+      setError(errorMessage);
+      
       throw error;
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleEliminarEmpleado = (empleado: Empleado) => {
-    setEmpleadoSeleccionado(empleado);
-    setDeleteError('');
-    setModalDeleteOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!empleadoSeleccionado) return;
+  const handleEliminarEmpleado = async (empleado: Empleado) => {
+    if (!confirm(`¿Estás seguro de eliminar a ${empleado.nombre}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
 
     try {
-      setSubmitting(true);
-      setDeleteError('');
-      await EmpleadosService.deleteEmpleado(empleadoSeleccionado.id);
-      setModalDeleteOpen(false);
-      setEmpleadoSeleccionado(null);
+      await EmpleadosService.deleteEmpleado(empleado.id);
       setSuccessMessage('Empleado eliminado exitosamente');
       await cargarEmpleados();
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
-      console.error('Error al eliminar empleado:', error);
-      setDeleteError(error.response?.data?.message || 'Error al eliminar el empleado');
-    } finally {
-      setSubmitting(false);
+      setError(error.response?.data?.message || 'Error al eliminar empleado');
+      setTimeout(() => setError(''), 5000);
     }
   };
 
-  const empleadosFiltrados = Array.isArray(empleados) ? empleados.filter(empleado =>
+  const empleadosFiltrados = empleados.filter(empleado =>
     empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     empleado.cargo.toLowerCase().includes(searchTerm.toLowerCase()) ||
     empleado.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  );
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#0490C8]"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
-    <DashboardLayout>
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Empleados</h1>
-          <p className="text-gray-600">Gestiona tu equipo de trabajo, horarios y disponibilidad</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Gestión de Empleados</h1>
+              <p className="mt-1 text-sm text-gray-600">
+                Administra tu equipo de trabajo, horarios y disponibilidad
+              </p>
+            </div>
+            <button
+              onClick={handleCrearEmpleado}
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-[#0490C8] text-white font-medium rounded-xl hover:bg-[#037ab0] transition-colors shadow-sm"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Nuevo Empleado
+            </button>
+          </div>
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mensajes de éxito/error */}
         {successMessage && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
@@ -204,77 +234,54 @@ export default function EmpleadosPage() {
           </div>
         )}
 
-        {/* Actions Bar */}
-        <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+        {/* Barra de búsqueda y estadísticas */}
+        <div className="mb-6 bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            {/* Búsqueda */}
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
               <input
                 type="text"
                 placeholder="Buscar por nombre, cargo o email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+                className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent text-sm"
               />
             </div>
 
-            {/* Create Button */}
-            <button
-              onClick={handleCrearEmpleado}
-              className="px-6 py-2.5 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2 whitespace-nowrap"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Nuevo Empleado
-            </button>
+            {/* Estadísticas */}
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-900">{empleados.length}</p>
+                <p className="text-xs text-gray-600">Total</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-[#0490C8]">
+                  {empleados.filter(e => e.estado === 'ACTIVO').length}
+                </p>
+                <p className="text-xs text-gray-600">Activos</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-gray-400">
+                  {empleados.filter(e => e.estado === 'INACTIVO').length}
+                </p>
+                <p className="text-xs text-gray-600">Inactivos</p>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Results Info */}
-        {!loading && (
-          <div className="mb-4 text-sm text-gray-600">
-            {searchTerm ? (
-              <p>
-                Se encontraron <span className="font-semibold text-gray-900">{empleadosFiltrados.length}</span> resultados
-                para &quot;{searchTerm}&quot;
-              </p>
-            ) : (
-              <p>
-                Total: <span className="font-semibold text-gray-900">{Array.isArray(empleados) ? empleados.length : 0}</span> empleados
-                {' • '}
-                <span className="text-[#0490C8] font-semibold">
-                  {Array.isArray(empleados) ? empleados.filter(e => e.estado === 'ACTIVO').length : 0} activos
-                </span>
-                {' • '}
-                <span className="text-gray-400 font-semibold">
-                  {Array.isArray(empleados) ? empleados.filter(e => e.estado === 'INACTIVO').length : 0} inactivos
-                </span>
-              </p>
-            )}
-          </div>
-        )}
 
         {/* Tabla de empleados */}
         <EmpleadosTable
           empleados={empleadosFiltrados}
           onEdit={handleEditarEmpleado}
           onEditHorarios={handleEditarHorarios}
-          onEditBloqueos={handleEditarBloqueos}
           onEditSucursales={handleEditarSucursales}
+          onEditBloqueos={handleEditarBloqueos}
           onDelete={handleEliminarEmpleado}
           loading={loading}
         />
@@ -322,19 +329,6 @@ export default function EmpleadosPage() {
         empleado={empleadoSeleccionado}
         onSuccess={cargarEmpleados}
       />
-
-      <DeleteEmpleadoModal
-        isOpen={modalDeleteOpen}
-        onClose={() => {
-          setModalDeleteOpen(false);
-          setEmpleadoSeleccionado(null);
-          setDeleteError('');
-        }}
-        onConfirm={handleConfirmDelete}
-        empleado={empleadoSeleccionado}
-        loading={submitting}
-        error={deleteError}
-      />
-    </DashboardLayout>
+    </div>
   );
 }

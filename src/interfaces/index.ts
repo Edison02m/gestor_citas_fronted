@@ -233,6 +233,123 @@ export interface AuthContextType {
 }
 
 // ============================================================================
+// EMPLEADOS
+// ============================================================================
+
+export interface Empleado {
+  id: string;
+  nombre: string;
+  cargo: string;
+  telefono: string;
+  email: string;
+  foto?: string | null;
+  color: string;
+  estado: "ACTIVO" | "INACTIVO";
+  negocioId: string;
+  horarios?: HorarioEmpleado[];
+  bloqueos?: BloqueoEmpleado[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HorarioEmpleado {
+  id: string;
+  diaSemana: number;
+  horaInicio: string;
+  horaFin: string;
+  tieneDescanso?: boolean;
+  descansoInicio?: string | null;
+  descansoFin?: string | null;
+  empleadoId: string;
+  sucursalId?: string | null;
+  sucursal?: {
+    id: string;
+    nombre: string;
+  };
+}
+
+export interface BloqueoEmpleado {
+  id: string;
+  fechaInicio: string;
+  fechaFin: string;
+  motivo?: string | null;
+  todoElDia: boolean;
+  horaInicio?: string | null;
+  horaFin?: string | null;
+  empleadoId: string;
+  createdAt: string;
+}
+
+export interface EmpleadoDto {
+  nombre: string;
+  cargo: string;
+  telefono: string;
+  email: string;
+  foto?: string;
+  color?: string;
+}
+
+export interface EmpleadoUpdateDto {
+  nombre?: string;
+  cargo?: string;
+  telefono?: string;
+  email?: string;
+  foto?: string | null;
+  color?: string;
+  estado?: "ACTIVO" | "INACTIVO";
+}
+
+export interface HorarioEmpleadoDto {
+  diaSemana: number;
+  horaInicio: string;
+  horaFin: string;
+  tieneDescanso?: boolean;
+  descansoInicio?: string;
+  descansoFin?: string;
+  sucursalId?: string | null;
+}
+
+export interface ActualizarHorariosEmpleadoDto {
+  horarios: HorarioEmpleadoDto[];
+}
+
+export interface BloqueoEmpleadoDto {
+  fechaInicio: Date | string;
+  fechaFin: Date | string;
+  motivo?: string;
+  todoElDia?: boolean;
+  horaInicio?: string;
+  horaFin?: string;
+}
+
+export interface EmpleadoSucursal {
+  empleadoId: string;
+  sucursalId: string;
+  asignadoEn: string;
+  sucursal: {
+    id: string;
+    nombre: string;
+    direccion: string;
+    telefono: string;
+    estado: "ACTIVA" | "INACTIVA";
+  };
+}
+
+export interface AsignarSucursalesDto {
+  sucursalIds: string[];
+}
+
+export interface EmpleadosListResponse {
+  success: true;
+  data: {
+    empleados: Empleado[];
+    total: number;
+    pagina: number;
+    totalPaginas: number;
+  };
+}
+
+// ============================================================================
 // API RESPONSE
 // ============================================================================
 

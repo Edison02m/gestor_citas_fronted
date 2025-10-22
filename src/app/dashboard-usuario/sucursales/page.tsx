@@ -14,6 +14,8 @@ export default function SucursalesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,7 +49,8 @@ export default function SucursalesPage() {
       setSucursales(data);
     } catch (error: any) {
       console.error('Error al cargar sucursales:', error);
-      alert(error.message || 'Error al cargar las sucursales');
+      setError(error.message || 'Error al cargar las sucursales');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setLoading(false);
     }
@@ -65,7 +68,8 @@ export default function SucursalesPage() {
       setSucursales(data);
     } catch (error: any) {
       console.error('Error al buscar sucursales:', error);
-      alert(error.message || 'Error al buscar sucursales');
+      setError(error.message || 'Error al buscar sucursales');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setIsSearching(false);
     }
@@ -99,14 +103,18 @@ export default function SucursalesPage() {
       if (selectedSucursal) {
         // Actualizar
         await SucursalesService.updateSucursal(selectedSucursal.id, data as ActualizarSucursalDto);
+        setSuccessMessage('Sucursal actualizada exitosamente');
       } else {
         // Crear
         await SucursalesService.createSucursal(data as CrearSucursalDto);
+        setSuccessMessage('Sucursal creada exitosamente');
       }
 
       setIsModalOpen(false);
       setSelectedSucursal(null);
       await loadSucursales();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
       throw error; // El modal manejará el error
     } finally {
@@ -120,9 +128,12 @@ export default function SucursalesPage() {
     try {
       setModalLoading(true);
       await SucursalesService.updateHorarios(selectedSucursal.id, { horarios });
+      setSuccessMessage('Horarios actualizados exitosamente');
       setIsHorariosModalOpen(false);
       setSelectedSucursal(null);
       await loadSucursales();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
       throw error; // El modal manejará el error
     } finally {
@@ -139,7 +150,10 @@ export default function SucursalesPage() {
       await SucursalesService.deleteSucursal(selectedSucursal.id);
       setIsDeleteModalOpen(false);
       setSelectedSucursal(null);
+      setSuccessMessage('Sucursal eliminada exitosamente');
       await loadSucursales();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
       console.error('Error al eliminar sucursal:', error);
       setDeleteError(error.message || 'Error al eliminar la sucursal');
@@ -156,6 +170,25 @@ export default function SucursalesPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Sucursales</h1>
           <p className="text-gray-600">Gestiona las sucursales de tu negocio</p>
         </div>
+
+        {/* Mensajes de éxito/error */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-medium text-green-800">{successMessage}</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+            <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-medium text-red-800">{error}</p>
+          </div>
+        )}
 
         {/* Actions Bar */}
         <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">

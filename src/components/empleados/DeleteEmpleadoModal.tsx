@@ -1,25 +1,25 @@
 'use client';
 
-import { Sucursal } from '@/interfaces';
+import { Empleado } from '@/interfaces';
 
-interface DeleteSucursalModalProps {
+interface DeleteEmpleadoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
-  sucursal: Sucursal | null;
+  empleado: Empleado | null;
   loading?: boolean;
   error?: string;
 }
 
-export default function DeleteSucursalModal({
+export default function DeleteEmpleadoModal({
   isOpen,
   onClose,
   onConfirm,
-  sucursal,
+  empleado,
   loading,
   error
-}: DeleteSucursalModalProps) {
-  if (!isOpen || !sucursal) return null;
+}: DeleteEmpleadoModalProps) {
+  if (!isOpen || !empleado) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -27,7 +27,7 @@ export default function DeleteSucursalModal({
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-start justify-between mb-3">
-            <h2 className="text-xl font-bold text-gray-900">Eliminar Sucursal</h2>
+            <h2 className="text-xl font-bold text-gray-900">Eliminar Empleado</h2>
             <button
               onClick={onClose}
               disabled={loading}
@@ -53,35 +53,53 @@ export default function DeleteSucursalModal({
                   Esta acción no se puede deshacer
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
-                  Al eliminar esta sucursal, se perderá toda la información asociada.
+                  Al eliminar este empleado, se perderá toda la información asociada.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Sucursal Info */}
+          {/* Empleado Info */}
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <svg className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <div className="text-sm">
-                <p className="text-gray-900 font-semibold">{sucursal.nombre}</p>
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                style={{ backgroundColor: empleado.color }}
+              >
+                {empleado.foto ? (
+                  <img 
+                    src={empleado.foto} 
+                    alt={empleado.nombre} 
+                    className="w-full h-full rounded-xl object-cover"
+                  />
+                ) : (
+                  empleado.nombre.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className="text-sm flex-1">
+                <p className="text-gray-900 font-semibold">{empleado.nombre}</p>
+                <p className="text-gray-600 text-xs mt-0.5">{empleado.cargo}</p>
               </div>
             </div>
 
-            {sucursal.direccion && (
+            {empleado.email && (
               <div className="flex items-start gap-3">
                 <svg className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <div className="text-sm">
-                  <p className="text-gray-900 font-medium">{sucursal.direccion}</p>
-                  {(sucursal.ciudad || sucursal.provincia) && (
-                    <p className="text-gray-500 text-xs mt-0.5">
-                      {[sucursal.ciudad, sucursal.provincia].filter(Boolean).join(', ')}
-                    </p>
-                  )}
+                  <p className="text-gray-900 font-medium">{empleado.email}</p>
+                </div>
+              </div>
+            )}
+
+            {empleado.telefono && (
+              <div className="flex items-start gap-3">
+                <svg className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <div className="text-sm">
+                  <p className="text-gray-900 font-medium">{empleado.telefono}</p>
                 </div>
               </div>
             )}
@@ -95,7 +113,7 @@ export default function DeleteSucursalModal({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">No se puede eliminar la sucursal</p>
+                  <p className="text-sm font-semibold text-gray-900">No se puede eliminar el empleado</p>
                   <p className="text-xs text-gray-600 mt-1">{error}</p>
                 </div>
               </div>

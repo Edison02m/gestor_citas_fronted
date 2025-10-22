@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sucursal, HorarioDto } from '@/interfaces';
+import { Empleado, HorarioEmpleadoDto } from '@/interfaces';
+import EmpleadosService from '@/services/empleados.service';
+import { SucursalesService } from '@/services/sucursales.service';
 
-interface HorariosModalProps {
+interface HorariosEmpleadoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (horarios: HorarioDto[]) => Promise<void>;
-  sucursal: Sucursal | null;
+  onSubmit: (horarios: HorarioEmpleadoDto[]) => Promise<void>;
+  empleado: Empleado | null;
   loading?: boolean;
 }
 
@@ -23,42 +25,123 @@ const DIAS_SEMANA = [
 
 interface HorarioState {
   diaSemana: number;
-  abierto: boolean;
-  horaApertura: string;
-  horaCierre: string;
+  activo: boolean;
+  horaInicio: string;
+  horaFin: string;
   tieneDescanso: boolean;
   descansoInicio: string;
   descansoFin: string;
+  sucursalId?: string | null;
 }
 
-export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loading }: HorariosModalProps) {
+export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, empleado, loading }: HorariosEmpleadoModalProps) {
   const [horarios, setHorarios] = useState<HorarioState[]>([]);
   const [diaSeleccionado, setDiaSeleccionado] = useState(1); // Lunes por defecto
   const [error, setError] = useState('');
+  const [sucursalId, setSucursalId] = useState<string | null>(null);
+  const [loadingSucursal, setLoadingSucursal] = useState(false);
 
   useEffect(() => {
-    if (sucursal && isOpen) {
-      const horariosIniciales = DIAS_SEMANA.map(dia => {
-        const horario = sucursal.horarios.find(h => h.diaSemana === dia.num);
+    if (empleado && isOpen) {
+      cargarHorarios();
+      cargarSucursalEmpleado();
+    }
+  }, [empleado, isOpen]);
+
+  const cargarSucursalEmpleado = async () => {
+    if (!empleado) return;
+    
+    try {
+      const sucursales = await EmpleadosService.getSucursales(empleado.id);
+      if (sucursales.length > 0) {
+        setSucursalId(sucursales[0].sucursalId);
+      }
+    } catch (error) {
+      console.error('Error al cargar sucursal del empleado:', error);
+    }
+  };
+
+  const sincronizarConSucursal = async () => {
+    if (!sucursalId) {
+      setError('El empleado no tiene una sucursal asignada');
+      return;
+    }
+
+    setLoadingSucursal(true);
+    setError('');
+
+    try {
+      const sucursal = await SucursalesService.getSucursal(sucursalId);
+      
+      if (!sucursal.horarios || sucursal.horarios.length === 0) {
+        setError('La sucursal no tiene horarios configurados');
+        setLoadingSucursal(false);
+        return;
+      }
+
+      // Mapear los horarios de la sucursal al formato del empleado
+      const nuevoHorarios = DIAS_SEMANA.map(dia => {
+        const horarioSucursal = sucursal.horarios.find(h => h.diaSemana === dia.num);
         
+        if (horarioSucursal && horarioSucursal.abierto) {
+          return {
+            diaSemana: dia.num,
+            activo: true,
+            horaInicio: horarioSucursal.horaApertura || '09:00',
+            horaFin: horarioSucursal.horaCierre || '18:00',
+            tieneDescanso: horarioSucursal.tieneDescanso || false,
+            descansoInicio: horarioSucursal.descansoInicio || '13:00',
+            descansoFin: horarioSucursal.descansoFin || '14:00'
+          };
+        }
+
         return {
           diaSemana: dia.num,
-          abierto: horario?.abierto || false,
-          horaApertura: horario?.horaApertura || '09:00',
-          horaCierre: horario?.horaCierre || '18:00',
-          tieneDescanso: horario?.tieneDescanso === true,
-          descansoInicio: horario?.descansoInicio || '13:00',
-          descansoFin: horario?.descansoFin || '14:00'
+          activo: false,
+          horaInicio: '09:00',
+          horaFin: '18:00',
+          tieneDescanso: false,
+          descansoInicio: '13:00',
+          descansoFin: '14:00'
         };
       });
-      
-      setHorarios(horariosIniciales);
-    }
-  }, [sucursal, isOpen]);
 
-  const handleToggleAbierto = (diaSemana: number) => {
+      setHorarios(nuevoHorarios);
+      setLoadingSucursal(false);
+    } catch (error: any) {
+      console.error('Error al sincronizar:', error);
+      setError(error.response?.data?.message || error.message || 'Error al sincronizar con la sucursal');
+      setLoadingSucursal(false);
+    }
+  };
+
+  const cargarHorarios = () => {
+    if (!empleado) return;
+
+    const horariosIniciales = DIAS_SEMANA.map(dia => {
+      // Verificar que empleado.horarios sea un array
+      const horariosArray = Array.isArray(empleado.horarios) ? empleado.horarios : [];
+      
+      // Buscar horario para este día (ya no filtramos por sucursal)
+      const horario = horariosArray.find(h => h.diaSemana === dia.num);
+      
+      return {
+        diaSemana: dia.num,
+        activo: !!horario,
+        horaInicio: horario?.horaInicio || '09:00',
+        horaFin: horario?.horaFin || '18:00',
+        tieneDescanso: horario?.tieneDescanso === true,
+        descansoInicio: horario?.descansoInicio || '13:00',
+        descansoFin: horario?.descansoFin || '14:00'
+      };
+    });
+    
+    setHorarios(horariosIniciales);
+  };
+
+  const handleToggleActivo = (diaSemana: number) => {
     setHorarios(prev => prev.map(h =>
-      h.diaSemana === diaSemana ? { ...h, abierto: !h.abierto } : h
+      h.diaSemana === diaSemana ? { ...h, activo: !h.activo } : h
     ));
   };
 
@@ -68,7 +151,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
     ));
   };
 
-  const handleHoraChange = (diaSemana: number, campo: 'horaApertura' | 'horaCierre' | 'descansoInicio' | 'descansoFin', valor: string) => {
+  const handleHoraChange = (diaSemana: number, campo: 'horaInicio' | 'horaFin' | 'descansoInicio' | 'descansoFin', valor: string) => {
     setHorarios(prev => prev.map(h =>
       h.diaSemana === diaSemana ? { ...h, [campo]: valor } : h
     ));
@@ -80,9 +163,9 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
 
     setHorarios(prev => prev.map(h => ({
       ...h,
-      abierto: horarioDia.abierto,
-      horaApertura: horarioDia.horaApertura,
-      horaCierre: horarioDia.horaCierre,
+      activo: horarioDia.activo,
+      horaInicio: horarioDia.horaInicio,
+      horaFin: horarioDia.horaFin,
       tieneDescanso: horarioDia.tieneDescanso,
       descansoInicio: horarioDia.descansoInicio,
       descansoFin: horarioDia.descansoFin
@@ -96,9 +179,9 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
     setHorarios(prev => prev.map(h =>
       h.diaSemana >= 1 && h.diaSemana <= 5 ? {
         ...h,
-        abierto: horarioDia.abierto,
-        horaApertura: horarioDia.horaApertura,
-        horaCierre: horarioDia.horaCierre,
+        activo: horarioDia.activo,
+        horaInicio: horarioDia.horaInicio,
+        horaFin: horarioDia.horaFin,
         tieneDescanso: horarioDia.tieneDescanso,
         descansoInicio: horarioDia.descansoInicio,
         descansoFin: horarioDia.descansoFin
@@ -113,9 +196,9 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
     setHorarios(prev => prev.map(h =>
       h.diaSemana === 0 || h.diaSemana === 6 ? {
         ...h,
-        abierto: horarioDia.abierto,
-        horaApertura: horarioDia.horaApertura,
-        horaCierre: horarioDia.horaCierre,
+        activo: horarioDia.activo,
+        horaInicio: horarioDia.horaInicio,
+        horaFin: horarioDia.horaFin,
         tieneDescanso: horarioDia.tieneDescanso,
         descansoInicio: horarioDia.descansoInicio,
         descansoFin: horarioDia.descansoFin
@@ -127,58 +210,67 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
     e.preventDefault();
     setError('');
 
-    // Validar que los horarios abiertos tengan horas válidas
-    for (const horario of horarios) {
-      if (horario.abierto) {
-        if (!horario.horaApertura || !horario.horaCierre) {
-          setError('Los días abiertos deben tener hora de apertura y cierre');
-          return;
-        }
-        if (horario.horaApertura >= horario.horaCierre) {
-          setError('La hora de apertura debe ser menor que la hora de cierre');
-          return;
-        }
+    // Validar horarios activos
+    const horariosActivos = horarios.filter(h => h.activo);
+    
+    if (horariosActivos.length === 0) {
+      setError('Debe configurar al menos un día de trabajo');
+      return;
+    }
 
-        // Validar descanso si está habilitado
-        if (horario.tieneDescanso) {
-          if (!horario.descansoInicio || !horario.descansoFin) {
-            setError('Los días con descanso deben tener hora de inicio y fin del descanso');
-            return;
-          }
-          if (horario.descansoInicio >= horario.descansoFin) {
-            setError('La hora de inicio del descanso debe ser menor que la hora de fin');
-            return;
-          }
-          if (horario.descansoInicio <= horario.horaApertura || horario.descansoFin >= horario.horaCierre) {
-            setError('El horario de descanso debe estar dentro del horario de apertura');
-            return;
-          }
+    for (const horario of horariosActivos) {
+      if (!horario.horaInicio || !horario.horaFin) {
+        setError('Todos los días activos deben tener hora de inicio y fin');
+        return;
+      }
+      if (horario.horaInicio >= horario.horaFin) {
+        setError('La hora de inicio debe ser menor que la hora de fin');
+        return;
+      }
+
+      // Validar descanso si está habilitado
+      if (horario.tieneDescanso) {
+        if (!horario.descansoInicio || !horario.descansoFin) {
+          setError('Los días con descanso deben tener hora de inicio y fin del descanso');
+          return;
+        }
+        if (horario.descansoInicio >= horario.descansoFin) {
+          setError('La hora de inicio del descanso debe ser menor que la hora de fin');
+          return;
+        }
+        if (horario.descansoInicio <= horario.horaInicio || horario.descansoFin >= horario.horaFin) {
+          setError('El horario de descanso debe estar dentro del horario de trabajo');
+          return;
         }
       }
     }
 
     try {
-      const horariosDto: HorarioDto[] = horarios.map(h => ({
-        diaSemana: h.diaSemana,
-        abierto: h.abierto,
-        ...(h.abierto && {
-          horaApertura: h.horaApertura,
-          horaCierre: h.horaCierre,
-          tieneDescanso: h.tieneDescanso,
-          ...(h.tieneDescanso && {
-            descansoInicio: h.descansoInicio,
-            descansoFin: h.descansoFin
-          })
-        })
-      }));
+      // El backend espera un array directo de horarios en formato específico
+      const horariosDto = horariosActivos.map(h => {
+        const horario: any = {
+          diaSemana: h.diaSemana,
+          horaInicio: h.horaInicio,
+          horaFin: h.horaFin,
+          tieneDescanso: h.tieneDescanso || false
+        };
+
+        // Solo incluir descanso si está habilitado
+        if (h.tieneDescanso) {
+          horario.descansoInicio = h.descansoInicio;
+          horario.descansoFin = h.descansoFin;
+        }
+
+        return horario;
+      });
 
       await onSubmit(horariosDto);
     } catch (error: any) {
-      setError(error.message || 'Error al actualizar horarios');
+      setError(error.response?.data?.message || error.message || 'Error al actualizar horarios');
     }
   };
 
-  if (!isOpen || !sucursal) return null;
+  if (!isOpen || !empleado) return null;
 
   const horarioDiaSeleccionado = horarios.find(h => h.diaSemana === diaSeleccionado);
 
@@ -189,7 +281,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Configurar Horarios</h2>
-            <p className="text-xs text-gray-600 mt-0.5">{sucursal.nombre}</p>
+            <p className="text-xs text-gray-600 mt-0.5">{empleado.nombre}</p>
           </div>
           <button
             onClick={onClose}
@@ -202,70 +294,85 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
           </button>
         </div>
 
-        <form id="horarios-form" onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto">
-          <div className="grid grid-cols-2 gap-6 h-full">
-            {/* Columna Izquierda: Selector de Días */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-700">Días de trabajo</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {DIAS_SEMANA.map((dia) => {
-                  const horario = horarios.find(h => h.diaSemana === dia.num);
-                  const esSeleccionado = diaSeleccionado === dia.num;
-                  const estaActivo = horario?.abierto;
-
-                  return (
+        {/* Content - 2 columnas */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+            {/* Columna izquierda: Selector de días y resumen */}
+            <div className="space-y-5">
+              {/* Selector de días - Grid compacto */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-gray-900">Días de trabajo</h3>
+                  {sucursalId && (
                     <button
-                      key={dia.num}
                       type="button"
-                      onClick={() => setDiaSeleccionado(dia.num)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
-                        esSeleccionado
-                          ? 'bg-[#0490C8] text-white shadow-md'
-                          : estaActivo
-                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          : 'bg-white border border-gray-300 text-gray-500 hover:border-gray-400'
-                      }`}
+                      onClick={sincronizarConSucursal}
+                      disabled={loadingSucursal}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0490C8] text-white text-xs font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50"
+                      title="Sincronizar con horario de la sucursal"
                     >
-                      <div className="text-center">
-                        <div className="font-bold">{dia.letra}</div>
-                        <div className="text-[10px] mt-0.5 opacity-90">{dia.nombre.slice(0, 3)}</div>
-                      </div>
+                      {loadingSucursal ? (
+                        <>
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Sincronizando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          <span>Igual a sucursal</span>
+                        </>
+                      )}
                     </button>
-                  );
-                })}
-              </div>
-
-              {/* Resumen de Horarios */}
-              <div className="bg-gray-50 rounded-xl p-3">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2">Resumen Semanal</h3>
-                <div className="space-y-1.5">
-                  {DIAS_SEMANA.map(dia => {
+                  )}
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {DIAS_SEMANA.map((dia) => {
                     const horario = horarios.find(h => h.diaSemana === dia.num);
-                    if (!horario) return null;
+                    const esSeleccionado = diaSeleccionado === dia.num;
+                    const estaActivo = horario?.activo;
 
                     return (
-                      <div
+                      <button
                         key={dia.num}
-                        className="flex items-center justify-between text-xs px-2 py-1 rounded-xl hover:bg-white transition-colors cursor-pointer"
+                        type="button"
                         onClick={() => setDiaSeleccionado(dia.num)}
+                        className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                          esSeleccionado
+                            ? 'bg-[#0490C8] text-white shadow-md'
+                            : estaActivo
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white border border-gray-300 text-gray-500 hover:border-gray-400'
+                        }`}
                       >
-                        <span className="font-medium text-gray-700 w-16">{dia.nombre.substring(0, 3)}</span>
-                        {horario.abierto ? (
-                          <div className="flex items-center gap-1 font-mono text-[11px]">
-                            <span className="text-gray-700">{horario.horaApertura}</span>
-                            {horario.tieneDescanso ? (
-                              <>
-                                <span className="text-gray-400">→</span>
-                                <span className="text-[#0490C8]">{horario.descansoInicio}-{horario.descansoFin}</span>
-                                <span className="text-gray-400">→</span>
-                              </>
-                            ) : (
-                              <span className="text-gray-400">━━</span>
-                            )}
-                            <span className="text-gray-700">{horario.horaCierre}</span>
-                          </div>
+                        <div className="text-center">
+                          <div className="font-bold">{dia.letra}</div>
+                          <div className="text-[10px] mt-0.5 opacity-90">{dia.nombre.slice(0, 3)}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Resumen semanal */}
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Resumen semanal</h3>
+                <div className="space-y-2">
+                  {horarios.map((horario) => {
+                    const dia = DIAS_SEMANA.find(d => d.num === horario.diaSemana);
+                    return (
+                      <div key={horario.diaSemana} className="text-xs">
+                        <span className="font-medium text-gray-700 inline-block w-20">{dia?.nombre}:</span>
+                        {horario.activo ? (
+                          <span className="text-gray-700">
+                            {horario.horaInicio} → {horario.tieneDescanso && (
+                              <span className="text-[#0490C8] font-medium">{horario.descansoInicio}-{horario.descansoFin} → </span>
+                            )}{horario.horaFin}
+                          </span>
                         ) : (
-                          <span className="text-gray-400 italic text-[11px]">Cerrado</span>
+                          <span className="text-gray-400">No trabaja</span>
                         )}
                       </div>
                     );
@@ -274,7 +381,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
               </div>
             </div>
 
-            {/* Columna Derecha: Configuración del Día */}
+            {/* Columna derecha: Configuración del día seleccionado */}
             <div>
               {horarioDiaSeleccionado && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3 h-full">
@@ -284,13 +391,13 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                     </h3>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <span className="text-xs font-medium text-gray-600">
-                        {horarioDiaSeleccionado.abierto ? 'Abierto' : 'Cerrado'}
+                        {horarioDiaSeleccionado.activo ? 'Activo' : 'Inactivo'}
                       </span>
                       <div className="relative">
                         <input
                           type="checkbox"
-                          checked={horarioDiaSeleccionado.abierto}
-                          onChange={() => handleToggleAbierto(diaSeleccionado)}
+                          checked={horarioDiaSeleccionado.activo}
+                          onChange={() => handleToggleActivo(diaSeleccionado)}
                           className="sr-only peer"
                         />
                         <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
@@ -298,25 +405,25 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                     </label>
                   </div>
 
-                  {horarioDiaSeleccionado.abierto && (
+                  {horarioDiaSeleccionado.activo && (
                     <>
                       {/* Horarios principales */}
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Apertura</label>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Inicio</label>
                           <input
                             type="time"
-                            value={horarioDiaSeleccionado.horaApertura}
-                            onChange={(e) => handleHoraChange(diaSeleccionado, 'horaApertura', e.target.value)}
+                            value={horarioDiaSeleccionado.horaInicio}
+                            onChange={(e) => handleHoraChange(diaSeleccionado, 'horaInicio', e.target.value)}
                             className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Cierre</label>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Fin</label>
                           <input
                             type="time"
-                            value={horarioDiaSeleccionado.horaCierre}
-                            onChange={(e) => handleHoraChange(diaSeleccionado, 'horaCierre', e.target.value)}
+                            value={horarioDiaSeleccionado.horaFin}
+                            onChange={(e) => handleHoraChange(diaSeleccionado, 'horaFin', e.target.value)}
                             className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                           />
                         </div>
@@ -406,37 +513,41 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
               )}
             </div>
           </div>
-        </form>
 
-        {/* Footer fijo */}
-        <div className="border-t border-gray-200 px-6 py-4 bg-white flex-shrink-0">
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs mb-3">
-              {error}
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-white flex-shrink-0">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={loading}
+                className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-4 py-2.5 bg-[#0490C8] text-white font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  'Guardar horarios'
+                )}
+              </button>
             </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 text-sm"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              form="horarios-form"
-              disabled={loading}
-              className="flex-1 px-4 py-2.5 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all disabled:opacity-50 text-sm"
-            >
-              {loading ? 'Guardando...' : 'Guardar Horarios'}
-            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
