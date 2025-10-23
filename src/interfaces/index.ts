@@ -437,3 +437,60 @@ export interface EstadisticasCodigos {
     disponibles: number;
   }>;
 }
+
+// ============================================================================
+// SERVICIOS
+// ============================================================================
+
+export interface Servicio {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  duracion: number; // minutos
+  precio: number;
+  foto: string | null;
+  estado: "ACTIVO" | "INACTIVO";
+  negocioId: string;
+  createdAt: string;
+  updatedAt: string;
+  sucursales?: ServicioSucursal[];
+}
+
+export interface ServicioSucursal {
+  sucursalId: string;
+  disponible: boolean;
+  asignadoEn: string;
+  sucursal?: {
+    id: string;
+    nombre: string;
+    direccion: string;
+    ciudad: string | null;
+    estado: "ACTIVA" | "INACTIVA";
+  };
+}
+
+export interface CreateServicioDto {
+  nombre: string;
+  descripcion: string;
+  duracion: number;
+  precio: number;
+  foto?: string;
+  sucursales: string[]; // Array de UUIDs de sucursales
+}
+
+export interface UpdateServicioDto {
+  nombre?: string;
+  descripcion?: string;
+  duracion?: number;
+  precio?: number;
+  foto?: string | null;
+  estado?: "ACTIVO" | "INACTIVO";
+}
+
+export interface AsignarSucursalesServicioDto {
+  sucursales: string[]; // Array de UUIDs de sucursales
+}
+
+export interface ToggleDisponibilidadDto {
+  disponible: boolean;
+}
