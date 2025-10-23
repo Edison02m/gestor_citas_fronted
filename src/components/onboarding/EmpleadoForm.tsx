@@ -24,7 +24,6 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
     telefono: '',
     email: '',
     foto: '',
-    color: '#10b981',
     sucursalIds: []
   });
 
@@ -90,7 +89,6 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
         telefono: (user as any)?.negocio?.telefono || '',
         email: user?.email || '',
         foto: (user as any)?.negocio?.logo || '',
-        color: '#0490C8',
         sucursalIds: sucursales.map(s => s.id) // Asignar a todas las sucursales
       };
 
@@ -270,19 +268,6 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
               onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
               className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="https://ejemplo.com/foto.jpg"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Color
-            </label>
-            <input
-              type="color"
-              value={formData.color}
-              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-full h-[38px] border border-gray-200 rounded-xl cursor-pointer"
               disabled={loading}
             />
           </div>

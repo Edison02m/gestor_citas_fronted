@@ -195,19 +195,13 @@ export interface CreateSucursalDto {
   horarios: HorarioInput[];
 }
 
-export interface ServicioExtraInput {
-  nombre: string;
-  precio: number;
-}
-
 export interface CreateServicioDto {
   nombre: string;
   descripcion: string;
   precio: number;
   duracion: number;
-  color: string;
+  color?: string;
   sucursalIds: string[];
-  extras?: ServicioExtraInput[];
 }
 
 export interface CreateEmpleadoDto {
@@ -216,7 +210,6 @@ export interface CreateEmpleadoDto {
   telefono: string;
   email?: string;
   foto?: string;
-  color: string;
   sucursalIds: string[];
   horarios?: HorarioInput[];
 }
@@ -243,7 +236,6 @@ export interface Empleado {
   telefono: string;
   email: string;
   foto?: string | null;
-  color: string;
   estado: "ACTIVO" | "INACTIVO";
   negocioId: string;
   horarios?: HorarioEmpleado[];
@@ -286,7 +278,6 @@ export interface EmpleadoDto {
   telefono: string;
   email: string;
   foto?: string;
-  color?: string;
 }
 
 export interface EmpleadoUpdateDto {
@@ -295,7 +286,6 @@ export interface EmpleadoUpdateDto {
   telefono?: string;
   email?: string;
   foto?: string | null;
-  color?: string;
   estado?: "ACTIVO" | "INACTIVO";
 }
 
@@ -449,6 +439,7 @@ export interface Servicio {
   duracion: number; // minutos
   precio: number;
   foto: string | null;
+  color: string;
   estado: "ACTIVO" | "INACTIVO";
   negocioId: string;
   createdAt: string;
@@ -469,21 +460,13 @@ export interface ServicioSucursal {
   };
 }
 
-export interface CreateServicioDto {
-  nombre: string;
-  descripcion: string;
-  duracion: number;
-  precio: number;
-  foto?: string;
-  sucursales: string[]; // Array de UUIDs de sucursales
-}
-
 export interface UpdateServicioDto {
   nombre?: string;
   descripcion?: string;
   duracion?: number;
   precio?: number;
   foto?: string | null;
+  color?: string;
   estado?: "ACTIVO" | "INACTIVO";
 }
 

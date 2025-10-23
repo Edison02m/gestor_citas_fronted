@@ -12,19 +12,6 @@ interface EmpleadoModalProps {
   loading?: boolean;
 }
 
-const COLORES_PREDEFINIDOS = [
-  '#3b82f6', // blue-500
-  '#ef4444', // red-500
-  '#10b981', // green-500
-  '#f59e0b', // amber-500
-  '#8b5cf6', // violet-500
-  '#ec4899', // pink-500
-  '#06b6d4', // cyan-500
-  '#84cc16', // lime-500
-  '#f97316', // orange-500
-  '#6366f1', // indigo-500
-];
-
 export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loading }: EmpleadoModalProps) {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -32,7 +19,6 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
     telefono: '',
     email: '',
     foto: '',
-    color: '#3b82f6',
     estado: 'ACTIVO' as 'ACTIVO' | 'INACTIVO'
   });
 
@@ -69,7 +55,6 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
         telefono: empleado.telefono,
         email: empleado.email,
         foto: empleado.foto || '',
-        color: empleado.color,
         estado: empleado.estado
       });
       setSucursalSeleccionada(''); // No pre-seleccionamos en edición
@@ -80,7 +65,6 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
         telefono: '',
         email: '',
         foto: '',
-        color: '#3b82f6',
         estado: 'ACTIVO'
       });
       setSucursalSeleccionada('');
@@ -134,8 +118,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
         nombre: formData.nombre.trim(),
         cargo: formData.cargo.trim(),
         telefono: formData.telefono.trim(),
-        email: formData.email.trim(),
-        color: formData.color
+        email: formData.email.trim()
       };
 
       // Solo incluir foto si tiene valor
@@ -210,8 +193,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                 {/* Avatar y nombre en fila */}
                 <div className="flex items-start gap-4">
                   <div 
-                    className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0"
-                    style={{ backgroundColor: formData.color }}
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 bg-gradient-to-br from-blue-500 to-cyan-600"
                   >
                     {formData.foto && formData.foto.trim() ? (
                       <img 
@@ -295,64 +277,32 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                   />
                 </div>
 
-                {/* Color y Estado */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-2">Color identificador</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {COLORES_PREDEFINIDOS.map((color) => (
-                        <button
-                          key={color}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, color })}
-                          className={`w-8 h-8 rounded-lg transition-all ${
-                            formData.color === color 
-                              ? 'ring-2 ring-offset-2 ring-[#0490C8] scale-110' 
-                              : 'hover:scale-105 ring-1 ring-gray-200'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          disabled={loading}
-                          title={color}
-                        />
-                      ))}
-                      <div className="relative">
-                        <input
-                          type="color"
-                          value={formData.color}
-                          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                          className="w-8 h-8 rounded-lg cursor-pointer border border-gray-200"
-                          disabled={loading}
-                          title="Color personalizado"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-2">Estado</label>
-                    <div className="flex gap-3 pt-1">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value="ACTIVO"
-                          checked={formData.estado === 'ACTIVO'}
-                          onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'ACTIVO' | 'INACTIVO' })}
-                          className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
-                          disabled={loading}
-                        />
-                        <span className="text-sm text-gray-700">Activo</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value="INACTIVO"
-                          checked={formData.estado === 'INACTIVO'}
-                          onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'ACTIVO' | 'INACTIVO' })}
-                          className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
-                          disabled={loading}
-                        />
-                        <span className="text-sm text-gray-700">Inactivo</span>
-                      </label>
-                    </div>
+                {/* Estado */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-2">Estado</label>
+                  <div className="flex gap-3 pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        value="ACTIVO"
+                        checked={formData.estado === 'ACTIVO'}
+                        onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'ACTIVO' | 'INACTIVO' })}
+                        className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
+                        disabled={loading}
+                      />
+                      <span className="text-sm text-gray-700">Activo</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        value="INACTIVO"
+                        checked={formData.estado === 'INACTIVO'}
+                        onChange={(e) => setFormData({ ...formData, estado: e.target.value as 'ACTIVO' | 'INACTIVO' })}
+                        className="w-4 h-4 text-[#0490C8] focus:ring-[#0490C8]"
+                        disabled={loading}
+                      />
+                      <span className="text-sm text-gray-700">Inactivo</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -361,11 +311,10 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
               <div className="grid grid-cols-2 gap-6">
                 {/* Columna Izquierda: Datos del empleado */}
                 <div className="space-y-3.5">
-                  {/* Avatar y Color en una fila compacta */}
+                  {/* Avatar */}
                   <div className="flex items-center gap-4">
                     <div 
-                      className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg ring-2 ring-white flex-shrink-0"
-                      style={{ backgroundColor: formData.color }}
+                      className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg ring-2 ring-white flex-shrink-0 bg-gradient-to-br from-blue-500 to-cyan-600"
                     >
                       {formData.foto && formData.foto.trim() ? (
                         <img 
@@ -379,43 +328,6 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                       ) : (
                         formData.nombre.charAt(0).toUpperCase() || '?'
                       )}
-                    </div>
-
-                    {/* Selector de color compacto */}
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Color identificador</label>
-                      <div className="flex items-center gap-1.5">
-                        {COLORES_PREDEFINIDOS.slice(0, 5).map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, color })}
-                            className={`w-7 h-7 rounded-lg transition-all relative flex-shrink-0 ${
-                              formData.color === color 
-                                ? 'ring-2 ring-offset-1 ring-[#0490C8] shadow-md' 
-                                : 'hover:scale-110 ring-1 ring-gray-200'
-                            }`}
-                            style={{ backgroundColor: color }}
-                            disabled={loading}
-                            title={color}
-                          >
-                            {formData.color === color && (
-                              <svg className="w-3 h-3 text-white absolute inset-0 m-auto drop-shadow" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            )}
-                          </button>
-                        ))}
-                        <input
-                          type="color"
-                          value={formData.color}
-                          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                          className="w-7 h-7 rounded-lg cursor-pointer border-2 border-gray-200 hover:border-[#0490C8] transition-colors flex-shrink-0"
-                          disabled={loading}
-                          title="Color personalizado"
-                        />
-                        <span className="text-[10px] text-gray-500 font-mono ml-1">{formData.color.toUpperCase()}</span>
-                      </div>
                     </div>
                   </div>
 

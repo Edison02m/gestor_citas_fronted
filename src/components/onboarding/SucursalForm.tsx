@@ -15,22 +15,19 @@ export default function SucursalForm({ onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedDay, setSelectedDay] = useState<number>(1); // Lunes por defecto
-  const [showCopyOptions, setShowCopyOptions] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [copiedDays, setCopiedDays] = useState<number[]>([]);
   
   const [formData, setFormData] = useState<CreateSucursalDto>({
     nombre: '',
     direccion: '',
     telefono: '',
     horarios: [
-      { diaSemana: 0, abierto: false, horaApertura: null, horaCierre: null, tieneDescanso: false, descansoInicio: null, descansoFin: null }, // Domingo cerrado
-      { diaSemana: 1, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: null, descansoFin: null },
-      { diaSemana: 2, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: null, descansoFin: null },
-      { diaSemana: 3, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: null, descansoFin: null },
-      { diaSemana: 4, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: null, descansoFin: null },
-      { diaSemana: 5, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: null, descansoFin: null },
-      { diaSemana: 6, abierto: false, horaApertura: null, horaCierre: null, tieneDescanso: false, descansoInicio: null, descansoFin: null }  // Sábado cerrado
+      { diaSemana: 0, abierto: false, horaApertura: null, horaCierre: null, tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' }, // Domingo cerrado
+      { diaSemana: 1, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
+      { diaSemana: 2, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
+      { diaSemana: 3, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
+      { diaSemana: 4, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
+      { diaSemana: 5, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
+      { diaSemana: 6, abierto: false, horaApertura: null, horaCierre: null, tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' }  // Sábado cerrado
     ]
   });
 
@@ -38,29 +35,6 @@ export default function SucursalForm({ onSuccess }: Props) {
     const newHorarios = [...formData.horarios];
     (newHorarios[index] as any)[field] = value;
     setFormData({ ...formData, horarios: newHorarios });
-  };
-
-  // Mostrar mensaje de éxito temporal
-  const showSuccessMessage = (message: string, days: number[]) => {
-    setSuccessMessage(message);
-    setCopiedDays(days);
-    setTimeout(() => {
-      setSuccessMessage('');
-      setCopiedDays([]);
-    }, 3000);
-  };
-
-  // Copiar horario actual a otros días
-  const copyToDay = (targetDay: number) => {
-    const sourceHorario = formData.horarios[selectedDay];
-    const newHorarios = [...formData.horarios];
-    newHorarios[targetDay] = {
-      ...sourceHorario,
-      diaSemana: targetDay
-    };
-    setFormData({ ...formData, horarios: newHorarios });
-    showSuccessMessage(`Horario copiado a ${diasCompletos[targetDay]}`, [targetDay]);
-    setShowCopyOptions(false);
   };
 
   // Aplicar a todos los días
@@ -71,8 +45,6 @@ export default function SucursalForm({ onSuccess }: Props) {
       diaSemana: index
     }));
     setFormData({ ...formData, horarios: newHorarios });
-    showSuccessMessage('Horario aplicado a todos los días', [0, 1, 2, 3, 4, 5, 6]);
-    setShowCopyOptions(false);
   };
 
   // Aplicar a días de semana (L-V)
@@ -86,8 +58,6 @@ export default function SucursalForm({ onSuccess }: Props) {
       };
     }
     setFormData({ ...formData, horarios: newHorarios });
-    showSuccessMessage('Horario aplicado de Lunes a Viernes', [1, 2, 3, 4, 5]);
-    setShowCopyOptions(false);
   };
 
   // Aplicar a fin de semana (S-D)
@@ -97,8 +67,6 @@ export default function SucursalForm({ onSuccess }: Props) {
     newHorarios[0] = { ...sourceHorario, diaSemana: 0 };
     newHorarios[6] = { ...sourceHorario, diaSemana: 6 };
     setFormData({ ...formData, horarios: newHorarios });
-    showSuccessMessage('Horario aplicado al fin de semana', [0, 6]);
-    setShowCopyOptions(false);
   };
 
   // Toggle abierto/cerrado
@@ -114,8 +82,8 @@ export default function SucursalForm({ onSuccess }: Props) {
         horaApertura: null,
         horaCierre: null,
         tieneDescanso: false,
-        descansoInicio: null,
-        descansoFin: null
+        descansoInicio: '12:00',
+        descansoFin: '13:00'
       };
     } else {
       // Si está cerrado, abrir con horarios por defecto
@@ -125,8 +93,8 @@ export default function SucursalForm({ onSuccess }: Props) {
         horaApertura: '09:00',
         horaCierre: '18:00',
         tieneDescanso: false,
-        descansoInicio: null,
-        descansoFin: null
+        descansoInicio: '12:00',
+        descansoFin: '13:00'
       };
     }
     
@@ -139,7 +107,59 @@ export default function SucursalForm({ onSuccess }: Props) {
     setLoading(true);
 
     try {
-      await OnboardingService.createSucursal(formData);
+      // Validar que los horarios abiertos tengan horas válidas
+      for (const horario of formData.horarios) {
+        if (horario.abierto) {
+          if (!horario.horaApertura || !horario.horaCierre) {
+            setError(`El día ${diasCompletos[horario.diaSemana]} está abierto pero falta la hora de apertura o cierre`);
+            setLoading(false);
+            return;
+          }
+          
+          if (horario.horaApertura >= horario.horaCierre) {
+            setError(`El día ${diasCompletos[horario.diaSemana]}: La hora de apertura debe ser menor que la hora de cierre`);
+            setLoading(false);
+            return;
+          }
+
+          // Validar descanso si está habilitado
+          if (horario.tieneDescanso) {
+            if (!horario.descansoInicio || !horario.descansoFin) {
+              setError(`El día ${diasCompletos[horario.diaSemana]} tiene descanso activado pero falta la hora de inicio o fin del descanso`);
+              setLoading(false);
+              return;
+            }
+            
+            if (horario.descansoInicio >= horario.descansoFin) {
+              setError(`El día ${diasCompletos[horario.diaSemana]}: La hora de inicio del descanso debe ser menor que la hora de fin`);
+              setLoading(false);
+              return;
+            }
+            
+            if (horario.descansoInicio <= horario.horaApertura || horario.descansoFin >= horario.horaCierre) {
+              setError(`El día ${diasCompletos[horario.diaSemana]}: El horario de descanso debe estar dentro del horario de apertura y cierre`);
+              setLoading(false);
+              return;
+            }
+          }
+        }
+      }
+
+      // Construir el DTO con formato condicional similar a HorariosModal
+      const horariosDto: HorarioInput[] = formData.horarios.map(h => ({
+        diaSemana: h.diaSemana,
+        abierto: h.abierto,
+        horaApertura: h.abierto ? h.horaApertura : null,
+        horaCierre: h.abierto ? h.horaCierre : null,
+        tieneDescanso: h.abierto ? h.tieneDescanso : false,
+        descansoInicio: (h.abierto && h.tieneDescanso) ? h.descansoInicio : null,
+        descansoFin: (h.abierto && h.tieneDescanso) ? h.descansoFin : null
+      }));
+
+      await OnboardingService.createSucursal({
+        ...formData,
+        horarios: horariosDto
+      });
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Error al crear sucursal');
@@ -152,20 +172,6 @@ export default function SucursalForm({ onSuccess }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Mensaje de éxito */}
-      {successMessage && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <p className="text-xs text-green-800 font-medium">
-            {successMessage}
-          </p>
-        </div>
-      )}
-
       {/* Información básica - Layout compacto en 2 columnas */}
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
@@ -214,286 +220,229 @@ export default function SucursalForm({ onSuccess }: Props) {
         </div>
       </div>
 
-      {/* Selector de días minimalista */}
+      {/* Horarios de atención - Layout de 2 columnas */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Horarios de atención
-          </label>
-          <button
-            type="button"
-            onClick={() => setShowCopyOptions(!showCopyOptions)}
-            className="text-xs text-[#0490C8] hover:text-[#023664] font-medium flex items-center gap-1"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            Copiar horario
-          </button>
-        </div>
-        <div className="flex gap-1.5">
-          {diasSemana.map((dia, index) => {
-            const hasCustomSchedule = copiedDays.includes(index);
-            const isClosed = !formData.horarios[index].abierto;
-            
-            return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => {
-                  setSelectedDay(index);
-                  setShowCopyOptions(false);
-                }}
-                disabled={loading}
-                className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all relative ${
-                  selectedDay === index
-                    ? 'bg-[#0490C8] text-white shadow-sm'
-                    : hasCustomSchedule
-                    ? 'bg-green-100 text-green-700 border border-green-300 animate-pulse'
-                    : isClosed
-                    ? 'bg-red-50 text-red-600 border border-red-200'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {dia}
-                {isClosed && selectedDay !== index && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Opciones de copiado */}
-      {showCopyOptions && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="flex items-start gap-2">
-            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+        <h3 className="text-sm font-bold text-gray-900 mb-3">Horarios de atención</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Columna Izquierda: Selector de días y resumen */}
+          <div className="space-y-4">
+            {/* Selector de días - Grid compacto */}
             <div>
-              <p className="text-xs text-gray-900 font-semibold">
-                Copiar horario de <span className="text-[#0490C8]">{diasCompletos[selectedDay]}</span>
-              </p>
-              {selectedHorario.abierto ? (
-                <p className="text-[10px] text-gray-600 mt-0.5">
-                  {selectedHorario.horaApertura} - {selectedHorario.horaCierre}
-                  {selectedHorario.tieneDescanso && ' (con descanso)'}
-                </p>
-              ) : (
-                <p className="text-[10px] text-red-600 font-medium mt-0.5">
-                  Día cerrado
-                </p>
-              )}
-            </div>
-          </div>
+              <h4 className="text-xs font-semibold text-gray-700 mb-2">Días de la semana</h4>
+              <div className="grid grid-cols-4 gap-2">
+                {diasCompletos.map((dia, index) => {
+                  const horario = formData.horarios[index];
+                  const esSeleccionado = selectedDay === index;
+                  const estaAbierto = horario?.abierto;
 
-          <div className="space-y-2">
-            <p className="text-[10px] text-gray-600 font-medium uppercase tracking-wide">Aplicar rápidamente a:</p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={applyToAll}
-                className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-[#0490C8] hover:text-white hover:border-[#0490C8] transition-all flex flex-col items-center gap-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>Todos</span>
-              </button>
-              <button
-                type="button"
-                onClick={applyToWeekdays}
-                className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-[#0490C8] hover:text-white hover:border-[#0490C8] transition-all flex flex-col items-center gap-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span>Lun-Vie</span>
-              </button>
-              <button
-                type="button"
-                onClick={applyToWeekend}
-                className="px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-[#0490C8] hover:text-white hover:border-[#0490C8] transition-all flex flex-col items-center gap-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Fin semana</span>
-              </button>
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDay(index);
+                      }}
+                      disabled={loading}
+                      className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                        esSeleccionado
+                          ? 'bg-[#0490C8] text-white shadow-md'
+                          : estaAbierto
+                          ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : 'bg-white border border-gray-300 text-gray-500 hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="font-bold">{diasSemana[index]}</div>
+                        <div className="text-[10px] mt-0.5 opacity-90">{dia.slice(0, 3)}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-2 pt-2 border-t border-blue-200">
-            <p className="text-[10px] text-gray-600 font-medium uppercase tracking-wide">O selecciona días específicos:</p>
-            <div className="grid grid-cols-7 gap-1.5">
-              {diasCompletos.map((dia, index) => (
-                index !== selectedDay && (
-                  <button
+            {/* Resumen semanal */}
+            <div>
+              <h4 className="text-xs font-semibold text-gray-700 mb-2">Resumen semanal</h4>
+              <div className="space-y-1.5">
+                {formData.horarios.map((horario, index) => (
+                  <div
                     key={index}
-                    type="button"
-                    onClick={() => copyToDay(index)}
-                    className="px-2 py-2 bg-white border border-gray-300 rounded-lg text-[10px] font-semibold text-gray-700 hover:bg-[#0490C8] hover:text-white hover:border-[#0490C8] transition-all"
-                    title={`Copiar a ${dia}`}
+                    className="flex items-center justify-between text-xs px-2 py-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => setSelectedDay(index)}
                   >
-                    {diasSemana[index]}
-                  </button>
-                )
-              ))}
+                    <span className="font-medium text-gray-700 w-16">{diasCompletos[index].substring(0, 3)}</span>
+                    {horario.abierto ? (
+                      <div className="flex items-center gap-1 font-mono text-[11px]">
+                        <span className="text-gray-700">{horario.horaApertura}</span>
+                        {horario.tieneDescanso ? (
+                          <>
+                            <span className="text-gray-400">→</span>
+                            <span className="text-[#0490C8]">{horario.descansoInicio}-{horario.descansoFin}</span>
+                            <span className="text-gray-400">→</span>
+                          </>
+                        ) : (
+                          <span className="text-gray-400">━━</span>
+                        )}
+                        <span className="text-gray-700">{horario.horaCierre}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 italic text-[11px]">Cerrado</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowCopyOptions(false)}
-            className="w-full text-xs text-gray-600 hover:text-gray-800 font-medium py-2 border-t border-blue-200"
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
+          {/* Columna Derecha: Configuración del día seleccionado */}
+          <div>
+            {selectedHorario && (
+              <div className="bg-gray-50 rounded-xl p-4 space-y-3 h-full">
+                <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900">
+                    {diasCompletos[selectedDay]}
+                  </h4>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-xs font-medium text-gray-600">
+                      {selectedHorario.abierto ? 'Abierto' : 'Cerrado'}
+                    </span>
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={selectedHorario.abierto}
+                        onChange={() => toggleAbierto(selectedDay)}
+                        disabled={loading}
+                        className="sr-only peer"
+                      />
+                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
+                    </div>
+                  </label>
+                </div>
 
-      {/* Horarios del día seleccionado - Diseño compacto */}
-      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4 space-y-3 border border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#0490C8] flex items-center justify-center">
-              <span className="text-xs font-bold text-white">{diasSemana[selectedDay]}</span>
-            </div>
-            <div>
-              <span className="text-sm font-semibold text-gray-900">{diasCompletos[selectedDay]}</span>
-              <p className="text-[10px] text-gray-600">Configuración de horario</p>
-            </div>
-          </div>
-          <div className="text-right">
-            {selectedHorario.abierto ? (
-              <span className="text-xs font-mono text-gray-900 bg-white px-2 py-1 rounded-lg border border-gray-200">
-                {selectedHorario.horaApertura} - {selectedHorario.horaCierre}
-              </span>
-            ) : (
-              <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg border border-red-200">
-                Cerrado
-              </span>
+                {selectedHorario.abierto && (
+                  <>
+                    {/* Horarios principales */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Apertura</label>
+                        <input
+                          type="time"
+                          value={selectedHorario.horaApertura || ''}
+                          onChange={(e) => updateHorario(selectedDay, 'horaApertura', e.target.value)}
+                          className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                          disabled={loading}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Cierre</label>
+                        <input
+                          type="time"
+                          value={selectedHorario.horaCierre || ''}
+                          onChange={(e) => updateHorario(selectedDay, 'horaCierre', e.target.value)}
+                          className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                          disabled={loading}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Descanso */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <label className="flex items-center justify-between cursor-pointer mb-2">
+                        <span className="text-xs font-medium text-gray-700">Descanso/Almuerzo</span>
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={selectedHorario.tieneDescanso}
+                            onChange={() => updateHorario(selectedDay, 'tieneDescanso', !selectedHorario.tieneDescanso)}
+                            disabled={loading}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#0490C8]"></div>
+                        </div>
+                      </label>
+
+                      {selectedHorario.tieneDescanso && (
+                        <div className="grid grid-cols-2 gap-3 mt-2">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Inicio</label>
+                            <input
+                              type="time"
+                              value={selectedHorario.descansoInicio || '12:00'}
+                              onChange={(e) => updateHorario(selectedDay, 'descansoInicio', e.target.value)}
+                              className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                              disabled={loading}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Fin</label>
+                            <input
+                              type="time"
+                              value={selectedHorario.descansoFin || '13:00'}
+                              onChange={(e) => updateHorario(selectedDay, 'descansoFin', e.target.value)}
+                              className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                              disabled={loading}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Acciones rápidas */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-xs text-gray-600 mb-2">Aplicar a otros días</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={applyToAll}
+                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          title="Aplicar a todos los días"
+                          disabled={loading}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>Toda la semana</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={applyToWeekdays}
+                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          title="Aplicar de Lunes a Viernes"
+                          disabled={loading}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <span>Entre semana</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={applyToWeekend}
+                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          title="Aplicar Sábado y Domingo"
+                          disabled={loading}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                          </svg>
+                          <span>Fin de semana</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>
-
-        {/* Toggle Abierto/Cerrado */}
-        <div className="flex items-center justify-between py-2 border-y border-gray-200">
-          <span className="text-sm font-medium text-gray-700">Estado del día</span>
-          <div className="flex items-center gap-2">
-            <span className={`text-xs font-medium ${selectedHorario.abierto ? 'text-gray-500' : 'text-gray-900'}`}>
-              Cerrado
-            </span>
-            <button
-              type="button"
-              onClick={() => toggleAbierto(selectedDay)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                selectedHorario.abierto ? 'bg-green-500' : 'bg-gray-300'
-              }`}
-              disabled={loading}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
-                  selectedHorario.abierto ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-            <span className={`text-xs font-medium ${selectedHorario.abierto ? 'text-green-600' : 'text-gray-500'}`}>
-              Abierto
-            </span>
-          </div>
-        </div>
-        
-        {/* Mostrar campos de hora solo si está abierto */}
-        {selectedHorario.abierto && (
-          <>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Apertura</label>
-                <input
-                  type="time"
-                  value={selectedHorario.horaApertura || ''}
-                  onChange={(e) => updateHorario(selectedDay, 'horaApertura', e.target.value)}
-                  className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20"
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Cierre</label>
-                <input
-                  type="time"
-                  value={selectedHorario.horaCierre || ''}
-                  onChange={(e) => updateHorario(selectedDay, 'horaCierre', e.target.value)}
-                  className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20"
-                  disabled={loading}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Toggle Descanso minimalista */}
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-xs text-gray-600">Descanso intermedio</span>
-              <button
-                type="button"
-                onClick={() => updateHorario(selectedDay, 'tieneDescanso', !selectedHorario.tieneDescanso)}
-                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  selectedHorario.tieneDescanso ? 'bg-[#0490C8]' : 'bg-gray-300'
-                }`}
-                disabled={loading}
-              >
-                <span
-                  className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                    selectedHorario.tieneDescanso ? 'translate-x-5' : 'translate-x-0.5'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {selectedHorario.tieneDescanso && (
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Desde</label>
-                  <input
-                    type="time"
-                    value={selectedHorario.descansoInicio || ''}
-                    onChange={(e) => updateHorario(selectedDay, 'descansoInicio', e.target.value)}
-                    className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20"
-                    disabled={loading}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Hasta</label>
-                  <input
-                    type="time"
-                    value={selectedHorario.descansoFin || ''}
-                    onChange={(e) => updateHorario(selectedDay, 'descansoFin', e.target.value)}
-                    className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20"
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Mensaje cuando está cerrado */}
-        {!selectedHorario.abierto && (
-          <div className="text-center py-6">
-            <svg className="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            <p className="text-sm text-gray-500">Este día permanecerá cerrado</p>
-          </div>
-        )}
       </div>
 
       {/* Error Message compacto */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs">
+        <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm shadow-sm">
           {error}
         </div>
       )}

@@ -130,27 +130,32 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
     // Validar que los horarios abiertos tengan horas válidas
     for (const horario of horarios) {
       if (horario.abierto) {
+        const nombreDia = DIAS_SEMANA.find(d => d.num === horario.diaSemana)?.nombre || 'Día ' + horario.diaSemana;
+        
         if (!horario.horaApertura || !horario.horaCierre) {
-          setError('Los días abiertos deben tener hora de apertura y cierre');
+          setError(`El día ${nombreDia} está abierto pero falta la hora de apertura o cierre`);
           return;
         }
+        
         if (horario.horaApertura >= horario.horaCierre) {
-          setError('La hora de apertura debe ser menor que la hora de cierre');
+          setError(`El día ${nombreDia}: La hora de apertura debe ser menor que la hora de cierre`);
           return;
         }
 
         // Validar descanso si está habilitado
         if (horario.tieneDescanso) {
           if (!horario.descansoInicio || !horario.descansoFin) {
-            setError('Los días con descanso deben tener hora de inicio y fin del descanso');
+            setError(`El día ${nombreDia} tiene descanso activado pero falta la hora de inicio o fin del descanso`);
             return;
           }
+          
           if (horario.descansoInicio >= horario.descansoFin) {
-            setError('La hora de inicio del descanso debe ser menor que la hora de fin');
+            setError(`El día ${nombreDia}: La hora de inicio del descanso debe ser menor que la hora de fin`);
             return;
           }
+          
           if (horario.descansoInicio <= horario.horaApertura || horario.descansoFin >= horario.horaCierre) {
-            setError('El horario de descanso debe estar dentro del horario de apertura');
+            setError(`El día ${nombreDia}: El horario de descanso debe estar dentro del horario de apertura y cierre`);
             return;
           }
         }
@@ -412,7 +417,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
         <div className="border-t border-gray-200 px-6 py-4 bg-white flex-shrink-0">
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs mb-3">
+            <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm shadow-sm mb-3">
               {error}
             </div>
           )}

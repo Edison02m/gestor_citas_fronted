@@ -19,6 +19,7 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
     duracion: '',
     precio: '',
     foto: '',
+    color: '#3b82f6',
     estado: 'ACTIVO' as 'ACTIVO' | 'INACTIVO',
     sucursales: [] as string[]
   });
@@ -41,6 +42,7 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
         duracion: servicio.duracion.toString(),
         precio: servicio.precio.toString(),
         foto: servicio.foto || '',
+        color: servicio.color || '#3b82f6',
         estado: servicio.estado || 'ACTIVO',
         sucursales: servicio.sucursales?.map(s => s.sucursalId) || []
       });
@@ -51,6 +53,7 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
         duracion: '',
         precio: '',
         foto: '',
+        color: '#3b82f6',
         estado: 'ACTIVO',
         sucursales: []
       });
@@ -107,7 +110,8 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
         nombre: formData.nombre.trim(),
         descripcion: formData.descripcion.trim(),
         duracion: duracion,
-        precio: precio
+        precio: precio,
+        color: formData.color
       };
 
       if (formData.foto) {
@@ -254,6 +258,17 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                 </div>
 
                 <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Color</label>
+                  <input
+                    type="color"
+                    value={formData.color}
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    className="w-full h-10 px-2 py-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div>
                   <label className="block text-xs font-medium text-gray-600 mb-2">Estado</label>
                   <div className="flex gap-3 pt-1">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -361,6 +376,19 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                       onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 text-sm bg-white"
                       placeholder="https://..."
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Color
+                    </label>
+                    <input
+                      type="color"
+                      value={formData.color}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      className="w-full h-10 px-2 py-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
                       disabled={loading}
                     />
                   </div>

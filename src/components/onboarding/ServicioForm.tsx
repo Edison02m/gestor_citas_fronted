@@ -2,10 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { OnboardingService } from '@/services/onboarding.service';
-import { CreateServicioDto, Sucursal, ServicioExtraInput } from '@/interfaces';
+import { Sucursal } from '@/interfaces';
 
 interface Props {
   onSuccess: () => void;
+}
+
+interface FormData {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  duracion: number;
+  color?: string;
+  sucursalIds: string[];
 }
 
 export default function ServicioForm({ onSuccess }: Props) {
@@ -14,17 +23,14 @@ export default function ServicioForm({ onSuccess }: Props) {
   const [sucursales, setSucursales] = useState<Sucursal[]>([]);
   const [loadingSucursales, setLoadingSucursales] = useState(true);
   
-  const [formData, setFormData] = useState<CreateServicioDto>({
+  const [formData, setFormData] = useState<FormData>({
     nombre: '',
     descripcion: '',
     precio: 0,
     duracion: 30,
     color: '#3b82f6',
-    sucursalIds: [],
-    extras: []
+    sucursalIds: []
   });
-
-  const [newExtra, setNewExtra] = useState<ServicioExtraInput>({ nombre: '', precio: 0 });
 
   useEffect(() => {
     loadSucursales();
@@ -54,23 +60,6 @@ export default function ServicioForm({ onSuccess }: Props) {
     setFormData({ ...formData, sucursalIds: newSucursalIds });
   };
 
-  const addExtra = () => {
-    if (newExtra.nombre && newExtra.precio > 0) {
-      setFormData({
-        ...formData,
-        extras: [...(formData.extras || []), newExtra]
-      });
-      setNewExtra({ nombre: '', precio: 0 });
-    }
-  };
-
-  const removeExtra = (index: number) => {
-    setFormData({
-      ...formData,
-      extras: formData.extras?.filter((_, i) => i !== index)
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -83,7 +72,17 @@ export default function ServicioForm({ onSuccess }: Props) {
     setLoading(true);
 
     try {
-      await OnboardingService.createServicio(formData);
+      // Construir el DTO para enviar al backend
+      const dataToSend = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
+        precio: formData.precio,
+        duracion: formData.duracion,
+        color: formData.color,
+        sucursalIds: formData.sucursalIds
+      };
+      
+      await OnboardingService.createServicio(dataToSend);
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Error al crear servicio');
@@ -213,67 +212,8 @@ export default function ServicioForm({ onSuccess }: Props) {
         </div>
       </div>
 
-      {/* Extras opcionales */}
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-        <label className="block text-xs font-medium text-gray-700 mb-2">
-          Extras opcionales
-        </label>
-        
-        {formData.extras && formData.extras.length > 0 && (
-          <div className="space-y-1.5 mb-2">
-            {formData.extras.map((extra, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-900">{extra.nombre}</span>
-                  <span className="text-xs text-gray-600">${extra.precio.toFixed(2)}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeExtra(index)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded p-1 transition-all"
-                  disabled={loading}
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={newExtra.nombre}
-            onChange={(e) => setNewExtra({ ...newExtra, nombre: e.target.value })}
-            className="flex-1 px-2 py-1.5 text-xs text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-            disabled={loading}
-          />
-          <input
-            type="number"
-            placeholder="$"
-            min="0"
-            step="0.01"
-            value={newExtra.precio || ''}
-            onChange={(e) => setNewExtra({ ...newExtra, precio: parseFloat(e.target.value) || 0 })}
-            className="w-20 px-2 py-1.5 text-xs text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-[#0490C8] focus:ring-1 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-            disabled={loading}
-          />
-          <button
-            type="button"
-            onClick={addExtra}
-            disabled={loading || !newExtra.nombre || newExtra.precio <= 0}
-            className="px-3 py-1.5 bg-[#0490C8] hover:bg-[#023664] text-white text-xs rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            +
-          </button>
-        </div>
-      </div>
-
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs">
+        <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm shadow-sm">
           {error}
         </div>
       )}
