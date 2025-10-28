@@ -124,20 +124,20 @@ export default function ClientesPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
-          <p className="text-gray-600">Gestiona la información de tus clientes</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
+          <p className="text-sm sm:text-base text-gray-600">Gestiona la información de tus clientes</p>
         </div>
 
         {/* Actions Bar */}
-        <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="bg-white rounded-2xl shadow-sm p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             {/* Search */}
             <div className="flex-1 relative">
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -151,33 +151,34 @@ export default function ClientesPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Buscar por nombre, cédula, teléfono o email..."
+                placeholder="Buscar cliente..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all"
               />
             </div>
 
             {/* Create Button */}
             <button
               onClick={handleCreate}
-              className="px-6 py-2.5 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-md flex items-center gap-2 whitespace-nowrap"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 whitespace-nowrap text-sm"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Nuevo Cliente
+              <span className="hidden sm:inline">Nuevo Cliente</span>
+              <span className="sm:hidden">Nuevo</span>
             </button>
           </div>
         </div>
 
         {/* Results Info */}
         {!loading && (
-          <div className="mb-4 text-sm text-gray-600">
+          <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 px-1">
             {searchTerm ? (
               <p>
-                Se encontraron <span className="font-semibold text-gray-900">{filteredClientes.length}</span> resultados
-                para &quot;{searchTerm}&quot;
+                <span className="font-semibold text-gray-900">{filteredClientes.length}</span> {filteredClientes.length === 1 ? 'resultado' : 'resultados'}
+                {' '}para &quot;{searchTerm}&quot;
               </p>
             ) : (
               <p>
@@ -197,22 +198,22 @@ export default function ClientesPage() {
 
         {/* Paginación */}
         {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-sm text-gray-600">
+          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+            <p className="text-xs sm:text-sm text-gray-600 order-2 sm:order-1">
               Página {currentPage} de {totalPages}
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 sm:flex-none px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Siguiente
               </button>

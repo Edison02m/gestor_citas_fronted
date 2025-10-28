@@ -102,3 +102,198 @@ body {
     scrollbar-width: none;
   }
 }
+
+/* FullCalendar Custom Styles con Tailwind */
+.fc {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Botones del header */
+.fc .fc-button {
+  @apply bg-[#0490C8] text-white border-none rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200;
+}
+
+.fc .fc-button:hover {
+  @apply bg-[#037aa8] shadow-md;
+}
+
+.fc .fc-button:active,
+.fc .fc-button-active {
+  @apply bg-[#026a8a] shadow-lg;
+}
+
+.fc .fc-button:disabled {
+  @apply bg-gray-300 cursor-not-allowed;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  @apply bg-[#026a8a] shadow-lg;
+}
+
+/* Título del calendario */
+.fc .fc-toolbar-title {
+  @apply text-xl md:text-2xl font-bold text-gray-900;
+}
+
+/* Headers de los días */
+.fc .fc-col-header-cell {
+  @apply bg-gray-50 border-gray-200 py-3;
+}
+
+.fc .fc-col-header-cell-cushion {
+  @apply text-xs font-semibold text-gray-700 uppercase;
+}
+
+/* Celdas de días */
+.fc .fc-daygrid-day {
+  @apply transition-colors duration-150;
+}
+
+.fc .fc-daygrid-day:hover {
+  @apply bg-gray-50;
+}
+
+.fc .fc-daygrid-day-number {
+  @apply text-sm font-medium text-gray-700 p-2;
+}
+
+/* Día de hoy */
+.fc .fc-day-today {
+  @apply bg-blue-50;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  @apply text-[#0490C8] font-bold;
+}
+
+/* Eventos */
+.fc-event {
+  @apply cursor-pointer transition-all duration-200 border-l-4;
+}
+
+.fc-event:hover {
+  @apply shadow-lg z-10;
+}
+
+.fc-event .fc-event-title {
+  @apply font-medium text-xs;
+}
+
+.fc-event .fc-event-time {
+  @apply font-semibold text-xs;
+}
+
+/* Vista mensual - forzar texto oscuro para mejor contraste */
+.fc-daygrid-event {
+  color: #1f2937 !important; /* text-gray-800 */
+}
+
+.fc-daygrid-event .fc-event-title,
+.fc-daygrid-event .fc-event-time {
+  color: #1f2937 !important; /* text-gray-800 */
+  font-weight: 600 !important;
+}
+
+/* Vista de semana/día - mantener texto blanco */
+.fc-timegrid-event .fc-event-title,
+.fc-timegrid-event .fc-event-time {
+  color: #ffffff !important;
+}
+
+/* Vista TimeGrid */
+.fc .fc-timegrid-slot {
+  @apply h-12 border-gray-100;
+}
+
+.fc .fc-timegrid-slot-label {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  @apply border-red-500;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  @apply border-red-500;
+}
+
+/* Vista de lista */
+.fc .fc-list-event:hover td {
+  @apply bg-gray-50;
+}
+
+.fc .fc-list-event-title {
+  @apply font-medium text-gray-900;
+}
+
+.fc .fc-list-event-time {
+  @apply text-gray-900 font-semibold;
+}
+
+.fc .fc-list-event-dot {
+  border-width: 4px !important;
+}
+
+.fc .fc-list-day-cushion {
+  @apply bg-gray-50 text-gray-900 font-semibold;
+}
+
+/* Bordes generales */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  @apply border-gray-200;
+}
+
+/* Scrollbar para vista de calendario */
+.fc-scroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Loading state */
+.fc-loading {
+  @apply opacity-60 pointer-events-none;
+}
+
+/* Popover para más eventos */
+.fc .fc-more-popover {
+  @apply bg-white border border-gray-200 rounded-lg shadow-xl;
+}
+
+.fc .fc-more-popover .fc-popover-header {
+  @apply bg-gray-50 border-b border-gray-200 px-4 py-2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fc .fc-toolbar {
+    @apply flex-col gap-3;
+  }
+  
+  .fc .fc-toolbar-chunk {
+    @apply w-full flex justify-center;
+  }
+  
+  .fc .fc-toolbar-title {
+    @apply text-lg;
+  }
+  
+  .fc .fc-button {
+    @apply px-2 py-1.5 text-xs;
+  }
+}

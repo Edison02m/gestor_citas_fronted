@@ -14,20 +14,20 @@ export default function CompletarOnboarding() {
     setLoading(true);
 
     try {
-      // 1. Completar onboarding en el backend
-      await OnboardingService.completar();
-
-      // 2. Actualizar el usuario desde el backend (esto obtiene primerLogin: false)
+      // El onboarding ya fue completado (desde EmpleadoForm o ServicioForm)
+      // Solo necesitamos refrescar el usuario y redirigir
+      
+      // 1. Actualizar el usuario desde el backend (esto obtiene primerLogin: false)
       await refreshUser();
 
-      // 3. Pequeño delay para asegurar que el estado se propagó
+      // 2. Pequeño delay para asegurar que el estado se propagó
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // 4. Redirigir al dashboard
+      // 3. Redirigir al dashboard
       router.push('/dashboard-usuario');
     } catch (error: any) {
-      console.error('Error al completar onboarding:', error);
-      alert(error.message || 'Error al completar onboarding');
+      console.error('Error al ir al dashboard:', error);
+      alert(error.message || 'Error al redirigir al dashboard');
       setLoading(false);
     }
     // No hacemos setLoading(false) aquí porque ya estamos redirigiendo

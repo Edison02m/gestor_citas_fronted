@@ -23,16 +23,13 @@ export default function OnboardingPage() {
       setStatus(data);
       setCurrentStep(data.pasoActual);
 
-      // Si ya completó, redirigir al dashboard
-      if (data.completado) {
-        router.push('/dashboard-usuario');
-      }
+      // NO redirigir automáticamente, dejar que el usuario vea el paso 5 y haga clic en "Ir al Dashboard"
     } catch (error) {
       console.error('Error al cargar estado:', error);
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, []);
 
   // 🔒 Proteger ruta: Solo usuarios autenticados con primerLogin
   useEffect(() => {

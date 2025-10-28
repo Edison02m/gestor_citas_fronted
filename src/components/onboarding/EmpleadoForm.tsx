@@ -64,7 +64,13 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
     setLoading(true);
 
     try {
+      // 1. Crear el empleado
       await OnboardingService.createEmpleado(formData);
+      
+      // 2. Completar el onboarding (ya que este es el último paso opcional)
+      await OnboardingService.completar();
+      
+      // 3. Notificar éxito para que recargue el estado
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Error al crear empleado');
@@ -82,24 +88,13 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
     setError('');
 
     try {
-      // Crear un empleado automáticamente con los datos del usuario actual
-      const empleadoData: CreateEmpleadoDto = {
-        nombre: user?.nombre || 'Propietario',
-        cargo: 'Propietario',
-        telefono: (user as any)?.negocio?.telefono || '',
-        email: user?.email || '',
-        foto: (user as any)?.negocio?.logo || '',
-        sucursalIds: sucursales.map(s => s.id) // Asignar a todas las sucursales
-      };
-
-      console.log('📝 Creando empleado automático:', empleadoData);
-      await OnboardingService.createEmpleado(empleadoData);
-      console.log('✅ Empleado automático creado');
-      
+      // Completar el onboarding sin crear empleados
+      await OnboardingService.completar();
+      // Llamar a onSkip para que recargue el estado y muestre el paso 5
       onSkip();
     } catch (err: any) {
-      console.error('❌ Error al crear empleado automático:', err);
-      setError(err.message || 'Error al crear empleado automático');
+      console.error('❌ Error al completar onboarding:', err);
+      setError(err.message || 'Error al completar la configuración');
       setShowSkipConfirm(false);
     } finally {
       setLoading(false);
@@ -124,29 +119,26 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       <div className="text-center space-y-6">
         <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
           <svg className="w-8 h-8 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Te agregaremos como empleado</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">¿Continuar sin empleados?</h3>
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 max-w-md mx-auto border border-blue-100">
             <p className="text-sm text-gray-700 mb-3">
-              Para poder gestionar citas, necesitas al menos un empleado registrado. 
+              Puedes agregar empleados más tarde desde el panel de control.
             </p>
-            <div className="flex items-center gap-2 text-left">
-              <div className="w-8 h-8 bg-[#0490C8] rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="flex items-start gap-2 text-left">
+              <div className="w-8 h-8 bg-[#0490C8] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold text-gray-900">{user?.nombre || 'Tú'}</span> será agregado como <span className="font-semibold text-gray-900">Propietario</span> en todas las sucursales
+                Los empleados son <span className="font-semibold text-gray-900">opcionales</span>. Puedes gestionar citas sin asignarlas a un empleado específico.
               </p>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-3">
-            Podrás agregar más empleados después desde el panel de control
-          </p>
         </div>
 
         {error && (
@@ -179,10 +171,10 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Creando...</span>
+                <span>Completando...</span>
               </>
             ) : (
-              <span>Continuar</span>
+              <span>Omitir y continuar</span>
             )}
           </button>
         </div>
@@ -270,6 +262,21 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
               placeholder="https://ejemplo.com/foto.jpg"
               disabled={loading}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Aviso sobre horarios */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+        <div className="flex items-start gap-2">
+          <svg className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm text-blue-800 font-medium">Horarios del empleado</p>
+            <p className="text-xs text-blue-700 mt-0.5">
+              Los horarios de trabajo se podrán configurar después desde el panel de control.
+            </p>
           </div>
         </div>
       </div>

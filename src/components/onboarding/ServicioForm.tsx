@@ -165,13 +165,21 @@ export default function ServicioForm({ onSuccess }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Color
             </label>
-            <input
-              type="color"
-              value={formData.color}
-              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-full h-[38px] border border-gray-200 rounded-xl cursor-pointer"
-              disabled={loading}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={formData.color}
+                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                className="w-12 h-[38px] px-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
+                disabled={loading}
+              />
+              <div 
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 font-mono"
+                style={{ backgroundColor: formData.color + '20' }}
+              >
+                {formData.color}
+              </div>
+            </div>
           </div>
         </div>
       </div>

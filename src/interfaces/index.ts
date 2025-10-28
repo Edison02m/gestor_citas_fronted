@@ -477,3 +477,133 @@ export interface AsignarSucursalesServicioDto {
 export interface ToggleDisponibilidadDto {
   disponible: boolean;
 }
+
+// ============================================================================
+// CITAS
+// ============================================================================
+
+export enum EstadoCita {
+  PENDIENTE = 'PENDIENTE',
+  CONFIRMADA = 'CONFIRMADA',
+  COMPLETADA = 'COMPLETADA',
+  CANCELADA = 'CANCELADA',
+  NO_ASISTIO = 'NO_ASISTIO',
+}
+
+export enum CanalOrigen {
+  MANUAL = 'MANUAL',
+  WEB = 'WEB',
+  WHATSAPP = 'WHATSAPP',
+}
+
+export interface Cita {
+  id: string;
+  fecha: string; // "2024-10-23"
+  horaInicio: string; // "09:00"
+  horaFin: string; // "10:00"
+  estado: EstadoCita;
+  notas?: string;
+  precioTotal: number;
+  canalOrigen: CanalOrigen;
+  clienteId: string;
+  servicioId: string;
+  empleadoId?: string;
+  sucursalId: string;
+  negocioId: string;
+  creadoPor?: string;
+  modificadoPor?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Relaciones expandidas
+  cliente?: {
+    id: string;
+    nombre: string;
+    telefono: string;
+    email?: string;
+    cedula: string;
+  };
+  servicio?: {
+    id: string;
+    nombre: string;
+    duracion: number;
+    precio: number;
+    color: string;
+  };
+  empleado?: {
+    id: string;
+    nombre: string;
+    cargo: string;
+    foto?: string;
+  };
+  sucursal?: {
+    id: string;
+    nombre: string;
+    direccion: string;
+    telefono: string;
+  };
+}
+
+export interface CreateCitaDto {
+  fecha: string; // "2024-10-23"
+  horaInicio: string; // "09:00"
+  horaFin: string; // "10:00"
+  clienteId: string;
+  servicioId: string;
+  empleadoId?: string;
+  sucursalId: string;
+  notas?: string;
+  canalOrigen?: CanalOrigen;
+}
+
+export interface UpdateCitaDto {
+  fecha?: string;
+  horaInicio?: string;
+  horaFin?: string;
+  servicioId?: string;
+  empleadoId?: string;
+  sucursalId?: string;
+  notas?: string;
+  estado?: EstadoCita;
+}
+
+export interface FiltrosCitasDto {
+  fechaInicio?: string;
+  fechaFin?: string;
+  clienteId?: string;
+  empleadoId?: string;
+  sucursalId?: string;
+  servicioId?: string;
+  estado?: EstadoCita;
+  canalOrigen?: CanalOrigen;
+  page?: number;
+  limit?: number;
+}
+
+export interface CitasListResponse {
+  success: true;
+  data: Cita[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface DisponibilidadEmpleadoDto {
+  empleadoId?: string;
+  sucursalId: string;
+  servicioId: string;
+  fecha: string; // "2024-10-23"
+}
+
+export interface HorarioDisponible {
+  horaInicio: string; // "09:00"
+  horaFin: string; // "09:30"
+  disponible: boolean;
+}
+
+export interface DisponibilidadResponse {
+  success: true;
+  data: HorarioDisponible[];
+}

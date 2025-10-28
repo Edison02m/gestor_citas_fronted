@@ -1,7 +1,13 @@
+﻿
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 const menuItems = [
   {
@@ -61,7 +67,7 @@ const menuItems = [
   }
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -72,50 +78,106 @@ export default function Sidebar() {
 
   const negocioNombre = isUsuario(user) ? (user as any).negocio?.nombre : 'Dashboard';
 
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    onClose(); // Cerrar sidebar en móvil al navegar
+  };
+
   return (
-    <div className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      {/* Header con nombre del negocio */}
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-900 truncate">
-          {negocioNombre}
-        </h1>
-        <p className="text-xs text-gray-500 mt-1 truncate">{user?.email}</p>
-      </div>
+    <>
+      {/* Sidebar - Desktop: siempre visible, Mobile: slide from left */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-64 lg:w-64
+          bg-white border-r border-gray-200
+          transform transition-transform duration-300 ease-in-out
+          lg:transform-none
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          flex flex-col
+        `}
+      >
+        {/* Header con nombre del negocio */}
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          {/* Layout móvil: horizontal con botón cerrar */}
+          <div className="flex items-center justify-between lg:hidden">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                {negocioNombre}
+              </h1>
+              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            </div>
 
-      {/* Menú */}
-      <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
-          
-          return (
+            {/* Botón cerrar en móvil */}
             <button
-              key={item.path}
-              onClick={() => router.push(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-[#0490C8] text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              onClick={onClose}
+              className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors ml-2"
             >
-              {item.icon}
-              <span>{item.name}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-          );
-        })}
-      </nav>
+          </div>
 
-      {/* Footer con botón de cerrar sesión */}
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span>Cerrar Sesión</span>
-        </button>
-      </div>
-    </div>
+          {/* Layout desktop: vertical centrado */}
+          <div className="hidden lg:flex lg:flex-col lg:items-center lg:text-center lg:space-y-3">
+            {/* Logo centrado arriba */}
+            <div className="flex justify-center">
+              <img
+                src="/Assets/logo_citaYA.png"
+                alt="CitaYa Logo"
+                className="h-8 w-auto"
+              />
+            </div>
+
+            {/* Información del negocio abajo */}
+            <div className="space-y-1">
+              <h1 className="text-xl font-bold text-gray-900 truncate">
+                {negocioNombre}
+              </h1>
+              <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Menú */}
+        <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
+            
+            return (
+              <button
+                key={item.path}
+                onClick={() => handleNavigation(item.path)}
+                className={`w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-[#0490C8] text-white shadow-sm'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {item.icon}
+                <span>{item.name}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Footer con botón de cerrar sesión */}
+        <div className="p-3 sm:p-4 border-t border-gray-200">
+          <button
+            onClick={() => {
+              logout();
+              onClose();
+            }}
+            className="w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

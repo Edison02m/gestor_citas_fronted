@@ -72,8 +72,7 @@ export default function EmpleadosTable({
             <div className="flex items-start gap-4 mb-3">
               {/* Avatar */}
               <div 
-                className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-white font-bold text-lg"
-                style={{ backgroundColor: empleado.color }}
+                className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center bg-gray-100 text-gray-600 font-bold text-lg"
               >
                 {empleado.foto ? (
                   <img 

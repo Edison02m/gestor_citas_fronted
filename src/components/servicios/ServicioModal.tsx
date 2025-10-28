@@ -259,13 +259,21 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
 
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Color</label>
-                  <input
-                    type="color"
-                    value={formData.color}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="w-full h-10 px-2 py-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
-                    disabled={loading}
-                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={formData.color}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      className="w-12 h-10 px-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
+                      disabled={loading}
+                    />
+                    <div 
+                      className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 font-mono"
+                      style={{ backgroundColor: formData.color + '20' }}
+                    >
+                      {formData.color}
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -384,13 +392,21 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                     <label className="block text-xs font-medium text-gray-600 mb-1">
                       Color
                     </label>
-                    <input
-                      type="color"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      className="w-full h-10 px-2 py-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
-                      disabled={loading}
-                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        className="w-12 h-10 px-1 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 bg-white cursor-pointer"
+                        disabled={loading}
+                      />
+                      <div 
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 font-mono"
+                        style={{ backgroundColor: formData.color + '20' }}
+                      >
+                        {formData.color}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
