@@ -71,6 +71,58 @@ export default function AgendaPublicaPage() {
   const [validandoCedula, setValidandoCedula] = useState(false);
   const [clienteEncontrado, setClienteEncontrado] = useState(false);
 
+  // Estado para código de país del teléfono
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
+
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+53', pais: 'Cuba', bandera: '🇨🇺' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+502', pais: 'Guatemala', bandera: '🇬🇹' },
+    { codigo: '+504', pais: 'Honduras', bandera: '🇭🇳' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+505', pais: 'Nicaragua', bandera: '🇳🇮' },
+    { codigo: '+507', pais: 'Panamá', bandera: '🇵🇦' },
+    { codigo: '+595', pais: 'Paraguay', bandera: '🇵🇾' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+1', pais: 'Puerto Rico', bandera: '🇵🇷' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
+
+  // Estado para dropdown de horarios
+  const [showHorarios, setShowHorarios] = useState(false);
+
+  // Cerrar dropdown de horarios al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.horarios-dropdown-container')) {
+        setShowHorarios(false);
+      }
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showHorarios || showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showHorarios, showCodigoPaisDropdown]);
+
   // Cargar información inicial del negocio
   useEffect(() => {
     if (linkPublico) {
@@ -130,6 +182,12 @@ export default function AgendaPublicaPage() {
           sucursalesRes.data[0].id
         );
         setEmpleados(empleadosRes.data);
+        
+        // Auto-seleccionar el primer empleado si hay empleados disponibles
+        if (empleadosRes.data.length > 0) {
+          setFormData(prev => ({ ...prev, empleadoId: empleadosRes.data[0].id }));
+          setEmpleadoSearch(empleadosRes.data[0].nombre);
+        }
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Error al cargar la información del negocio');
@@ -152,6 +210,12 @@ export default function AgendaPublicaPage() {
         formData.sucursalId
       );
       setEmpleados(empleadosRes.data);
+      
+      // Auto-seleccionar el primer empleado si hay empleados disponibles
+      if (empleadosRes.data.length > 0 && !formData.empleadoId) {
+        setFormData(prev => ({ ...prev, empleadoId: empleadosRes.data[0].id }));
+        setEmpleadoSearch(empleadosRes.data[0].nombre);
+      }
     } catch (err: any) {
       console.error('Error al cargar empleados:', err);
     }
@@ -321,16 +385,19 @@ export default function AgendaPublicaPage() {
       setSubmitting(true);
       setError('');
 
+      // Combinar código de país con teléfono
+      const telefonoCompleto = `${codigoPais}${formData.clienteTelefono}`;
+
       const dto: CreateCitaPublicaDto = {
         fecha: formData.fecha,
         horaInicio: formData.horaInicio,
         horaFin: formData.horaFin,
         clienteCedula: formData.clienteCedula,
         clienteNombre: formData.clienteNombre,
-        clienteTelefono: formData.clienteTelefono,
+        clienteTelefono: telefonoCompleto, // Enviar con código de país
         clienteEmail: formData.clienteEmail || undefined,
         servicioId: formData.servicioId,
-        empleadoId: formData.empleadoId || undefined,
+        empleadoId: empleados.length > 0 ? formData.empleadoId : undefined, // Solo si hay empleados
         sucursalId: formData.sucursalId,
         notas: formData.notas || undefined,
       };
@@ -377,9 +444,40 @@ export default function AgendaPublicaPage() {
         setError('Por favor selecciona una sucursal');
         return;
       }
+      
+      // Validar que la sucursal seleccionada existe
+      if (formData.sucursalId && sucursales.length > 1) {
+        const sucursalValida = sucursales.find(s => s.id === formData.sucursalId);
+        if (!sucursalValida) {
+          setError('Por favor selecciona una sucursal válida de la lista');
+          return;
+        }
+      }
+      
       if (!formData.servicioId) {
         setError('Por favor selecciona un servicio');
         return;
+      }
+      
+      // Validar que el servicio seleccionado existe
+      const servicioValido = servicios.find(s => s.id === formData.servicioId);
+      if (!servicioValido) {
+        setError('Por favor selecciona un servicio válido de la lista');
+        return;
+      }
+      
+      // Solo validar empleado si hay empleados disponibles en la sucursal
+      if (empleados.length > 0) {
+        if (!formData.empleadoId) {
+          setError('Por favor selecciona un empleado');
+          return;
+        }
+        // Validar que el empleado seleccionado existe en la lista
+        const empleadoValido = empleados.find(e => e.id === formData.empleadoId);
+        if (!empleadoValido) {
+          setError('Por favor selecciona un empleado válido de la lista');
+          return;
+        }
       }
     }
 
@@ -485,11 +583,25 @@ export default function AgendaPublicaPage() {
         // Cliente encontrado, autocompletar campos
         const cliente = response.data.cliente;
         
+        // Extraer código de país del teléfono si existe
+        let telefonoSinCodigo = cliente.telefono || '';
+        let codigoPaisDetectado = '+593'; // Ecuador por defecto
+        
+        if (telefonoSinCodigo && telefonoSinCodigo.startsWith('+')) {
+          // El teléfono tiene código de país, extraerlo
+          const codigoEncontrado = codigosPaises.find(p => telefonoSinCodigo.startsWith(p.codigo));
+          if (codigoEncontrado) {
+            codigoPaisDetectado = codigoEncontrado.codigo;
+            telefonoSinCodigo = telefonoSinCodigo.substring(codigoEncontrado.codigo.length);
+          }
+        }
+        
+        setCodigoPais(codigoPaisDetectado);
         setFormData(prev => ({
           ...prev,
           clienteCedula: cliente.cedula,
           clienteNombre: cliente.nombre,
-          clienteTelefono: cliente.telefono || '',
+          clienteTelefono: telefonoSinCodigo,
           clienteEmail: cliente.email || ''
         }));
         setClienteEncontrado(true);
@@ -556,43 +668,162 @@ export default function AgendaPublicaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-2 sm:p-4">
       <div className={`w-full transition-all duration-300 ${paso === 3 ? 'max-w-4xl' : 'max-w-lg'}`}>
-        {/* Header del negocio - Limpio y profesional */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* Header del negocio - Limpio y profesional - Responsive */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-3 sm:mb-4">
+          <div className="flex items-center justify-between flex-wrap sm:flex-nowrap gap-3">
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
               {negocio?.logo && (
                 <img
                   src={negocio.logo}
                   alt={negocio.nombre}
-                  className="w-14 h-14 rounded-xl object-cover flex-shrink-0 border border-gray-100"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0 border border-gray-100"
                 />
               )}
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-gray-900 truncate">{negocio?.nombre}</h1>
+                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">{negocio?.nombre}</h1>
                 {negocio?.descripcion && (
-                  <p className="text-sm text-gray-600 truncate mt-0.5">{negocio.descripcion}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 truncate mt-0.5">{negocio.descripcion}</p>
                 )}
               </div>
             </div>
-            {negocio?.telefono && (
-              <a
-                href={`tel:${negocio.telefono}`}
-                className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-colors text-sm font-medium ml-4"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span className="hidden sm:inline">Llamar</span>
-              </a>
+            {sucursales.length > 0 && (
+              <div className="flex-shrink-0 w-full sm:w-auto sm:ml-4 relative horarios-dropdown-container">
+                <button
+                  onClick={() => setShowHorarios(!showHorarios)}
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-3 sm:px-4 py-2 hover:bg-gray-100 transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                >
+                  {sucursales.length === 1 ? (
+                    // Una sola sucursal - mostrar botón con nombre
+                    <div className="flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="font-medium text-gray-900">Horarios</span>
+                      <svg 
+                        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform ${showHorarios ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  ) : (
+                    // Múltiples sucursales - mostrar cantidad con flecha
+                    <div className="flex items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm text-gray-700">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <span className="font-medium">{sucursales.length} sucursales</span>
+                      <svg 
+                        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform ${showHorarios ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+
+                {/* Dropdown de horarios - Responsive */}
+                {showHorarios && (
+                  <div className="absolute left-0 sm:right-0 sm:left-auto mt-2 w-full sm:w-72 max-h-80 sm:max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                    {(() => {
+                      const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                      
+                      if (sucursales.length === 1) {
+                        // Una sola sucursal
+                        const horarios = sucursales[0].horarios || [];
+                        
+                        if (horarios.length === 0) {
+                          return (
+                            <div className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-500 text-center">
+                              No hay horarios configurados
+                            </div>
+                          );
+                        }
+                        
+                        return (
+                          <div className="py-2">
+                            <div className="px-3 sm:px-4 py-2 border-b border-gray-100">
+                              <p className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{sucursales[0].nombre}</p>
+                            </div>
+                            <div className="px-3 sm:px-4 py-2 space-y-1.5">
+                              {horarios.map((h, idx) => (
+                                <div 
+                                  key={idx} 
+                                  className={`flex justify-between items-center text-[11px] sm:text-xs py-1 ${
+                                    !h.abierto ? 'text-gray-400' : 'text-gray-700'
+                                  }`}
+                                >
+                                  <span className="font-medium min-w-[35px] sm:min-w-[40px]">{diasSemana[h.diaSemana]}</span>
+                                  <span className={`${!h.abierto ? 'italic' : 'font-medium'}`}>
+                                    {h.abierto && h.horaApertura && h.horaCierre 
+                                      ? `${h.horaApertura} - ${h.horaCierre}`
+                                      : 'Cerrado'}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        // Múltiples sucursales
+                        return (
+                          <div className="py-2">
+                            <div className="px-3 sm:px-4 py-2 border-b border-gray-100">
+                              <p className="font-semibold text-xs sm:text-sm text-gray-900">Horarios por sucursal</p>
+                            </div>
+                            <div className="divide-y divide-gray-100">
+                              {sucursales.map((sucursal, sucIdx) => {
+                                const horarios = sucursal.horarios || [];
+                                
+                                return (
+                                  <div key={sucursal.id} className="px-3 sm:px-4 py-2.5 sm:py-3">
+                                    <p className="font-semibold text-[11px] sm:text-xs text-gray-900 mb-1.5 sm:mb-2 truncate">{sucursal.nombre}</p>
+                                    {horarios.length === 0 ? (
+                                      <p className="text-[11px] sm:text-xs text-gray-400 italic">Sin horarios</p>
+                                    ) : (
+                                      <div className="space-y-0.5 sm:space-y-1">
+                                        {horarios.map((h, idx) => (
+                                          <div 
+                                            key={idx} 
+                                            className={`flex justify-between items-center text-[10px] sm:text-xs ${
+                                              !h.abierto ? 'text-gray-400' : 'text-gray-600'
+                                            }`}
+                                          >
+                                            <span className="font-medium min-w-[30px] sm:min-w-[35px]">{diasSemana[h.diaSemana]}</span>
+                                            <span className={`text-[10px] sm:text-[11px] ${!h.abierto ? 'italic' : 'font-medium'}`}>
+                                              {h.abierto && h.horaApertura && h.horaCierre 
+                                                ? `${h.horaApertura} - ${h.horaCierre}`
+                                                : 'Cerrado'}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Indicador de pasos - Estilo onboarding */}
+        {/* Indicador de pasos - Estilo onboarding - Responsive */}
         {paso < 4 && (
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4 px-2 sm:px-0">
             <div className="flex items-center justify-between">
               {[
                 { numero: 1, nombre: 'Tus datos' },
@@ -602,7 +833,7 @@ export default function AgendaPublicaPage() {
                 <div key={p.numero} className="flex items-center flex-1">
                   <div className="flex flex-col items-center flex-1">
                     <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
+                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
                         p.numero < paso
                           ? 'bg-green-500 text-white'
                           : p.numero === paso
@@ -613,7 +844,7 @@ export default function AgendaPublicaPage() {
                       {p.numero < paso ? '✓' : p.numero}
                     </div>
                     <p
-                      className={`text-[11px] mt-1.5 text-center leading-tight ${
+                      className={`text-[9px] sm:text-[11px] mt-1 sm:mt-1.5 text-center leading-tight px-1 ${
                         p.numero === paso ? 'text-gray-900 font-medium' : 'text-gray-500'
                       }`}
                     >
@@ -622,7 +853,7 @@ export default function AgendaPublicaPage() {
                   </div>
                   {index < 2 && (
                     <div
-                      className={`h-px flex-1 mx-1 transition-all ${
+                      className={`h-px flex-1 mx-0.5 sm:mx-1 transition-all ${
                         p.numero < paso ? 'bg-green-500' : 'bg-gray-200'
                       }`}
                     ></div>
@@ -637,11 +868,11 @@ export default function AgendaPublicaPage() {
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Header del paso actual */}
           {paso < 4 && (
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">
                 {paso === 1 ? 'Tus datos' : paso === 2 ? 'Selecciona servicio' : 'Fecha y hora'}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
                 {paso === 1 
                   ? 'Ingresa tu información de contacto' 
                   : paso === 2 
@@ -653,10 +884,10 @@ export default function AgendaPublicaPage() {
 
           {/* Form */}
           <form onSubmit={(e) => e.preventDefault()}>
-            <div className="px-8 py-6 max-h-[70vh] overflow-y-auto">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 max-h-[70vh] overflow-y-auto">
               {/* Paso 1: Datos del Cliente - Minimalista */}
               {paso === 1 && (
-                <div className="space-y-3">
+                <div className="space-y-3 sm:space-y-3">
                   {/* Cédula */}
                   <div>
                     <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5">
@@ -719,9 +950,9 @@ export default function AgendaPublicaPage() {
                     />
                   </div>
 
-                  {/* Grid Teléfono y Email */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Teléfono */}
+                  {/* Grid Teléfono y Email - Responsive */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Teléfono con código de país */}
                     <div>
                       <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5">
                         <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -729,17 +960,64 @@ export default function AgendaPublicaPage() {
                         </svg>
                         Teléfono <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="tel"
-                        value={formData.clienteTelefono}
-                        onChange={(e) => handleInputChange('clienteTelefono', e.target.value)}
-                        placeholder="0999999999"
-                        className={`w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 placeholder-gray-400 transition-all ${
-                          clienteEncontrado ? 'bg-green-50/30' : ''
-                        } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                        disabled={validandoCedula}
-                        required
-                      />
+                      <div className="flex gap-2">
+                        {/* Selector de código de país */}
+                        <div className="relative w-24 codigo-pais-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                            className="w-full px-2 py-2 text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                          >
+                            <span className="truncate">
+                              {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
+                            </span>
+                            <svg className={`w-3 h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          
+                          {showCodigoPaisDropdown && (
+                            <div className="fixed z-[100] w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                                 style={{
+                                   top: `${(document.querySelector('.codigo-pais-dropdown-container button') as HTMLElement)?.getBoundingClientRect().bottom + 4}px`,
+                                   left: `${(document.querySelector('.codigo-pais-dropdown-container button') as HTMLElement)?.getBoundingClientRect().left}px`
+                                 }}>
+                              {codigosPaises.map((pais) => (
+                                <button
+                                  key={`${pais.codigo}-${pais.pais}`}
+                                  type="button"
+                                  onClick={() => {
+                                    setCodigoPais(pais.codigo);
+                                    setShowCodigoPaisDropdown(false);
+                                  }}
+                                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">{pais.bandera}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
+                                      <div className="text-[10px] text-gray-500">{pais.codigo}</div>
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Input de teléfono */}
+                        <input
+                          type="tel"
+                          value={formData.clienteTelefono}
+                          onChange={(e) => handleInputChange('clienteTelefono', e.target.value)}
+                          placeholder="999999999"
+                          className={`flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 placeholder-gray-400 transition-all ${
+                            clienteEncontrado ? 'bg-green-50/30' : ''
+                          } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                          disabled={validandoCedula}
+                          required
+                        />
+                      </div>
                     </div>
 
                     {/* Email */}
@@ -784,11 +1062,21 @@ export default function AgendaPublicaPage() {
                           onChange={(e) => {
                             setSucursalSearch(e.target.value);
                             setShowSucursalDropdown(true);
+                            // Limpiar sucursalId si el texto no coincide
+                            const sucursalCoincide = sucursales.find(s => s.nombre === e.target.value);
+                            if (!sucursalCoincide) {
+                              setFormData(prev => ({ ...prev, sucursalId: '', empleadoId: '' }));
+                              setEmpleadoSearch('');
+                            }
                           }}
                           onFocus={() => setShowSucursalDropdown(true)}
                           onBlur={() => setTimeout(() => setShowSucursalDropdown(false), 200)}
                           placeholder="Buscar sucursal..."
-                          className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all"
+                          className={`w-full px-3 py-2 text-sm text-gray-900 bg-white border rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all ${
+                            formData.sucursalId && sucursales.find(s => s.id === formData.sucursalId)
+                              ? 'border-green-500 bg-green-50/30'
+                              : 'border-gray-200'
+                          }`}
                           required
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -837,11 +1125,20 @@ export default function AgendaPublicaPage() {
                         onChange={(e) => {
                           setServicioSearch(e.target.value);
                           setShowServicioDropdown(true);
+                          // Limpiar servicioId si el texto no coincide
+                          const servicioCoincide = servicios.find(s => s.nombre === e.target.value);
+                          if (!servicioCoincide) {
+                            setFormData(prev => ({ ...prev, servicioId: '', horaInicio: '', horaFin: '' }));
+                          }
                         }}
                         onFocus={() => setShowServicioDropdown(true)}
                         onBlur={() => setTimeout(() => setShowServicioDropdown(false), 200)}
                         placeholder="Buscar servicio..."
-                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all"
+                        className={`w-full px-3 py-2 text-sm text-gray-900 bg-white border rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all ${
+                          formData.servicioId && servicios.find(s => s.id === formData.servicioId)
+                            ? 'border-green-500 bg-green-50/30'
+                            : 'border-gray-200'
+                        }`}
                         required
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -878,14 +1175,14 @@ export default function AgendaPublicaPage() {
                     )}
                   </div>
 
-                  {/* Empleado (opcional) */}
+                  {/* Empleado (obligatorio solo si hay empleados) */}
                   {empleados.length > 0 && (
                     <div className="relative">
                       <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5">
                         <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
-                        Empleado <span className="text-[10px] text-gray-400 font-normal">(opcional)</span>
+                        Empleado <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <input
@@ -894,11 +1191,22 @@ export default function AgendaPublicaPage() {
                           onChange={(e) => {
                             setEmpleadoSearch(e.target.value);
                             setShowEmpleadoDropdown(true);
+                            // Limpiar empleadoId si el usuario escribe manualmente
+                            // Solo mantener si el texto coincide exactamente con un empleado
+                            const empleadoCoincide = empleados.find(emp => emp.nombre === e.target.value);
+                            if (!empleadoCoincide) {
+                              setFormData(prev => ({ ...prev, empleadoId: '' }));
+                            }
                           }}
                           onFocus={() => setShowEmpleadoDropdown(true)}
                           onBlur={() => setTimeout(() => setShowEmpleadoDropdown(false), 200)}
                           placeholder="Buscar empleado..."
-                          className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all"
+                          className={`w-full px-3 py-2 text-sm text-gray-900 bg-white border rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10 placeholder-gray-400 transition-all ${
+                            formData.empleadoId && empleados.find(e => e.id === formData.empleadoId)
+                              ? 'border-green-500 bg-green-50/30'
+                              : 'border-gray-200'
+                          }`}
+                          required
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1040,7 +1348,7 @@ export default function AgendaPublicaPage() {
                             </svg>
                             Horarios disponibles ({horariosDisponibles.filter(h => h.disponible).length} espacios)
                           </label>
-                          <div className="grid grid-cols-3 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
                             {horariosDisponibles.filter(horario => horario.disponible).map((horario) => {
                               const servicio = servicios.find(s => s.id === formData.servicioId);
                               const duracion = servicio?.duracion || 0;
@@ -1162,9 +1470,9 @@ export default function AgendaPublicaPage() {
               )}
             </div>
 
-            {/* Footer con botones - Minimalista */}
+            {/* Footer con botones - Minimalista - Responsive */}
             {paso < 4 && (
-              <div className="border-t border-gray-100 px-6 py-4 bg-gray-50/30">
+              <div className="border-t border-gray-100 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50/30">
                 {/* Error */}
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2.5 rounded-xl text-xs mb-3 flex items-start gap-2">
@@ -1182,12 +1490,13 @@ export default function AgendaPublicaPage() {
                       type="button"
                       onClick={retrocederPaso}
                       disabled={submitting}
-                      className="px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-white hover:border-gray-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
+                      className="px-3 sm:px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-white hover:border-gray-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
-                      Atrás
+                      <span className="hidden sm:inline">Atrás</span>
+                      <span className="sm:hidden">←</span>
                     </button>
                   )}
 
@@ -1195,10 +1504,11 @@ export default function AgendaPublicaPage() {
                     <button
                       type="button"
                       onClick={avanzarPaso}
-                      className="flex-1 px-4 py-2.5 bg-[#0490C8] hover:bg-[#037ba8] text-white font-medium rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+                      className="flex-1 px-3 sm:px-4 py-2.5 bg-[#0490C8] hover:bg-[#037ba8] text-white font-medium rounded-xl transition-all text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2"
                     >
-                      Siguiente
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span className="hidden sm:inline">Siguiente</span>
+                      <span className="sm:hidden">Siguiente</span>
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
@@ -1207,19 +1517,21 @@ export default function AgendaPublicaPage() {
                       type="button"
                       onClick={handleSubmit}
                       disabled={submitting || !formData.horaInicio}
-                      className="flex-1 px-4 py-2.5 bg-[#0490C8] hover:bg-[#037ba8] text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                      className="flex-1 px-3 sm:px-4 py-2.5 bg-[#0490C8] hover:bg-[#037ba8] text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-xs sm:text-sm"
                     >
                       {submitting ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Agendando...
+                          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span className="hidden sm:inline">Agendando...</span>
+                          <span className="sm:hidden">Enviando...</span>
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          Confirmar Cita
+                          <span className="hidden sm:inline">Confirmar Cita</span>
+                          <span className="sm:hidden">Confirmar</span>
                         </>
                       )}
                     </button>
@@ -1228,6 +1540,23 @@ export default function AgendaPublicaPage() {
               </div>
             )}
           </form>
+        </div>
+
+        {/* Footer - Powered by CitaYA */}
+        <div className="mt-6 sm:mt-8 flex items-center justify-center gap-2 text-xs text-gray-500">
+          <span>Powered by</span>
+          <a 
+            href="/" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center"
+          >
+            <img 
+              src="/Assets/logo_citaYA.png" 
+              alt="CitaYA" 
+              className="h-5 sm:h-6 w-auto opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+            />
+          </a>
         </div>
       </div>
     </div>

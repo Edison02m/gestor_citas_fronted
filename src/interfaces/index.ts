@@ -628,6 +628,7 @@ export interface SucursalPublica {
   telefono?: string;
   ciudad: string;
   estado: string;
+  horarios?: HorarioSucursal[]; // Horarios de la sucursal
 }
 
 export interface ServicioPublico {
