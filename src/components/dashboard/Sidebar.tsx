@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isCollapsed?: boolean;
 }
 
 const menuItems = [
@@ -57,6 +58,16 @@ const menuItems = [
     )
   },
   {
+    name: 'Configuración',
+    path: '/dashboard-usuario/configuracion',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    )
+  },
+  {
     name: 'Perfil',
     path: '/dashboard-usuario/perfil',
     icon: (
@@ -67,7 +78,7 @@ const menuItems = [
   }
 ];
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, isCollapsed = false }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -89,18 +100,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-50
-          w-64 lg:w-64
           bg-white border-r border-gray-200
-          transform transition-transform duration-300 ease-in-out
+          transform transition-all duration-300 ease-in-out
           lg:transform-none
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isCollapsed ? 'lg:w-20' : 'w-64 lg:w-64'}
           flex flex-col
         `}
       >
         {/* Header con nombre del negocio */}
         <div className="p-4 sm:p-6 border-b border-gray-200">
           {/* Layout móvil: horizontal con botón cerrar */}
-          <div className="flex items-center justify-between lg:hidden">
+          <div className={`flex items-center justify-between lg:hidden`}>
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                 {negocioNombre}
@@ -119,24 +130,26 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           </div>
 
-          {/* Layout desktop: vertical centrado */}
-          <div className="hidden lg:flex lg:flex-col lg:items-center lg:text-center lg:space-y-3">
+          {/* Layout desktop: vertical centrado o colapsado */}
+          <div className={`hidden lg:flex lg:flex-col ${isCollapsed ? 'lg:items-center' : 'lg:items-center lg:text-center lg:space-y-3'}`}>
             {/* Logo centrado arriba */}
             <div className="flex justify-center">
               <img
                 src="/Assets/logo_citaYA.png"
                 alt="CitaYa Logo"
-                className="h-8 w-auto"
+                className={`w-auto transition-all duration-300 ${isCollapsed ? 'h-6' : 'h-8'}`}
               />
             </div>
 
-            {/* Información del negocio abajo */}
-            <div className="space-y-1">
-              <h1 className="text-xl font-bold text-gray-900 truncate">
-                {negocioNombre}
-              </h1>
-              <p className="text-sm text-gray-500 truncate">{user?.email}</p>
-            </div>
+            {/* Información del negocio abajo - oculta cuando está colapsado */}
+            {!isCollapsed && (
+              <div className="space-y-1">
+                <h1 className="text-xl font-bold text-gray-900 truncate">
+                  {negocioNombre}
+                </h1>
+                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -149,14 +162,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
-                className={`w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${
+                  isCollapsed 
+                    ? 'lg:justify-center lg:px-3 lg:py-3 px-3 sm:px-4 py-2.5 sm:py-3' 
+                    : 'px-3 sm:px-4 py-2.5 sm:py-3'
+                } ${
                   isActive
                     ? 'bg-[#0490C8] text-white shadow-sm'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
+                title={isCollapsed ? item.name : undefined}
               >
                 {item.icon}
-                <span>{item.name}</span>
+                <span className={`${isCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
               </button>
             );
           })}
@@ -169,12 +187,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               logout();
               onClose();
             }}
-            className="w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
+            className={`w-full flex items-center gap-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all ${
+              isCollapsed 
+                ? 'lg:justify-center lg:px-3 lg:py-3 px-3 sm:px-4 py-2.5 sm:py-3' 
+                : 'px-3 sm:px-4 py-2.5 sm:py-3'
+            }`}
+            title={isCollapsed ? 'Cerrar Sesión' : undefined}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span>Cerrar Sesión</span>
+            <span className={`${isCollapsed ? 'lg:hidden' : ''}`}>Cerrar Sesión</span>
           </button>
         </div>
       </aside>

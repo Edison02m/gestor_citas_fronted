@@ -14,10 +14,6 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
@@ -73,9 +69,11 @@ body {
   @keyframes fadeIn {
     from {
       opacity: 0;
+      transform: translateY(-10px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
@@ -84,6 +82,10 @@ body {
   }
 
   .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
 

@@ -607,3 +607,82 @@ export interface DisponibilidadResponse {
   success: true;
   data: HorarioDisponible[];
 }
+
+// ============================================================================
+// AGENDA PÚBLICA
+// ============================================================================
+
+export interface NegocioPublico {
+  id: string;
+  nombre: string;
+  telefono: string;
+  logo?: string;
+  descripcion?: string;
+  agendaPublica: boolean;
+}
+
+export interface SucursalPublica {
+  id: string;
+  nombre: string;
+  direccion: string;
+  telefono?: string;
+  ciudad: string;
+  estado: string;
+}
+
+export interface ServicioPublico {
+  id: string;
+  nombre: string;
+  descripcion?: string;
+  duracion: number;
+  precio: number;
+  color?: string;
+}
+
+export interface EmpleadoPublico {
+  id: string;
+  nombre: string;
+  cargo?: string;
+  foto?: string;
+}
+
+export interface DisponibilidadPublicaDto {
+  empleadoId?: string;
+  sucursalId: string;
+  servicioId: string;
+  fecha: string;
+}
+
+export interface CreateCitaPublicaDto {
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  clienteCedula: string;
+  clienteNombre: string;
+  clienteTelefono: string;
+  clienteEmail?: string;
+  servicioId: string;
+  empleadoId?: string;
+  sucursalId: string;
+  notas?: string;
+}
+
+export interface NegocioPublicoResponse {
+  success: true;
+  data: NegocioPublico;
+}
+
+export interface SucursalesPublicasResponse {
+  success: true;
+  data: SucursalPublica[];
+}
+
+export interface ServiciosPublicosResponse {
+  success: true;
+  data: ServicioPublico[];
+}
+
+export interface EmpleadosPublicosResponse {
+  success: true;
+  data: EmpleadoPublico[];
+}

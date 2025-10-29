@@ -21,7 +21,14 @@ export default function CitaDetailModal({ isOpen, onClose, cita, onCitaUpdated }
 
   const handleEditSuccess = () => {
     setIsEditModalOpen(false);
+    console.log('✅ Cita editada exitosamente - notificando al padre...');
     onCitaUpdated?.();
+    onClose(); // Cerrar también el modal de detalle
+  };
+
+  const handleEditClose = () => {
+    setIsEditModalOpen(false);
+    // NO cerramos el modal de detalle cuando se cancela la edición
   };
 
   if (!isOpen || !cita) return null;
@@ -42,7 +49,7 @@ export default function CitaDetailModal({ isOpen, onClose, cita, onCitaUpdated }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
       <div className="bg-white rounded-2xl max-w-4xl w-full shadow-xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between px-5 py-3 border-b border-gray-200 bg-white">
@@ -230,7 +237,7 @@ export default function CitaDetailModal({ isOpen, onClose, cita, onCitaUpdated }
       {/* Modal de Edición */}
       <EditarCitaModal
         isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+        onClose={handleEditClose}
         cita={cita}
         onSuccess={handleEditSuccess}
       />

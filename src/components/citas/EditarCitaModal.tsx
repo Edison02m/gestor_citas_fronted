@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Cita, UpdateCitaDto, Cliente, Servicio, Empleado, Sucursal } from '@/interfaces';
+import { Cita, UpdateCitaDto, Cliente, Servicio, Empleado, Sucursal, EstadoCita } from '@/interfaces';
 import { ClientesService } from '@/services/clientes.service';
 import { ServiciosService } from '@/services/servicios.service';
 import { EmpleadosService } from '@/services/empleados.service';
@@ -46,6 +46,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
         servicioId: cita.servicio?.id,
         empleadoId: cita.empleado?.id || undefined,
         sucursalId: cita.sucursal?.id,
+        estado: cita.estado,
         notas: cita.notas || '',
       };
       
@@ -404,6 +405,12 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
         console.log('🏢 Sucursal cambió:', cita.sucursal?.id, '→', formData.sucursalId);
       }
       
+      // Comparar estado
+      if (formData.estado && formData.estado !== cita.estado) {
+        dataToUpdate.estado = formData.estado;
+        console.log('🔄 Estado cambió:', cita.estado, '→', formData.estado);
+      }
+      
       // Comparar notas
       const notasOriginal = cita.notas || '';
       const notasNuevas = formData.notas || '';
@@ -467,12 +474,46 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
     }
   };
 
+  const getEstadoLabel = (estado: string) => {
+    switch (estado) {
+      case EstadoCita.PENDIENTE:
+        return 'Pendiente';
+      case EstadoCita.CONFIRMADA:
+        return 'Confirmada';
+      case EstadoCita.COMPLETADA:
+        return 'Completada';
+      case EstadoCita.CANCELADA:
+        return 'Cancelada';
+      case EstadoCita.NO_ASISTIO:
+        return 'No asistió';
+      default:
+        return estado;
+    }
+  };
+
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case EstadoCita.PENDIENTE:
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case EstadoCita.CONFIRMADA:
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case EstadoCita.COMPLETADA:
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case EstadoCita.CANCELADA:
+        return 'bg-red-50 text-red-700 border-red-200';
+      case EstadoCita.NO_ASISTIO:
+        return 'bg-gray-50 text-gray-700 border-gray-200';
+      default:
+        return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
+
   if (!isOpen || !cita) return null;
 
   const hayConflicto = verificarConflicto(formData.horaInicio || '', formData.horaFin || '');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4">
       <div className="bg-white rounded-2xl w-full shadow-xl overflow-hidden flex flex-col" style={{ maxWidth: '950px', maxHeight: '90vh' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white flex-shrink-0">
@@ -504,78 +545,103 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Columna Izquierda: Información Básica */}
                 <div className="space-y-3">
-                  {/* Servicio */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
-                      Servicio <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.servicioId || ''}
-                      onChange={(e) => {
-                        const nuevoServicioId = e.target.value;
-                        setFormData({ ...formData, servicioId: nuevoServicioId });
-                        
-                        // Recalcular hora de fin si hay hora de inicio y servicio seleccionado
-                        if (formData.horaInicio && nuevoServicioId) {
-                          const servicio = servicios.find(s => s.id === nuevoServicioId);
-                          if (servicio) {
-                            const nuevaHoraFin = calcularHoraFin(formData.horaInicio, servicio.duracion);
-                            setFormData(prev => ({ ...prev, servicioId: nuevoServicioId, horaFin: nuevaHoraFin }));
+                  {/* Grid 2 columnas para Servicio y Sucursal */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Servicio */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                        Servicio <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={formData.servicioId || ''}
+                        onChange={(e) => {
+                          const nuevoServicioId = e.target.value;
+                          setFormData({ ...formData, servicioId: nuevoServicioId });
+                          
+                          // Recalcular hora de fin si hay hora de inicio y servicio seleccionado
+                          if (formData.horaInicio && nuevoServicioId) {
+                            const servicio = servicios.find(s => s.id === nuevoServicioId);
+                            if (servicio) {
+                              const nuevaHoraFin = calcularHoraFin(formData.horaInicio, servicio.duracion);
+                              setFormData(prev => ({ ...prev, servicioId: nuevoServicioId, horaFin: nuevaHoraFin }));
+                            }
                           }
-                        }
-                      }}
-                      className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
-                      disabled={loadingData}
-                      required
-                    >
-                      <option value="">Seleccionar servicio...</option>
-                      {servicios.map(servicio => (
-                        <option key={servicio.id} value={servicio.id}>
-                          {servicio.nombre} - {servicio.duracion}min - ${servicio.precio}
-                        </option>
-                      ))}
-                    </select>
+                        }}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                        disabled={loadingData}
+                        required
+                      >
+                        <option value="">Seleccionar servicio...</option>
+                        {servicios.map(servicio => (
+                          <option key={servicio.id} value={servicio.id}>
+                            {servicio.nombre} - {servicio.duracion}min - ${servicio.precio}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Sucursal */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                        Sucursal <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={formData.sucursalId || ''}
+                        onChange={(e) => setFormData({ ...formData, sucursalId: e.target.value })}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                        disabled={loadingData}
+                        required
+                      >
+                        <option value="">Seleccionar sucursal...</option>
+                        {sucursales.map(sucursal => (
+                          <option key={sucursal.id} value={sucursal.id}>
+                            {sucursal.nombre} - {sucursal.direccion}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
-                  {/* Sucursal */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
-                      Sucursal <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.sucursalId || ''}
-                      onChange={(e) => setFormData({ ...formData, sucursalId: e.target.value })}
-                      className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
-                      disabled={loadingData}
-                      required
-                    >
-                      <option value="">Seleccionar sucursal...</option>
-                      {sucursales.map(sucursal => (
-                        <option key={sucursal.id} value={sucursal.id}>
-                          {sucursal.nombre} - {sucursal.direccion}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Grid 2 columnas para Empleado y Estado */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Empleado */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                        Empleado {empleados.length === 0 && <span className="text-red-500">*</span>}
+                      </label>
+                      <select
+                        value={formData.empleadoId || ''}
+                        onChange={(e) => setFormData({ ...formData, empleadoId: e.target.value || undefined })}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                        disabled={loadingData}
+                      >
+                        <option value="">Sin asignar</option>
+                        {empleados.map(empleado => (
+                          <option key={empleado.id} value={empleado.id}>
+                            {empleado.nombre} - {empleado.cargo}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  {/* Empleado */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
-                      Empleado {empleados.length === 0 && <span className="text-red-500">*</span>}
-                    </label>
-                    <select
-                      value={formData.empleadoId || ''}
-                      onChange={(e) => setFormData({ ...formData, empleadoId: e.target.value || undefined })}
-                      className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
-                      disabled={loadingData}
-                    >
-                      <option value="">Sin asignar</option>
-                      {empleados.map(empleado => (
-                        <option key={empleado.id} value={empleado.id}>
-                          {empleado.nombre} - {empleado.cargo}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Estado */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                        Estado <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={formData.estado || ''}
+                        onChange={(e) => setFormData({ ...formData, estado: e.target.value as EstadoCita })}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                        required
+                      >
+                        {Object.values(EstadoCita).map((estado) => (
+                          <option key={estado} value={estado}>
+                            {getEstadoLabel(estado)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   {/* Selector de Fecha */}
