@@ -52,7 +52,7 @@ export default function EmpleadosPage() {
       setEmpleados(data);
     } catch (error: any) {
       setError('Error al cargar empleados');
-      console.error(error);
+      // Log removido
     } finally {
       setLoading(false);
     }
@@ -121,16 +121,16 @@ export default function EmpleadosPage() {
     setSubmitting(true);
     setError('');
 
-    console.log('🚀 [Page] Iniciando actualización de horarios...');
-    console.log('👤 [Page] Empleado ID:', empleadoSeleccionado.id);
+      // Log removido
+      // Log removido
     console.log('📊 [Page] Horarios recibidos:', JSON.stringify(horarios, null, 2));
 
     try {
       // Enviar array directo de horarios, no wrapper object
       const resultado = await EmpleadosService.updateHorarios(empleadoSeleccionado.id, horarios);
       
-      console.log('✅ [Page] Horarios actualizados exitosamente');
-      console.log('📦 [Page] Resultado:', resultado);
+      // Log removido
+      // Log removido
       
       setSuccessMessage('Horarios actualizados exitosamente');
       setModalHorariosOpen(false);
@@ -139,9 +139,9 @@ export default function EmpleadosPage() {
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
-      console.error('❌ [Page] Error al actualizar horarios:', error);
-      console.error('❌ [Page] Error response:', error.response?.data);
-      console.error('❌ [Page] Error status:', error.response?.status);
+      // Log removido
+      // Log removido
+      // Log removido
       console.error('❌ [Page] Error completo:', JSON.stringify(error, null, 2));
       
       const errorMessage = error.response?.data?.message || error.message || 'Error al actualizar horarios';

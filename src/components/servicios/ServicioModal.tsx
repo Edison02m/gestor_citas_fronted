@@ -83,11 +83,6 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
       return;
     }
 
-    if (!formData.descripcion.trim()) {
-      setErrors('La descripción es requerida');
-      return;
-    }
-
     const duracion = parseInt(formData.duracion);
     if (!formData.duracion || isNaN(duracion) || duracion <= 0) {
       setErrors('La duración debe ser mayor a 0 minutos');
@@ -202,7 +197,7 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Descripción (opcional)</label>
                   <textarea
                     value={formData.descripcion}
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
@@ -210,7 +205,6 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                     className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 text-sm bg-white resize-none"
                     placeholder="Describe el servicio..."
                     disabled={loading}
-                    required
                   />
                 </div>
 
@@ -326,7 +320,7 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
 
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Descripción <span className="text-red-500">*</span>
+                      Descripción (opcional)
                     </label>
                     <textarea
                       value={formData.descripcion}
@@ -335,7 +329,6 @@ export default function ServicioModal({ isOpen, onClose, onSubmit, servicio, loa
                       className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 text-sm bg-white resize-none"
                       placeholder="Describe el servicio..."
                       disabled={loading}
-                      required
                     />
                   </div>
 

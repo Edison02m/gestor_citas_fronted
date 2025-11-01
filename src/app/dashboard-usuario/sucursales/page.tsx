@@ -48,7 +48,7 @@ export default function SucursalesPage() {
       const data = await SucursalesService.getSucursales();
       setSucursales(data);
     } catch (error: any) {
-      console.error('Error al cargar sucursales:', error);
+      // Log removido
       setError(error.message || 'Error al cargar las sucursales');
       setTimeout(() => setError(''), 5000);
     } finally {
@@ -67,7 +67,7 @@ export default function SucursalesPage() {
       const data = await SucursalesService.searchSucursales(searchTerm.trim());
       setSucursales(data);
     } catch (error: any) {
-      console.error('Error al buscar sucursales:', error);
+      // Log removido
       setError(error.message || 'Error al buscar sucursales');
       setTimeout(() => setError(''), 5000);
     } finally {
@@ -155,7 +155,7 @@ export default function SucursalesPage() {
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
-      console.error('Error al eliminar sucursal:', error);
+      // Log removido
       setDeleteError(error.message || 'Error al eliminar la sucursal');
     } finally {
       setModalLoading(false);

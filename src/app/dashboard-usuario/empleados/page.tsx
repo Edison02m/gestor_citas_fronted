@@ -43,7 +43,7 @@ export default function EmpleadosPage() {
       setEmpleados(Array.isArray(data) ? data : []);
     } catch (error: any) {
       setError('Error al cargar empleados');
-      console.error(error);
+      // Log removido
       setEmpleados([]); // Establecer array vacío en caso de error
     } finally {
       setLoading(false);
@@ -163,7 +163,7 @@ export default function EmpleadosPage() {
 
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
-      console.error('Error al eliminar empleado:', error);
+      // Log removido
       setDeleteError(error.response?.data?.message || 'Error al eliminar el empleado');
     } finally {
       setSubmitting(false);

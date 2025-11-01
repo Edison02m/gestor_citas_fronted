@@ -21,17 +21,58 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
   });
 
   const [errors, setErrors] = useState<string>('');
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
+
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+53', pais: 'Cuba', bandera: '🇨🇺' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+502', pais: 'Guatemala', bandera: '🇬🇹' },
+    { codigo: '+504', pais: 'Honduras', bandera: '🇭🇳' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+505', pais: 'Nicaragua', bandera: '🇳🇮' },
+    { codigo: '+507', pais: 'Panamá', bandera: '🇵🇦' },
+    { codigo: '+595', pais: 'Paraguay', bandera: '🇵🇾' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+1', pais: 'Puerto Rico', bandera: '🇵🇷' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
 
   useEffect(() => {
     if (cliente) {
+      // Extraer código de país del teléfono si existe
+      let telefonoSinCodigo = cliente.telefono || '';
+      let codigoPaisDetectado = '+593'; // Ecuador por defecto
+      
+      if (telefonoSinCodigo && telefonoSinCodigo.startsWith('+')) {
+        // El teléfono tiene código de país, extraerlo
+        const codigoEncontrado = codigosPaises.find(p => telefonoSinCodigo.startsWith(p.codigo));
+        if (codigoEncontrado) {
+          codigoPaisDetectado = codigoEncontrado.codigo;
+          telefonoSinCodigo = telefonoSinCodigo.substring(codigoEncontrado.codigo.length);
+        }
+      }
+      
+      setCodigoPais(codigoPaisDetectado);
       setFormData({
         nombre: cliente.nombre,
         cedula: cliente.cedula,
-        telefono: cliente.telefono,
+        telefono: telefonoSinCodigo,
         email: cliente.email || '',
         notas: cliente.notas || ''
       });
     } else {
+      setCodigoPais('+593');
       setFormData({
         nombre: '',
         cedula: '',
@@ -42,6 +83,24 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
     }
     setErrors('');
   }, [cliente, isOpen]);
+
+  // Cerrar dropdown de código de país al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showCodigoPaisDropdown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,13 +132,23 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
       return;
     }
 
+    if (!formData.email || !formData.email.trim()) {
+      setErrors('El email es requerido');
+      return;
+    }
+
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       setErrors('El formato del email no es válido');
       return;
     }
 
     try {
-      await onSubmit(formData);
+      // Combinar código de país con teléfono antes de enviar
+      const dataToSubmit = {
+        ...formData,
+        telefono: `${codigoPais}${formData.telefono}`
+      };
+      await onSubmit(dataToSubmit);
     } catch (error: any) {
       setErrors(error.message || 'Error al guardar el cliente');
     }
@@ -150,24 +219,69 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Teléfono *
             </label>
-            <input
-              type="tel"
-              required
-              value={formData.telefono}
-              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-              placeholder="0987654321"
-              disabled={loading}
-            />
+            <div className="flex gap-2">
+              {/* Selector de código de país */}
+              <div className="w-32 relative codigo-pais-dropdown-container">
+                <button
+                  type="button"
+                  onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                  className="w-full px-2 py-2 text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                  disabled={loading}
+                >
+                  <span className="truncate">
+                    {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
+                  </span>
+                  <svg className={`w-3 h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {showCodigoPaisDropdown && (
+                  <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {codigosPaises.map((pais) => (
+                      <button
+                        key={`${pais.codigo}-${pais.pais}`}
+                        type="button"
+                        onClick={() => {
+                          setCodigoPais(pais.codigo);
+                          setShowCodigoPaisDropdown(false);
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{pais.bandera}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
+                            <div className="text-[10px] text-gray-500">{pais.codigo}</div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Input de teléfono */}
+              <input
+                type="tel"
+                required
+                value={formData.telefono}
+                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+                placeholder="999999999"
+                disabled={loading}
+              />
+            </div>
           </div>
 
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Email (opcional)
+              Email *
             </label>
             <input
               type="email"
+              required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"

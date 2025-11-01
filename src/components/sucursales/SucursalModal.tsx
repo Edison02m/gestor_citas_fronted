@@ -23,6 +23,7 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
     provincia: '',
     telefono: '',
     email: '',
+    googleMapsUrl: '',
     estado: 'ACTIVA' as 'ACTIVA' | 'INACTIVA'
   });
 
@@ -37,6 +38,7 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
         provincia: sucursal.provincia || '',
         telefono: sucursal.telefono,
         email: sucursal.email || '',
+        googleMapsUrl: sucursal.googleMapsUrl || '',
         estado: sucursal.estado || 'ACTIVA'
       });
     } else {
@@ -47,6 +49,7 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
         provincia: '',
         telefono: '',
         email: '',
+        googleMapsUrl: '',
         estado: 'ACTIVA'
       });
     }
@@ -88,6 +91,7 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
       if (formData.ciudad) dataToSend.ciudad = formData.ciudad;
       if (formData.provincia) dataToSend.provincia = formData.provincia;
       if (formData.email) dataToSend.email = formData.email;
+      if (formData.googleMapsUrl) dataToSend.googleMapsUrl = formData.googleMapsUrl;
 
       // Solo incluir estado si es edición
       if (sucursal) {
@@ -250,6 +254,24 @@ export default function SucursalModal({ isOpen, onClose, onSubmit, sucursal, loa
                 disabled={loading}
               />
             </div>
+          </div>
+
+          {/* Google Maps URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              URL de Google Maps (opcional)
+            </label>
+            <input
+              type="url"
+              value={formData.googleMapsUrl}
+              onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })}
+              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              placeholder="https://maps.google.com/..."
+              disabled={loading}
+            />
+            <p className="mt-1.5 text-xs text-gray-500">
+              Puedes copiar el enlace desde Google Maps para mostrar la ubicación exacta
+            </p>
           </div>
 
           {/* Estado - Solo al editar */}

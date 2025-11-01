@@ -38,14 +38,14 @@ export default function ServicioForm({ onSuccess }: Props) {
 
   const loadSucursales = async () => {
     try {
-      console.log('🔍 Cargando sucursales...');
+      // Log removido
       const data = await OnboardingService.getSucursales();
-      console.log('✅ Sucursales cargadas:', data);
+      // Log removido
       setSucursales(data);
       // Seleccionar todas las sucursales por defecto
       setFormData(prev => ({ ...prev, sucursalIds: data.map(s => s.id) }));
     } catch (err) {
-      console.error('❌ Error al cargar sucursales:', err);
+      // Log removido
       setError('No se pudieron cargar las sucursales. Asegúrate de haber creado al menos una sucursal.');
     } finally {
       setLoadingSucursales(false);

@@ -41,7 +41,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
       // Filtrar solo sucursales activas
       setSucursales(data.filter(s => s.estado === 'ACTIVA'));
     } catch (error) {
-      console.error('Error al cargar sucursales:', error);
+      // Log removido
     } finally {
       setLoadingSucursales(false);
     }

@@ -105,6 +105,7 @@ export interface Sucursal {
   provincia: string | null;
   telefono: string;
   email: string | null;
+  googleMapsUrl: string | null;
   estado: "ACTIVA" | "INACTIVA";
   negocioId: string;
   createdAt: string;
@@ -140,6 +141,7 @@ export interface CrearSucursalDto {
   provincia?: string;
   telefono: string;
   email?: string;
+  googleMapsUrl?: string;
   horarios: HorarioDto[];
 }
 
@@ -150,6 +152,7 @@ export interface ActualizarSucursalDto {
   provincia?: string | null;
   telefono?: string;
   email?: string | null;
+  googleMapsUrl?: string | null;
 }
 
 export interface ActualizarHorariosDto {
@@ -192,6 +195,7 @@ export interface CreateSucursalDto {
   nombre: string;
   direccion: string;
   telefono: string;
+  googleMapsUrl?: string;
   horarios: HorarioInput[];
 }
 
@@ -238,6 +242,7 @@ export interface Empleado {
   foto?: string | null;
   estado: "ACTIVO" | "INACTIVO";
   negocioId: string;
+  sucursales?: EmpleadoSucursal[];
   horarios?: HorarioEmpleado[];
   bloqueos?: BloqueoEmpleado[];
   createdAt: string;
@@ -638,6 +643,7 @@ export interface ServicioPublico {
   duracion: number;
   precio: number;
   color?: string;
+  sucursales?: ServicioSucursal[];
 }
 
 export interface EmpleadoPublico {

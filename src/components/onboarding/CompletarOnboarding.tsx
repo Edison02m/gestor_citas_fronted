@@ -26,7 +26,7 @@ export default function CompletarOnboarding() {
       // 3. Redirigir al dashboard
       router.push('/dashboard-usuario');
     } catch (error: any) {
-      console.error('Error al ir al dashboard:', error);
+      // Log removido
       alert(error.message || 'Error al redirigir al dashboard');
       setLoading(false);
     }

@@ -51,7 +51,7 @@ export default function CrearCodigoModal({ isOpen, onClose, onSubmit }: CrearCod
       setNotas('');
       onClose();
     } catch (error) {
-      console.error('Error al crear código:', error);
+      // Log removido
     } finally {
       setLoading(false);
     }

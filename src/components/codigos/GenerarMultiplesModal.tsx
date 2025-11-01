@@ -45,7 +45,7 @@ export default function GenerarMultiplesModal({ isOpen, onClose, onSubmit }: Gen
       setUsoMaximo(1);
       onClose();
     } catch (error) {
-      console.error('Error al generar códigos:', error);
+      // Log removido
     } finally {
       setLoading(false);
     }

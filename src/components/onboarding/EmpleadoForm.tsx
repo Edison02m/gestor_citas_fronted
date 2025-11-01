@@ -38,7 +38,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       // Seleccionar todas las sucursales por defecto
       setFormData(prev => ({ ...prev, sucursalIds: data.map(s => s.id) }));
     } catch (err) {
-      console.error('Error al cargar sucursales:', err);
+      // Log removido
     } finally {
       setLoadingSucursales(false);
     }
@@ -93,7 +93,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       // Llamar a onSkip para que recargue el estado y muestre el paso 5
       onSkip();
     } catch (err: any) {
-      console.error('❌ Error al completar onboarding:', err);
+      // Log removido
       setError(err.message || 'Error al completar la configuración');
       setShowSkipConfirm(false);
     } finally {

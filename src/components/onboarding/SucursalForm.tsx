@@ -20,6 +20,7 @@ export default function SucursalForm({ onSuccess }: Props) {
     nombre: '',
     direccion: '',
     telefono: '',
+    googleMapsUrl: '',
     horarios: [
       { diaSemana: 0, abierto: false, horaApertura: null, horaCierre: null, tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' }, // Domingo cerrado
       { diaSemana: 1, abierto: true, horaApertura: '09:00', horaCierre: '18:00', tieneDescanso: false, descansoInicio: '12:00', descansoFin: '13:00' },
@@ -217,6 +218,23 @@ export default function SucursalForm({ onSuccess }: Props) {
             placeholder="Av. Principal 123"
             disabled={loading}
           />
+        </div>
+
+        <div className="col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            URL de Google Maps (opcional)
+          </label>
+          <input
+            type="url"
+            value={formData.googleMapsUrl}
+            onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })}
+            className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+            placeholder="https://maps.google.com/..."
+            disabled={loading}
+          />
+          <p className="mt-1.5 text-xs text-gray-500">
+            Enlace de Google Maps para mostrar la ubicación
+          </p>
         </div>
       </div>
 

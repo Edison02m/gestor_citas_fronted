@@ -48,7 +48,7 @@ export default function ServiciosPage() {
       const data = await ServiciosService.getServicios();
       setServicios(data);
     } catch (error: any) {
-      console.error('Error al cargar servicios:', error);
+      // Log removido
       setError(error.message || 'Error al cargar los servicios');
       setTimeout(() => setError(''), 5000);
     } finally {
@@ -67,7 +67,7 @@ export default function ServiciosPage() {
       const data = await ServiciosService.searchServicios(searchTerm.trim());
       setServicios(data);
     } catch (error: any) {
-      console.error('Error al buscar servicios:', error);
+      // Log removido
       setError(error.message || 'Error al buscar servicios');
       setTimeout(() => setError(''), 5000);
     } finally {
@@ -147,7 +147,7 @@ export default function ServiciosPage() {
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
-      console.error('Error al eliminar servicio:', error);
+      // Log removido
       setDeleteError(error.message || 'Error al eliminar el servicio');
     } finally {
       setModalLoading(false);

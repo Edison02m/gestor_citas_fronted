@@ -91,7 +91,7 @@ export default function SelectorHorario({
         });
       }
     } catch (error) {
-      console.error('Error al cargar citas:', error);
+      // Log removido
       setError('Error al cargar las citas existentes');
       setHorarioSucursal({
         horaApertura: '08:00',

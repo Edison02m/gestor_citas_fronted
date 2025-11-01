@@ -39,7 +39,7 @@ export default function CodigosPage() {
       setCodigos(response.codigos);
       setTotalPages(response.totalPages);
     } catch (error) {
-      console.error('Error al cargar códigos:', error);
+      // Log removido
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function CodigosPage() {
       const stats = await codigosService.obtenerEstadisticas();
       setEstadisticas(stats);
     } catch (error) {
-      console.error('Error al cargar estadísticas:', error);
+      // Log removido
     }
   };
 

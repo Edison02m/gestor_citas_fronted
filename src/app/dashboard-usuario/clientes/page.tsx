@@ -43,7 +43,7 @@ export default function ClientesPage() {
       setTotal(data.total);
       setTotalPages(data.totalPaginas);
     } catch (error: any) {
-      console.error('Error al cargar clientes:', error);
+      // Log removido
     } finally {
       setLoading(false);
     }

@@ -75,12 +75,25 @@ export default function SucursalesTable({
               <svg className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               </svg>
-              <div className="text-sm">
+              <div className="text-sm flex-1">
                 <p className="text-gray-900 font-medium">{sucursal.direccion}</p>
                 {(sucursal.ciudad || sucursal.provincia) && (
                   <p className="text-gray-500 text-xs mt-0.5">
                     {[sucursal.ciudad, sucursal.provincia].filter(Boolean).join(', ')}
                   </p>
+                )}
+                {sucursal.googleMapsUrl && (
+                  <a
+                    href={sucursal.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-[#0490C8] hover:text-[#023664] font-medium mt-1.5 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Ver en Maps
+                  </a>
                 )}
               </div>
             </div>

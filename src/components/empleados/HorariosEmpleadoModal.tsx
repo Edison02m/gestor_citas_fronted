@@ -57,7 +57,7 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
         setSucursalId(sucursales[0].sucursalId);
       }
     } catch (error) {
-      console.error('Error al cargar sucursal del empleado:', error);
+      // Log removido
     }
   };
 
@@ -109,7 +109,7 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
       setHorarios(nuevoHorarios);
       setLoadingSucursal(false);
     } catch (error: any) {
-      console.error('Error al sincronizar:', error);
+      // Log removido
       setError(error.response?.data?.message || error.message || 'Error al sincronizar con la sucursal');
       setLoadingSucursal(false);
     }

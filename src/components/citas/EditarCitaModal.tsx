@@ -107,6 +107,36 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
     }
   }, [loadingData]);
 
+  // Limpiar servicio si no está disponible en la sucursal seleccionada
+  useEffect(() => {
+    if (formData.sucursalId && formData.servicioId && servicios.length > 0) {
+      const servicioActual = servicios.find(s => s.id === formData.servicioId);
+      const estáDisponible = servicioActual?.sucursales?.some(
+        ss => ss.sucursalId === formData.sucursalId && ss.disponible
+      );
+      
+      if (!estáDisponible) {
+        console.log('⚠️ EDITAR CITA - Servicio no disponible en sucursal, limpiando...');
+        setFormData(prev => ({ ...prev, servicioId: undefined, horaInicio: '', horaFin: '' }));
+      }
+    }
+  }, [formData.sucursalId, servicios]);
+
+  // Limpiar empleado si no está asignado a la sucursal seleccionada
+  useEffect(() => {
+    if (formData.sucursalId && formData.empleadoId && empleados.length > 0) {
+      const empleadoActual = empleados.find(e => e.id === formData.empleadoId);
+      const estáAsignado = empleadoActual?.sucursales?.some(
+        es => es.sucursalId === formData.sucursalId
+      );
+      
+      if (!estáAsignado) {
+        console.log('⚠️ EDITAR CITA - Empleado no asignado a sucursal, limpiando...');
+        setFormData(prev => ({ ...prev, empleadoId: undefined, horaInicio: '', horaFin: '' }));
+      }
+    }
+  }, [formData.sucursalId, empleados]);
+
   const calcularHorariosDisponibles = async () => {
     if (!fechaSeleccionada || !formData.empleadoId || !formData.sucursalId || !formData.servicioId) return;
 
@@ -510,6 +540,32 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
 
   if (!isOpen || !cita) return null;
 
+  // Filtrar servicios por sucursal seleccionada
+  const serviciosFiltrados = servicios.filter(servicio => {
+    // Si no hay sucursal seleccionada, mostrar todos los servicios
+    if (!formData.sucursalId) {
+      return true;
+    }
+    
+    // Si hay sucursal seleccionada, solo mostrar servicios disponibles en esa sucursal
+    return servicio.sucursales?.some(
+      ss => ss.sucursalId === formData.sucursalId && ss.disponible
+    );
+  });
+
+  // Filtrar empleados por sucursal seleccionada
+  const empleadosFiltrados = empleados.filter(empleado => {
+    // Si no hay sucursal seleccionada, mostrar todos los empleados
+    if (!formData.sucursalId) {
+      return true;
+    }
+    
+    // Si hay sucursal seleccionada, solo mostrar empleados asignados a esa sucursal
+    return empleado.sucursales?.some(
+      es => es.sucursalId === formData.sucursalId
+    );
+  });
+
   const hayConflicto = verificarConflicto(formData.horaInicio || '', formData.horaFin || '');
 
   return (
@@ -572,7 +628,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
                         required
                       >
                         <option value="">Seleccionar servicio...</option>
-                        {servicios.map(servicio => (
+                        {serviciosFiltrados.map(servicio => (
                           <option key={servicio.id} value={servicio.id}>
                             {servicio.nombre} - {servicio.duracion}min - ${servicio.precio}
                           </option>
@@ -607,7 +663,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
                     {/* Empleado */}
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1.5">
-                        Empleado {empleados.length === 0 && <span className="text-red-500">*</span>}
+                        Empleado {empleadosFiltrados.length === 0 && <span className="text-red-500">*</span>}
                       </label>
                       <select
                         value={formData.empleadoId || ''}
@@ -616,7 +672,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
                         disabled={loadingData}
                       >
                         <option value="">Sin asignar</option>
-                        {empleados.map(empleado => (
+                        {empleadosFiltrados.map(empleado => (
                           <option key={empleado.id} value={empleado.id}>
                             {empleado.nombre} - {empleado.cargo}
                           </option>

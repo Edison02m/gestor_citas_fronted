@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CreateCitaDto, Cliente, Servicio, Empleado, Sucursal, CanalOrigen, Cita } from '@/interfaces';
+import { CreateCitaDto, Cliente, Servicio, Empleado, Sucursal, CanalOrigen, Cita, CreateClienteDto } from '@/interfaces';
 import { ClientesService } from '@/services/clientes.service';
 import { ServiciosService } from '@/services/servicios.service';
 import { EmpleadosService } from '@/services/empleados.service';
@@ -9,6 +9,7 @@ import { SucursalesService } from '@/services/sucursales.service';
 import { CitasService } from '@/services/citas.service';
 import SelectorSemana from './SelectorSemana';
 import { formatDateInput } from '@/utils/format';
+import ClienteModal from '@/components/clientes/ClienteModal';
 
 interface CrearCitaModalProps {
   isOpen: boolean;
@@ -44,6 +45,10 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
   const [loadingData, setLoadingData] = useState(false);
   const [loadingCitas, setLoadingCitas] = useState(false);
   const [errors, setErrors] = useState<string>('');
+
+  // Modal de crear cliente
+  const [showClienteModal, setShowClienteModal] = useState(false);
+  const [loadingCliente, setLoadingCliente] = useState(false);
 
   // Estados para búsqueda en selectores
   const [clienteSearch, setClienteSearch] = useState('');
@@ -95,7 +100,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       }
 
     } catch (error) {
-      console.error('Error al cargar datos:', error);
+      // Log removido
       setErrors('Error al cargar los datos necesarios');
     } finally {
       setLoadingData(false);
@@ -137,19 +142,45 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     (cliente.email && cliente.email.toLowerCase().includes(clienteSearch.toLowerCase()))
   );
 
-  const serviciosFiltrados = servicios.filter(servicio =>
-    servicio.nombre.toLowerCase().includes(servicioSearch.toLowerCase())
-  );
+  const serviciosFiltrados = servicios.filter(servicio => {
+    // Filtrar por búsqueda de texto
+    const matchesSearch = servicio.nombre.toLowerCase().includes(servicioSearch.toLowerCase());
+    
+    // Si no hay sucursal seleccionada, mostrar todos los servicios que coincidan con la búsqueda
+    if (!formData.sucursalId) {
+      return matchesSearch;
+    }
+    
+    // Si hay sucursal seleccionada, solo mostrar servicios disponibles en esa sucursal
+    const estáEnSucursal = servicio.sucursales?.some(
+      ss => ss.sucursalId === formData.sucursalId && ss.disponible
+    );
+    
+    return matchesSearch && estáEnSucursal;
+  });
 
   const sucursalesFiltradas = sucursales.filter(sucursal =>
     sucursal.nombre.toLowerCase().includes(sucursalSearch.toLowerCase()) ||
     sucursal.direccion.toLowerCase().includes(sucursalSearch.toLowerCase())
   );
 
-  const empleadosFiltrados = empleados.filter(empleado =>
-    empleado.nombre.toLowerCase().includes(empleadoSearch.toLowerCase()) ||
-    empleado.cargo.toLowerCase().includes(empleadoSearch.toLowerCase())
-  );
+  const empleadosFiltrados = empleados.filter(empleado => {
+    // Filtrar por búsqueda de texto
+    const matchesSearch = empleado.nombre.toLowerCase().includes(empleadoSearch.toLowerCase()) ||
+      empleado.cargo.toLowerCase().includes(empleadoSearch.toLowerCase());
+    
+    // Si no hay sucursal seleccionada, mostrar todos los empleados que coincidan con la búsqueda
+    if (!formData.sucursalId) {
+      return matchesSearch;
+    }
+    
+    // Si hay sucursal seleccionada, solo mostrar empleados asignados a esa sucursal
+    const estáEnSucursal = empleado.sucursales?.some(
+      es => es.sucursalId === formData.sucursalId
+    );
+    
+    return matchesSearch && estáEnSucursal;
+  });
 
   // Funciones para manejar selección
   const handleClienteSelect = (cliente: Cliente) => {
@@ -176,6 +207,28 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     setShowEmpleadoDropdown(false);
   };
 
+  // Función para crear nuevo cliente
+  const handleCrearCliente = async (data: CreateClienteDto | any) => {
+    try {
+      setLoadingCliente(true);
+      const nuevoCliente = await ClientesService.createCliente(data as CreateClienteDto);
+      
+      // Agregar el nuevo cliente a la lista
+      setClientes(prev => [nuevoCliente, ...prev]);
+      
+      // Auto-seleccionar el nuevo cliente
+      setFormData(prev => ({ ...prev, clienteId: nuevoCliente.id }));
+      setClienteSearch(nuevoCliente.nombre);
+      
+      // Cerrar el modal
+      setShowClienteModal(false);
+    } catch (error: any) {
+      throw error;
+    } finally {
+      setLoadingCliente(false);
+    }
+  };
+
   // Actualizar formData.fecha cuando se selecciona una fecha
   useEffect(() => {
     if (fechaSeleccionada) {
@@ -186,6 +239,40 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       }));
     }
   }, [fechaSeleccionada]);
+
+  // Resetear servicio seleccionado cuando cambia la sucursal
+  useEffect(() => {
+    if (formData.sucursalId && formData.servicioId) {
+      // Verificar si el servicio actual está disponible en la nueva sucursal
+      const servicioActual = servicios.find(s => s.id === formData.servicioId);
+      const estáDisponible = servicioActual?.sucursales?.some(
+        ss => ss.sucursalId === formData.sucursalId && ss.disponible
+      );
+      
+      // Si el servicio no está disponible en la nueva sucursal, limpiarlo
+      if (!estáDisponible) {
+        setFormData(prev => ({ ...prev, servicioId: '' }));
+        setServicioSearch('');
+      }
+    }
+  }, [formData.sucursalId]);
+
+  // Resetear empleado seleccionado cuando cambia la sucursal
+  useEffect(() => {
+    if (formData.sucursalId && formData.empleadoId) {
+      // Verificar si el empleado actual está asignado a la nueva sucursal
+      const empleadoActual = empleados.find(e => e.id === formData.empleadoId);
+      const estáEnSucursal = empleadoActual?.sucursales?.some(
+        es => es.sucursalId === formData.sucursalId
+      );
+      
+      // Si el empleado no está en la nueva sucursal, limpiarlo
+      if (!estáEnSucursal) {
+        setFormData(prev => ({ ...prev, empleadoId: '' }));
+        setEmpleadoSearch('');
+      }
+    }
+  }, [formData.sucursalId]);
 
   // Cuando cambia la fecha seleccionada o los datos necesarios, calcular horarios disponibles
   useEffect(() => {
@@ -228,40 +315,40 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       // Obtener el día de la semana (0 = domingo, 6 = sábado)
       const diaSemana = fechaSeleccionada.getDay();
 
-      console.log('🏢 INFORMACIÓN DE SUCURSAL Y EMPLEADO:');
-      console.log('Fecha seleccionada:', fechaSeleccionada);
+      // Log removido
+      // Log removido
       console.log('Día de la semana (0=domingo, 6=sábado):', diaSemana);
-      console.log('Sucursal seleccionada:', sucursal.nombre);
-      console.log('Horarios de la sucursal:', sucursal.horarios);
-      console.log('Empleado seleccionado:', empleado.nombre);
-      console.log('Horarios del empleado:', empleado.horarios);
+      // Log removido
+      // Log removido
+      // Log removido
+      // Log removido
 
       // Buscar el horario de la sucursal para ese día
       const horarioSucursal = sucursal.horarios?.find(h => h.diaSemana === diaSemana && h.abierto);
       if (!horarioSucursal) {
-        console.warn('⚠️ No se encontró horario de sucursal para el día', diaSemana);
+      // Log removido
         setHorariosDisponibles([]);
         return;
       }
 
-      console.log('✅ Horario de sucursal encontrado:', horarioSucursal);
+      // Log removido
 
       // Buscar el horario del empleado para ese día
       const horarioEmpleado = empleado.horarios?.find(h => h.diaSemana === diaSemana);
       if (!horarioEmpleado) {
-        console.warn('⚠️ No se encontró horario de empleado para el día', diaSemana);
+      // Log removido
         setHorariosDisponibles([]);
         return;
       }
 
-      console.log('✅ Horario de empleado encontrado:', horarioEmpleado);
+      // Log removido
 
       // Verificar que los horarios tengan valores válidos
       if (!horarioSucursal.horaApertura || !horarioSucursal.horaCierre || 
           !horarioEmpleado.horaInicio || !horarioEmpleado.horaFin) {
-        console.error('❌ Horarios inválidos o incompletos');
-        console.error('Sucursal - Apertura:', horarioSucursal.horaApertura, 'Cierre:', horarioSucursal.horaCierre);
-        console.error('Empleado - Inicio:', horarioEmpleado.horaInicio, 'Fin:', horarioEmpleado.horaFin);
+      // Log removido
+      // Log removido
+      // Log removido
         setHorariosDisponibles([]);
         return;
       }
@@ -275,17 +362,17 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         ? horarioSucursal.horaCierre 
         : horarioEmpleado.horaFin;
 
-      console.log('⏰ Horario efectivo calculado:');
+      // Log removido
       console.log('Inicio:', horaInicio, '(sucursal:', horarioSucursal.horaApertura, ', empleado:', horarioEmpleado.horaInicio, ')');
       console.log('Fin:', horaFin, '(sucursal:', horarioSucursal.horaCierre, ', empleado:', horarioEmpleado.horaFin, ')');
 
       // Generar todos los horarios posibles cada 15 minutos
       const horarios = generarHorariosPosibles(horaInicio, horaFin, servicio.duracion, citasActivas, horarioSucursal, horarioEmpleado);
-      console.log('📋 Horarios disponibles generados:', horarios.length, 'espacios');
+      // Log removido
       setHorariosDisponibles(horarios);
 
     } catch (error) {
-      console.error('Error al calcular horarios disponibles:', error);
+      // Log removido
       setHorariosDisponibles([]);
     } finally {
       setLoadingCitas(false);
@@ -333,7 +420,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     horarioSucursal: any,
     horarioEmpleado: any
   ): boolean => {
-    console.log(`\n🔍 Verificando disponibilidad para ${horaInicio} - ${horaFin}`);
+      // Log removido
     
     // Verificar conflicto con citas existentes
     const citaConflicto = citasOcupadas.find(cita => {
@@ -345,13 +432,13 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         (horaInicio <= citaInicio && horaFin >= citaFin)
       );
       if (hayConflicto) {
-        console.log(`❌ Conflicto con cita existente: ${citaInicio} - ${citaFin}`);
+      // Log removido
       }
       return hayConflicto;
     });
 
     if (citaConflicto) {
-      console.log(`   ❌ RECHAZADO: Hay cita ocupada`);
+      // Log removido
       return false;
     }
 
@@ -365,8 +452,8 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         (horaInicio <= descansoInicio && horaFin >= descansoFin)
       );
       if (enDescansoSucursal) {
-        console.log(`❌ Conflicto con descanso de sucursal: ${descansoInicio} - ${descansoFin}`);
-        console.log(`   ❌ RECHAZADO: En horario de descanso de sucursal`);
+      // Log removido
+      // Log removido
         return false;
       }
     }
@@ -381,13 +468,13 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         (horaInicio <= descansoInicio && horaFin >= descansoFin)
       );
       if (enDescansoEmpleado) {
-        console.log(`❌ Conflicto con descanso de empleado: ${descansoInicio} - ${descansoFin}`);
-        console.log(`   ❌ RECHAZADO: En horario de descanso de empleado`);
+      // Log removido
+      // Log removido
         return false;
       }
     }
 
-    console.log(`   ✅ DISPONIBLE`);
+      // Log removido
     return true;
   };
 
@@ -449,16 +536,16 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         fecha: formatDateInput(fechaSeleccionada!), // El ! asegura que fechaSeleccionada no es null (siempre tendrá un valor por defecto)
       };
       
-      console.log('📅 DATOS A ENVIAR AL BACKEND:');
+      // Log removido
       console.log('Fecha seleccionada (Date object):', fechaSeleccionada);
       console.log('Fecha formateada (string):', dataToSubmit.fecha);
-      console.log('Hora inicio:', dataToSubmit.horaInicio);
-      console.log('Hora fin:', dataToSubmit.horaFin);
-      console.log('Cliente ID:', dataToSubmit.clienteId);
-      console.log('Servicio ID:', dataToSubmit.servicioId);
-      console.log('Empleado ID:', dataToSubmit.empleadoId);
-      console.log('Sucursal ID:', dataToSubmit.sucursalId);
-      console.log('Objeto completo:', dataToSubmit);
+      // Log removido
+      // Log removido
+      // Log removido
+      // Log removido
+      // Log removido
+      // Log removido
+      // Log removido
       
       await onSubmit(dataToSubmit);
       resetForm();
@@ -571,6 +658,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                       placeholder="Buscar cliente por nombre, cédula, teléfono o email..."
                       className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10"
                       disabled={loadingData}
+                      autoComplete="off"
                       required
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -582,81 +670,46 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
 
                   {/* Dropdown */}
                   {showClienteDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                      {clientesFiltrados.length > 0 ? (
-                        clientesFiltrados.map(cliente => (
-                          <button
-                            key={cliente.id}
-                            type="button"
-                            onClick={() => handleClienteSelect(cliente)}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                          >
-                            <div className="text-sm font-medium text-gray-900">{cliente.nombre}</div>
-                            <div className="text-xs text-gray-500">
-                              {cliente.cedula}
-                              {cliente.telefono && ` • ${cliente.telefono}`}
-                              {cliente.email && ` • ${cliente.email}`}
-                            </div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                          No se encontraron clientes
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden flex flex-col">
+                      {/* Botón crear nuevo cliente */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowClienteModal(true);
+                          setShowClienteDropdown(false);
+                        }}
+                        className="w-full px-3 py-2.5 text-left bg-[#0490C8] hover:bg-[#023664] text-white font-medium transition-colors flex items-center gap-2 border-b border-[#023664]"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span className="text-sm">Crear nuevo cliente</span>
+                      </button>
 
-                {/* Servicio */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-600 mb-1.5">
-                    Servicio <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={servicioSearch}
-                      onChange={(e) => {
-                        setServicioSearch(e.target.value);
-                        setShowServicioDropdown(true);
-                      }}
-                      onFocus={() => setShowServicioDropdown(true)}
-                      onBlur={() => setTimeout(() => setShowServicioDropdown(false), 200)}
-                      placeholder="Buscar servicio..."
-                      className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10"
-                      disabled={loadingData}
-                      required
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Dropdown */}
-                  {showServicioDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                      {serviciosFiltrados.length > 0 ? (
-                        serviciosFiltrados.map(servicio => (
-                          <button
-                            key={servicio.id}
-                            type="button"
-                            onClick={() => handleServicioSelect(servicio)}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                          >
-                            <div className="text-sm font-medium text-gray-900">{servicio.nombre}</div>
-                            <div className="text-xs text-gray-500">
-                              {servicio.duracion}min • ${servicio.precio}
-                            </div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                          No se encontraron servicios
-                        </div>
-                      )}
+                      {/* Lista de clientes */}
+                      <div className="overflow-y-auto max-h-48">
+                        {clientesFiltrados.length > 0 ? (
+                          clientesFiltrados.map(cliente => (
+                            <button
+                              key={cliente.id}
+                              type="button"
+                              onClick={() => handleClienteSelect(cliente)}
+                              className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            >
+                              <div className="text-sm font-medium text-gray-900">{cliente.nombre}</div>
+                              <div className="text-xs text-gray-500">
+                                {cliente.cedula}
+                                {cliente.telefono && ` • ${cliente.telefono}`}
+                                {cliente.email && ` • ${cliente.email}`}
+                              </div>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                            No se encontraron clientes
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -680,6 +733,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                         placeholder="Buscar sucursal..."
                         className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10"
                         disabled={loadingData}
+                        autoComplete="off"
                         required
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -714,6 +768,65 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                   </div>
                 )}
 
+                {/* Servicio */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                    Servicio <span className="text-red-500">*</span>
+                    {!formData.sucursalId && sucursales.length > 1 && (
+                      <span className="text-xs text-gray-500 ml-1">(Selecciona primero una sucursal)</span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={servicioSearch}
+                      onChange={(e) => {
+                        setServicioSearch(e.target.value);
+                        setShowServicioDropdown(true);
+                      }}
+                      onFocus={() => setShowServicioDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowServicioDropdown(false), 200)}
+                      placeholder="Buscar servicio..."
+                      className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 pr-10"
+                      disabled={loadingData}
+                      autoComplete="off"
+                      required
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Dropdown */}
+                  {showServicioDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                      {serviciosFiltrados.length > 0 ? (
+                        serviciosFiltrados.map(servicio => (
+                          <button
+                            key={servicio.id}
+                            type="button"
+                            onClick={() => handleServicioSelect(servicio)}
+                            className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          >
+                            <div className="text-sm font-medium text-gray-900">{servicio.nombre}</div>
+                            <div className="text-xs text-gray-500">
+                              {servicio.duracion}min • ${servicio.precio}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                          {!formData.sucursalId && sucursales.length > 1 
+                            ? 'Selecciona una sucursal primero' 
+                            : 'No se encontraron servicios'}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {/* Empleado (mostrar solo si hay empleados) */}
                 {empleados.length > 0 && (
                   <div className="relative">
@@ -734,6 +847,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                         placeholder="Buscar empleado..."
                         className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 disabled:bg-gray-50 pr-10"
                         disabled={loadingData || empleados.length === 1}
+                        autoComplete="off"
                         required={empleados.length > 1}
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -969,6 +1083,14 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
           </div>
         </form>
       </div>
+
+      {/* Modal para crear nuevo cliente */}
+      <ClienteModal
+        isOpen={showClienteModal}
+        onClose={() => setShowClienteModal(false)}
+        onSubmit={handleCrearCliente}
+        loading={loadingCliente}
+      />
     </div>
   );
 }

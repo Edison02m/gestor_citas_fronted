@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { agendaPublicaService } from '@/services/agenda-publica.service';
 import SelectorSemana from '@/components/citas/SelectorSemana';
+import NotFound404 from '@/components/landing/NotFound404';
 import { formatDateInput } from '@/utils/format';
 import {
   NegocioPublico,
@@ -155,6 +156,23 @@ export default function AgendaPublicaPage() {
     }
   }, [fechaSeleccionada, formData.empleadoId, formData.sucursalId, formData.servicioId]);
 
+  // Resetear servicio seleccionado cuando cambia la sucursal
+  useEffect(() => {
+    if (formData.sucursalId && formData.servicioId) {
+      // Verificar si el servicio actual está disponible en la nueva sucursal
+      const servicioActual = servicios.find(s => s.id === formData.servicioId);
+      const estáDisponible = servicioActual?.sucursales?.some(
+        ss => ss.sucursalId === formData.sucursalId && ss.disponible
+      );
+      
+      // Si el servicio no está disponible en la nueva sucursal, limpiarlo
+      if (!estáDisponible) {
+        setFormData(prev => ({ ...prev, servicioId: '', horaInicio: '', horaFin: '' }));
+        setServicioSearch('');
+      }
+    }
+  }, [formData.sucursalId]);
+
   const cargarDatosIniciales = async () => {
     try {
       setLoading(true);
@@ -302,9 +320,22 @@ export default function AgendaPublicaPage() {
   };
 
   // Funciones de filtrado para búsqueda
-  const serviciosFiltrados = servicios.filter(servicio =>
-    servicio.nombre.toLowerCase().includes(servicioSearch.toLowerCase())
-  );
+  const serviciosFiltrados = servicios.filter(servicio => {
+    // Filtrar por búsqueda de texto
+    const matchesSearch = servicio.nombre.toLowerCase().includes(servicioSearch.toLowerCase());
+    
+    // Si no hay sucursal seleccionada, mostrar todos los servicios que coincidan con la búsqueda
+    if (!formData.sucursalId) {
+      return matchesSearch;
+    }
+    
+    // Si hay sucursal seleccionada, solo mostrar servicios disponibles en esa sucursal
+    const estáEnSucursal = servicio.sucursales?.some(
+      ss => ss.sucursalId === formData.sucursalId && ss.disponible
+    );
+    
+    return matchesSearch && estáEnSucursal;
+  });
 
   const sucursalesFiltradas = sucursales.filter(sucursal =>
     sucursal.nombre.toLowerCase().includes(sucursalSearch.toLowerCase()) ||
@@ -429,6 +460,16 @@ export default function AgendaPublicaPage() {
       }
       if (!formData.clienteTelefono) {
         setError('El teléfono es obligatorio');
+        return;
+      }
+      if (!formData.clienteEmail) {
+        setError('El email es obligatorio');
+        return;
+      }
+      // Validar formato del email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.clienteEmail)) {
+        setError('El email no tiene un formato válido');
         return;
       }
     }
@@ -651,19 +692,12 @@ export default function AgendaPublicaPage() {
 
   if (error && !negocio) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={cargarDatosIniciales}
-            className="px-6 py-2 bg-[#0490C8] text-white rounded-xl hover:bg-[#037ba8] transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
+      <NotFound404
+        title="Enlace no encontrado"
+        message={error || "Lo sentimos, el enlace de agenda que estás buscando no existe o ha sido desactivado. Verifica que el enlace sea correcto."}
+        onRetry={cargarDatosIniciales}
+        showRetry={true}
+      />
     );
   }
 
@@ -951,7 +985,7 @@ export default function AgendaPublicaPage() {
                   </div>
 
                   {/* Grid Teléfono y Email - Responsive */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     {/* Teléfono con código de país */}
                     <div>
                       <label className="flex items-center gap-2 text-xs font-medium text-gray-700 mb-1.5">
@@ -1026,7 +1060,7 @@ export default function AgendaPublicaPage() {
                         <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Email <span className="text-[10px] text-gray-400 font-normal">(opcional)</span>
+                        Email <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="email"
@@ -1037,6 +1071,7 @@ export default function AgendaPublicaPage() {
                           clienteEncontrado ? 'bg-green-50/30' : ''
                         } disabled:bg-gray-100 disabled:cursor-not-allowed`}
                         disabled={validandoCedula}
+                        required
                       />
                     </div>
                   </div>
@@ -1117,6 +1152,9 @@ export default function AgendaPublicaPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       Servicio <span className="text-red-500">*</span>
+                      {!formData.sucursalId && sucursales.length > 1 && (
+                        <span className="text-xs text-gray-500 ml-1">(Selecciona primero una sucursal)</span>
+                      )}
                     </label>
                     <div className="relative">
                       <input
@@ -1168,7 +1206,9 @@ export default function AgendaPublicaPage() {
                           ))
                         ) : (
                           <div className="px-3 py-2 text-xs text-gray-500 text-center">
-                            No se encontraron servicios
+                            {!formData.sucursalId && sucursales.length > 1 
+                              ? 'Selecciona una sucursal primero' 
+                              : 'No se encontraron servicios'}
                           </div>
                         )}
                       </div>

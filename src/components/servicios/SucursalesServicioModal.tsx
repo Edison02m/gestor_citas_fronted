@@ -39,7 +39,7 @@ export default function SucursalesServicioModal({
       const data = await SucursalesService.getSucursales();
       setSucursalesDisponibles(data.filter(s => s.estado === 'ACTIVA'));
     } catch (error) {
-      console.error('Error al cargar sucursales:', error);
+      // Log removido
     } finally {
       setLoadingSucursales(false);
     }
