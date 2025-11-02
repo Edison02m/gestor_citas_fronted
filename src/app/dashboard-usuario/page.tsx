@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Usuario } from '@/interfaces';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import UsageDashboard from '@/components/dashboard/UsageDashboard';
+import LimitReachedModal from '@/components/dashboard/LimitReachedModal';
 
 // Helper para verificar si es Usuario (no SuperAdmin)
 const isUsuario = (user: any): user is Usuario => {
@@ -101,6 +103,47 @@ export default function DashboardUsuarioPage() {
             Gestiona tu negocio de forma simple y eficiente
           </p>
         </div>
+
+        {/* 🎯 Banner de Plan Pendiente */}
+        {user.negocio?.planPendiente && user.negocio?.fechaInicioPendiente && (
+          <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-5 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500 text-white">
+                    📅 PLAN PROGRAMADO
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-gray-900 mb-1">
+                  Tienes un plan {user.negocio.planPendiente.replace('_', ' ')} pendiente
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Se activará automáticamente el{' '}
+                  <span className="font-semibold text-blue-700">
+                    {new Date(user.negocio.fechaInicioPendiente).toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </p>
+                <div className="flex items-center gap-2 text-xs text-blue-600">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <span>Tu plan actual permanecerá activo hasta que se active el nuevo plan</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Estado de Suscripción - Grid Responsive */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -290,6 +333,11 @@ export default function DashboardUsuarioPage() {
           </div>
         </div>
 
+        {/* Dashboard de uso de recursos */}
+        <div className="mb-6 sm:mb-8">
+          <UsageDashboard />
+        </div>
+
         {/* Acciones rápidas */}
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
           <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
@@ -377,6 +425,9 @@ export default function DashboardUsuarioPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de límite alcanzado (se muestra globalmente) */}
+      <LimitReachedModal />
     </DashboardLayout>
   );
 }

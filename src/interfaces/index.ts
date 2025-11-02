@@ -28,6 +28,9 @@ export interface Usuario {
     estadoSuscripcion: string;
     fechaVencimiento?: string;
     diasRestantes?: number | null;
+    // 🎯 Plan pendiente (sistema de cola)
+    planPendiente?: string | null;
+    fechaInicioPendiente?: string | null;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -364,11 +367,11 @@ export interface ApiError {
 // ============================================================================
 
 export enum PlanSuscripcion {
-  PRUEBA = 'PRUEBA',
-  MENSUAL = 'MENSUAL',
-  TRIMESTRAL = 'TRIMESTRAL',
-  SEMESTRAL = 'SEMESTRAL',
-  ANUAL = 'ANUAL',
+  GRATIS = 'GRATIS',
+  PRO_MENSUAL = 'PRO_MENSUAL',
+  PRO_ANUAL = 'PRO_ANUAL',
+  PRO_PLUS_MENSUAL = 'PRO_PLUS_MENSUAL',
+  PRO_PLUS_ANUAL = 'PRO_PLUS_ANUAL',
   PERSONALIZADO = 'PERSONALIZADO',
 }
 
@@ -376,7 +379,7 @@ export interface CodigoSuscripcion {
   id: string;
   codigo: string;
   plan: PlanSuscripcion;
-  duracionMeses: number;
+  duracionDias: number;
   descripcion?: string;
   precio?: number;
   usado: boolean;
@@ -392,7 +395,7 @@ export interface CodigoSuscripcion {
 
 export interface CreateCodigoDto {
   plan: PlanSuscripcion;
-  duracionMeses: number;
+  duracionDias: number;
   descripcion?: string;
   precio?: number;
   fechaExpiracion?: string;
@@ -403,7 +406,7 @@ export interface CreateCodigoDto {
 
 export interface GenerarCodigosDto {
   plan: PlanSuscripcion;
-  duracionMeses: number;
+  duracionDias: number;
   cantidad: number;
   descripcion?: string;
   precio?: number;
@@ -692,4 +695,98 @@ export interface ServiciosPublicosResponse {
 export interface EmpleadosPublicosResponse {
   success: true;
   data: EmpleadoPublico[];
+}
+
+// ============================================================================
+// PLANES Y SUSCRIPCIONES (Sistema de Planes)
+// ============================================================================
+
+export type TipoPlan = 
+  | 'GRATIS'
+  | 'PRO_MENSUAL'
+  | 'PRO_ANUAL'
+  | 'PRO_PLUS_MENSUAL'
+  | 'PRO_PLUS_ANUAL';
+
+export interface Plan {
+  id: TipoPlan;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  periodo: 'mensual' | 'anual' | 'gratis';
+  caracteristicas: string[];
+  limiteSucursales: number | 'ilimitado';
+  limiteEmpleados: number | 'ilimitado';
+  limiteServicios: number | 'ilimitado';
+  limiteClientes: number | 'ilimitado';
+  limiteCitasMes: number | 'ilimitado';
+  limiteWhatsAppMes: number | 'ilimitado';
+  limiteEmailMes: number | 'ilimitado';
+  reportesAvanzados: boolean;
+  esPopular?: boolean;
+}
+
+export interface PlanActual {
+  plan: TipoPlan;
+  fechaInicio: string;
+  fechaVencimiento: string | null;
+  diasRestantes: number | null;
+  estadoSuscripcion: string;
+}
+
+export interface UsoRecurso {
+  nombre: string;
+  tipo: 'sucursales' | 'empleados' | 'servicios' | 'clientes' | 'citas' | 'whatsapp' | 'email';
+  usado: number;
+  limite: number | 'ilimitado';
+  porcentaje: number;
+  icon: string;
+}
+
+export interface ResumenUso {
+  sucursales: { usado: number; limite: number | null; porcentaje: number };
+  empleados: { usado: number; limite: number | null; porcentaje: number };
+  servicios: { usado: number; limite: number | null; porcentaje: number };
+  clientes: { usado: number; limite: number | null; porcentaje: number };
+  citasMes: { usado: number; limite: number | null; porcentaje: number };
+  whatsappMes: { usado: number; limite: number | null; porcentaje: number };
+  emailMes: { usado: number; limite: number | null; porcentaje: number };
+  planActual: string;
+}
+
+export interface HistorialUsoMes {
+  mes: string;
+  anio: number;
+  citasCreadas: number;
+  whatsappEnviados: number;
+}
+
+// Respuestas de API
+export interface PlanesDisponiblesResponse {
+  success: true;
+  data: Plan[];
+}
+
+export interface PlanActualResponse {
+  success: true;
+  data: PlanActual;
+}
+
+export interface ResumenUsoResponse {
+  success: true;
+  data: ResumenUso;
+}
+
+export interface HistorialUsoResponse {
+  success: true;
+  data: HistorialUsoMes[];
+}
+
+export interface CambiarPlanResponse {
+  success: true;
+  message: string;
+  data: {
+    planAnterior: TipoPlan;
+    planNuevo: TipoPlan;
+  };
 }

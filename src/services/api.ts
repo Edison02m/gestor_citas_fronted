@@ -44,6 +44,24 @@ function handleSubscriptionError(error: any): void {
 }
 
 /**
+ * Manejar errores de límites alcanzados (HTTP 402)
+ */
+function handleLimitReachedError(error: any): void {
+  if (typeof window !== 'undefined') {
+    // Emitir evento personalizado para que el modal lo capture
+    const event = new CustomEvent('limitReached', {
+      detail: {
+        message: error.message || 'Has alcanzado el límite de tu plan actual',
+        recurso: error.recurso || 'recurso',
+        limiteActual: error.limiteActual,
+        planActual: error.planActual,
+      },
+    });
+    window.dispatchEvent(event);
+  }
+}
+
+/**
  * Cliente HTTP con soporte para autenticación JWT
  */
 const api = {
@@ -69,7 +87,12 @@ const api = {
         handleSubscriptionError(error);
       }
       
-      throw { response: { data: error } };
+      // 💳 Interceptar errores de límite alcanzado (HTTP 402 Payment Required)
+      if (response.status === 402) {
+        handleLimitReachedError(error);
+      }
+      
+      throw { response: { data: error, status: response.status } };
     }
 
     return response.json();
@@ -97,6 +120,11 @@ const api = {
       // 🔥 Interceptar errores de suscripción
       if (response.status === 403) {
         handleSubscriptionError(error);
+      }
+      
+      // 💳 Interceptar errores de límite alcanzado (HTTP 402 Payment Required)
+      if (response.status === 402) {
+        handleLimitReachedError(error);
       }
       
       throw { response: { data: error, status: response.status } };
@@ -129,7 +157,12 @@ const api = {
         handleSubscriptionError(error);
       }
       
-      throw { response: { data: error } };
+      // 💳 Interceptar errores de límite alcanzado (HTTP 402 Payment Required)
+      if (response.status === 402) {
+        handleLimitReachedError(error);
+      }
+      
+      throw { response: { data: error, status: response.status } };
     }
 
     return response.json();
@@ -158,7 +191,12 @@ const api = {
         handleSubscriptionError(error);
       }
       
-      throw { response: { data: error } };
+      // 💳 Interceptar errores de límite alcanzado (HTTP 402 Payment Required)
+      if (response.status === 402) {
+        handleLimitReachedError(error);
+      }
+      
+      throw { response: { data: error, status: response.status } };
     }
 
     return response.json();
@@ -188,12 +226,12 @@ const api = {
         handleSubscriptionError(error);
       }
       
-      throw { response: { data: error } };
-    }
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Error en la petición' }));
-      throw { response: { data: error } };
+      // 💳 Interceptar errores de límite alcanzado (HTTP 402 Payment Required)
+      if (response.status === 402) {
+        handleLimitReachedError(error);
+      }
+      
+      throw { response: { data: error, status: response.status } };
     }
 
     return response.json();

@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import ClientesTable from '@/components/clientes/ClientesTable';
 import ClienteModal from '@/components/clientes/ClienteModal';
 import DeleteClienteModal from '@/components/clientes/DeleteClienteModal';
+import TableSkeleton from '@/components/shared/TableSkeleton';
 import { ClientesService } from '@/services/clientes.service';
 import { Cliente, CreateClienteDto, UpdateClienteDto } from '@/interfaces';
 
@@ -188,13 +189,17 @@ export default function ClientesPage() {
           </div>
         )}
 
-        {/* Table */}
-        <ClientesTable
-          clientes={filteredClientes}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          loading={loading}
-        />
+        {/* Table o Skeleton */}
+        {loading ? (
+          <TableSkeleton rows={8} />
+        ) : (
+          <ClientesTable
+            clientes={filteredClientes}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            loading={false}
+          />
+        )}
 
         {/* Paginación */}
         {totalPages > 1 && (

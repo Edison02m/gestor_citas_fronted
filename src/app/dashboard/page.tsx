@@ -194,6 +194,29 @@ export default function DashboardPage() {
               </div>
             </button>
 
+            <button
+              onClick={() => router.push('/dashboard/planes')}
+              className="relative group bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 hover:border-indigo-500 text-left"
+            >
+              <div className="flex items-center mb-3">
+                <div className="flex-shrink-0 bg-[#0490C8] rounded-md p-3">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <h3 className="ml-4 text-lg font-medium text-gray-900">Configuración de Planes</h3>
+              </div>
+              <p className="text-sm text-gray-500">
+                Administra límites, precios y características de cada plan
+              </p>
+              <div className="mt-4 flex items-center text-sm font-medium text-[#0490C8] group-hover:text-[#023664]">
+                Configurar Planes
+                <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+
             <div className="relative bg-white p-6 rounded-lg shadow border border-gray-200 opacity-50">
               <div className="flex items-center mb-3">
                 <div className="flex-shrink-0 bg-gray-400 rounded-md p-3">

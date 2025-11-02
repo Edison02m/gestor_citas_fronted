@@ -11,8 +11,8 @@ interface GenerarMultiplesModalProps {
 
 export default function GenerarMultiplesModal({ isOpen, onClose, onSubmit }: GenerarMultiplesModalProps) {
   const [loading, setLoading] = useState(false);
-  const [plan, setPlan] = useState<PlanSuscripcion>(PlanSuscripcion.MENSUAL);
-  const [duracionMeses, setDuracionMeses] = useState(1);
+  const [plan, setPlan] = useState<PlanSuscripcion>(PlanSuscripcion.GRATIS);
+  const [duracionDias, setDuracionDias] = useState(14);
   const [cantidad, setCantidad] = useState(10);
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
@@ -27,7 +27,7 @@ export default function GenerarMultiplesModal({ isOpen, onClose, onSubmit }: Gen
     try {
       const data: any = {
         plan,
-        duracionMeses: plan === PlanSuscripcion.PRUEBA ? 0 : duracionMeses,
+        duracionDias,
         cantidad,
         descripcion: descripcion || undefined,
         precio: precio ? parseFloat(precio) : undefined,
@@ -37,8 +37,8 @@ export default function GenerarMultiplesModal({ isOpen, onClose, onSubmit }: Gen
       await onSubmit(data);
       
       // Resetear formulario
-      setPlan(PlanSuscripcion.MENSUAL);
-      setDuracionMeses(1);
+      setPlan(PlanSuscripcion.GRATIS);
+      setDuracionDias(14);
       setCantidad(10);
       setDescripcion('');
       setPrecio('');
@@ -88,33 +88,40 @@ export default function GenerarMultiplesModal({ isOpen, onClose, onSubmit }: Gen
                 <label className="block text-sm font-medium text-gray-700">Plan *</label>
                 <select
                   value={plan}
-                  onChange={(e) => setPlan(e.target.value as PlanSuscripcion)}
+                  onChange={(e) => {
+                    const newPlan = e.target.value as PlanSuscripcion;
+                    setPlan(newPlan);
+                    // Auto-ajustar duración según plan
+                    if (newPlan === PlanSuscripcion.GRATIS) setDuracionDias(14);
+                    else if (newPlan === PlanSuscripcion.PRO_MENSUAL) setDuracionDias(30);
+                    else if (newPlan === PlanSuscripcion.PRO_ANUAL) setDuracionDias(365);
+                    else if (newPlan === PlanSuscripcion.PRO_PLUS_MENSUAL) setDuracionDias(30);
+                    else if (newPlan === PlanSuscripcion.PRO_PLUS_ANUAL) setDuracionDias(365);
+                  }}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 bg-white"
                   required
                 >
-                  <option value={PlanSuscripcion.PRUEBA}>Prueba (7 días gratis)</option>
-                  <option value={PlanSuscripcion.MENSUAL}>Mensual (1 mes)</option>
-                  <option value={PlanSuscripcion.TRIMESTRAL}>Trimestral (3 meses)</option>
-                  <option value={PlanSuscripcion.SEMESTRAL}>Semestral (6 meses)</option>
-                  <option value={PlanSuscripcion.ANUAL}>Anual (12 meses)</option>
+                  <option value={PlanSuscripcion.GRATIS}>Gratis (14 días)</option>
+                  <option value={PlanSuscripcion.PRO_MENSUAL}>PRO Mensual (30 días)</option>
+                  <option value={PlanSuscripcion.PRO_ANUAL}>PRO Anual (365 días)</option>
+                  <option value={PlanSuscripcion.PRO_PLUS_MENSUAL}>PRO PLUS Mensual (30 días)</option>
+                  <option value={PlanSuscripcion.PRO_PLUS_ANUAL}>PRO PLUS Anual (365 días)</option>
                   <option value={PlanSuscripcion.PERSONALIZADO}>Personalizado</option>
                 </select>
               </div>
 
-              {/* Duración (solo si no es PRUEBA) */}
-              {plan !== PlanSuscripcion.PRUEBA && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Duración (meses) *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={duracionMeses}
-                    onChange={(e) => setDuracionMeses(parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 bg-white"
-                    required
-                  />
-                </div>
-              )}
+              {/* Duración */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Duración (días) *</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={duracionDias}
+                  onChange={(e) => setDuracionDias(parseInt(e.target.value))}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 bg-white"
+                  required
+                />
+              </div>
 
               {/* Descripción */}
               <div>

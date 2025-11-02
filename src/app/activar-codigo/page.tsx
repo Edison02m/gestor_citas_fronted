@@ -18,6 +18,11 @@ export default function ActivarCodigoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [planEnCola, setPlanEnCola] = useState<{
+    planPendiente: string;
+    fechaActivacion: string;
+    planActual: string;
+  } | null>(null);
 
   useEffect(() => {
     // Redirigir si no está autenticado
@@ -38,11 +43,8 @@ export default function ActivarCodigoPage() {
       return;
     }
 
-    // Redirigir si ya tiene suscripción activa
-    if (isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA') {
-      router.push('/dashboard-usuario');
-      return;
-    }
+    // ✅ PERMITIR ACCESO: Usuarios con suscripción activa también pueden activar códigos
+    // para renovar o cambiar de plan
   }, [user, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,18 +74,34 @@ export default function ActivarCodigoPage() {
             estadoSuscripcion: string;
             fechaVencimiento: string;
           };
+          // 🎯 Sistema de cola
+          enCola?: boolean;
+          planActual?: string;
+          planPendiente?: string;
+          fechaActivacionPendiente?: string;
         };
       }>('/suscripciones/activar-codigo', { codigo: codigo.trim() });
 
       setSuccess(response.message);
 
+      // 🎯 Si el plan está en cola, guardar información adicional
+      if (response.data.enCola) {
+        setPlanEnCola({
+          planPendiente: response.data.planPendiente || '',
+          fechaActivacion: response.data.fechaActivacionPendiente || '',
+          planActual: response.data.planActual || '',
+        });
+      }
+
       // 🔥 ACTUALIZAR EL USUARIO EN EL CONTEXTO
       await refreshUser();
 
-      // Esperar 1 segundo y redirigir al dashboard
+      // Si el plan está en cola, esperar más tiempo para que el usuario lea el mensaje
+      const tiempoEspera = response.data.enCola ? 4000 : 1500;
+      
       setTimeout(() => {
         router.push('/dashboard-usuario');
-      }, 1000);
+      }, tiempoEspera);
     } catch (error: any) {
       setError(error.response?.data?.message || 'Error al activar código');
     } finally {
@@ -123,15 +141,38 @@ export default function ActivarCodigoPage() {
             </svg>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Activa tu Suscripción
+            {isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA' 
+              ? 'Renovar o Cambiar Plan' 
+              : 'Activa tu Suscripción'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Bienvenido, <span className="font-medium">{isUsuario(user) ? user.negocio?.nombre : user?.email}</span>
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            Ingresa tu código de activación para comenzar a usar el sistema
+            {isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA'
+              ? 'Ingresa un código para renovar tu suscripción o cambiar de plan'
+              : 'Ingresa tu código de activación para comenzar a usar el sistema'}
           </p>
         </div>
+
+        {/* Banner informativo si ya tiene suscripción activa */}
+        {isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <svg className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Ya tienes una suscripción activa
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Puedes ingresar un nuevo código para renovar o cambiar tu plan actual
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Card */}
         <div className="bg-white rounded-lg shadow-xl p-8">
@@ -174,7 +215,7 @@ export default function ActivarCodigoPage() {
               </div>
             )}
 
-            {success && (
+            {success && !planEnCola && (
               <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-start">
                 <svg
                   className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5"
@@ -191,6 +232,44 @@ export default function ActivarCodigoPage() {
                   <p className="text-sm font-medium">{success}</p>
                   <p className="text-xs mt-1">Redirigiendo al dashboard...</p>
                 </div>
+              </div>
+            )}
+
+            {/* Mensaje especial para plan en cola */}
+            {success && planEnCola && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
+                <div className="flex items-start mb-3">
+                  <svg className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold">📅 Plan Programado</p>
+                    <p className="text-sm mt-1">{success}</p>
+                  </div>
+                </div>
+                <div className="bg-blue-100 rounded-lg p-3 text-xs space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-blue-700">Plan actual:</span>
+                    <span className="font-semibold text-blue-900">{planEnCola.planActual}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-700">Plan programado:</span>
+                    <span className="font-semibold text-blue-900">{planEnCola.planPendiente}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-700">Fecha de activación:</span>
+                    <span className="font-semibold text-blue-900">
+                      {new Date(planEnCola.fechaActivacion).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs mt-3 text-blue-600 text-center">
+                  El plan se activará automáticamente • Redirigiendo...
+                </p>
               </div>
             )}
 
@@ -240,14 +319,25 @@ export default function ActivarCodigoPage() {
               </div>
             </div>
 
-            {/* Botón Cerrar Sesión */}
-            <button
-              type="button"
-              onClick={logout}
-              className="w-full text-sm text-gray-600 hover:text-gray-900 transition duration-150"
-            >
-              Cerrar sesión
-            </button>
+            {/* Botones de acción */}
+            <div className="flex gap-3">
+              {isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA' && (
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard-usuario')}
+                  className="flex-1 text-sm text-gray-600 hover:text-gray-900 py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150"
+                >
+                  Volver al Dashboard
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={logout}
+                className={`${isUsuario(user) && user.negocio?.estadoSuscripcion === 'ACTIVA' ? 'flex-1' : 'w-full'} text-sm text-gray-600 hover:text-gray-900 transition duration-150`}
+              >
+                Cerrar sesión
+              </button>
+            </div>
           </form>
         </div>
 

@@ -10,20 +10,20 @@ interface CodigosTableProps {
 }
 
 const planLabels: Record<PlanSuscripcion, string> = {
-  PRUEBA: 'Prueba (7 días)',
-  MENSUAL: 'Mensual',
-  TRIMESTRAL: 'Trimestral',
-  SEMESTRAL: 'Semestral',
-  ANUAL: 'Anual',
+  GRATIS: 'Gratis (14 días)',
+  PRO_MENSUAL: 'PRO Mensual',
+  PRO_ANUAL: 'PRO Anual',
+  PRO_PLUS_MENSUAL: 'PRO PLUS Mensual',
+  PRO_PLUS_ANUAL: 'PRO PLUS Anual',
   PERSONALIZADO: 'Personalizado',
 };
 
 const planColors: Record<PlanSuscripcion, string> = {
-  PRUEBA: 'bg-purple-100 text-purple-800',
-  MENSUAL: 'bg-blue-100 text-blue-800',
-  TRIMESTRAL: 'bg-green-100 text-green-800',
-  SEMESTRAL: 'bg-yellow-100 text-yellow-800',
-  ANUAL: 'bg-red-100 text-red-800',
+  GRATIS: 'bg-purple-100 text-purple-800',
+  PRO_MENSUAL: 'bg-blue-100 text-blue-800',
+  PRO_ANUAL: 'bg-cyan-100 text-cyan-800',
+  PRO_PLUS_MENSUAL: 'bg-green-100 text-green-800',
+  PRO_PLUS_ANUAL: 'bg-emerald-100 text-emerald-800',
   PERSONALIZADO: 'bg-gray-100 text-gray-800',
 };
 
@@ -95,7 +95,7 @@ export default function CodigosTable({ codigos, onDelete, onView }: CodigosTable
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {codigo.plan === PlanSuscripcion.PRUEBA ? '7 días' : `${codigo.duracionMeses} mes${codigo.duracionMeses > 1 ? 'es' : ''}`}
+                {codigo.duracionDias} día{codigo.duracionDias !== 1 ? 's' : ''}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {codigo.vecesUsado} / {codigo.usoMaximo}

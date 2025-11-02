@@ -184,16 +184,20 @@ export default function Home() {
               
               {/* Opciones principales - Siempre visibles */}
               {[
-                { name: 'Características', href: '#features', icon: Sparkles },
-                { name: 'Módulos', href: '#modules', icon: Grid3x3 },
-                { name: 'Precios', href: '#pricing', icon: DollarSign },
+                { name: 'Características', href: '#features', icon: Sparkles, scroll: true },
+                { name: 'Módulos', href: '#modules', icon: Grid3x3, scroll: true },
+                { name: 'Precios', href: '/planes', icon: DollarSign, scroll: false },
               ].map((item, i) => (
                 <motion.button
                   key={i}
                   onClick={() => {
-                    const element = document.querySelector(item.href);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (item.scroll) {
+                      const element = document.querySelector(item.href);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    } else {
+                      router.push(item.href);
                     }
                   }}
                   className={`group flex items-center gap-2 text-sm font-medium transition-colors relative ${
@@ -284,18 +288,22 @@ export default function Home() {
             )}
             
             {[
-              { name: 'Características', href: '#features', icon: Sparkles },
-              { name: 'Módulos', href: '#modules', icon: Grid3x3 },
-              { name: 'Precios', href: '#pricing', icon: DollarSign },
+              { name: 'Características', href: '#features', icon: Sparkles, scroll: true },
+              { name: 'Módulos', href: '#modules', icon: Grid3x3, scroll: true },
+              { name: 'Precios', href: '/planes', icon: DollarSign, scroll: false },
             ].map((item, i) => (
               <motion.button
                 key={i}
                 onClick={() => {
                   setIsMenuOpen(false);
                   setTimeout(() => {
-                    const element = document.querySelector(item.href);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (item.scroll) {
+                      const element = document.querySelector(item.href);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    } else {
+                      router.push(item.href);
                     }
                   }, 300);
                 }}

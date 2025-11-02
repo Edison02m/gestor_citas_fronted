@@ -10,6 +10,7 @@ import HorariosEmpleadoModal from '@/components/empleados/HorariosEmpleadoModal'
 import BloqueosEmpleadoModal from '@/components/empleados/BloqueosEmpleadoModal';
 import SucursalesEmpleadoModal from '@/components/empleados/SucursalesEmpleadoModal';
 import DeleteEmpleadoModal from '@/components/empleados/DeleteEmpleadoModal';
+import TableSkeleton from '@/components/shared/TableSkeleton';
 
 export default function EmpleadosPage() {
   const [empleados, setEmpleados] = useState<Empleado[]>([]);
@@ -268,16 +269,20 @@ export default function EmpleadosPage() {
           </div>
         )}
 
-        {/* Tabla de empleados */}
-        <EmpleadosTable
-          empleados={empleadosFiltrados}
-          onEdit={handleEditarEmpleado}
-          onEditHorarios={handleEditarHorarios}
-          onEditBloqueos={handleEditarBloqueos}
-          onEditSucursales={handleEditarSucursales}
-          onDelete={handleEliminarEmpleado}
-          loading={loading}
-        />
+        {/* Tabla de empleados o Skeleton */}
+        {loading ? (
+          <TableSkeleton rows={6} />
+        ) : (
+          <EmpleadosTable
+            empleados={empleadosFiltrados}
+            onEdit={handleEditarEmpleado}
+            onEditHorarios={handleEditarHorarios}
+            onEditBloqueos={handleEditarBloqueos}
+            onEditSucursales={handleEditarSucursales}
+            onDelete={handleEliminarEmpleado}
+            loading={false}
+          />
+        )}
       </div>
 
       {/* Modales */}
