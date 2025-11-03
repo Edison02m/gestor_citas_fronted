@@ -117,8 +117,13 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
       return;
     }
 
-    if (formData.cedula.length !== 10 || !/^\d+$/.test(formData.cedula)) {
-      setErrors('La cédula debe tener 10 dígitos numéricos');
+    if (formData.cedula.length !== 10) {
+      setErrors('La cédula debe tener exactamente 10 dígitos');
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.cedula)) {
+      setErrors('La cédula debe contener solo números');
       return;
     }
 
@@ -127,8 +132,13 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
       return;
     }
 
-    if (formData.telefono.length < 7) {
-      setErrors('El teléfono debe tener al menos 7 dígitos');
+    if (formData.telefono.length !== 9) {
+      setErrors('El teléfono debe tener exactamente 9 dígitos');
+      return;
+    }
+
+    if (!/^\d{9}$/.test(formData.telefono)) {
+      setErrors('El teléfono debe contener solo números');
       return;
     }
 
@@ -205,13 +215,18 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
               value={formData.cedula}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, ''); // Solo números
-                setFormData({ ...formData, cedula: value });
+                // Limitar a 10 dígitos
+                if (value.length <= 10) {
+                  setFormData({ ...formData, cedula: value });
+                }
               }}
               className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="1234567890"
               disabled={loading}
             />
-            <p className="text-xs text-gray-500 mt-1">10 dígitos numéricos</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {formData.cedula.length}/10 dígitos {formData.cedula.length === 10 && '✓'}
+            </p>
           </div>
 
           {/* Teléfono */}
@@ -266,7 +281,19 @@ export default function ClienteModal({ isOpen, onClose, onSubmit, cliente, loadi
                 type="tel"
                 required
                 value={formData.telefono}
-                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, ''); // Solo números
+                  
+                  // Si el primer caracter es 0, quitarlo
+                  if (value.startsWith('0')) {
+                    value = value.substring(1);
+                  }
+                  
+                  // Limitar a 9 dígitos
+                  if (value.length <= 9) {
+                    setFormData({ ...formData, telefono: value });
+                  }
+                }}
                 className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
                 placeholder="999999999"
                 disabled={loading}

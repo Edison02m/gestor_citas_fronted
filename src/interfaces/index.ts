@@ -790,3 +790,31 @@ export interface CambiarPlanResponse {
     planNuevo: TipoPlan;
   };
 }
+
+// ============================================================================
+// WHATSAPP
+// ============================================================================
+
+export interface WhatsAppStatusResponse {
+  connected: boolean;
+  phoneNumber: string | null;
+  instanceId: string | null;
+  configuredAt: string | null;
+}
+
+export interface VincularWhatsAppResponse {
+  success: boolean;
+  message: string;
+  instanceId: string;
+  qrCode: string;
+}
+
+export interface QRCodeResponse {
+  qrCode: string;
+  message: string;
+}
+
+export interface DesvincularWhatsAppResponse {
+  success: boolean;
+  message: string;
+}

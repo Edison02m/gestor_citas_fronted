@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Overlay para móvil */}
       {sidebarOpen && (
         <div
@@ -29,9 +29,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Top bar para móvil */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <div className="lg:hidden flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Top bar para desktop con botón de colapsar */}
-        <div className="hidden lg:flex sticky top-0 z-30 bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
+        <div className="hidden lg:flex flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
@@ -70,8 +70,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex-1" />
         </div>
 
-        {/* Contenido principal */}
-        <main className="flex-1 overflow-auto">
+        {/* Contenido principal con scroll */}
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

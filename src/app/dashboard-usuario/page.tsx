@@ -99,7 +99,7 @@ export default function DashboardUsuarioPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             ¡Hola, {user.nombre}! 👋
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-sm text-gray-600">
             Gestiona tu negocio de forma simple y eficiente
           </p>
         </div>
@@ -121,12 +121,12 @@ export default function DashboardUsuarioPage() {
                     📅 PLAN PROGRAMADO
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-gray-900 mb-1">
+                <h3 className="text-sm font-bold text-gray-900 mb-1">
                   Tienes un plan {user.negocio.planPendiente.replace('_', ' ')} pendiente
                 </h3>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-gray-700 mb-3">
                   Se activará automáticamente el{' '}
-                  <span className="font-semibold text-blue-700">
+                  <span className="font-bold text-blue-700">
                     {new Date(user.negocio.fechaInicioPendiente).toLocaleDateString('es-ES', {
                       day: 'numeric',
                       month: 'long',
@@ -146,101 +146,77 @@ export default function DashboardUsuarioPage() {
         )}
 
         {/* Estado de Suscripción - Grid Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
           {/* Card Estado */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">Estado</h3>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0490C8]/10 flex items-center justify-center">
-                <svg
-                  className="h-5 w-5 sm:h-6 sm:w-6 text-[#0490C8]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-            </div>
-            <div
-              className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border ${
-                estadoColor[user.negocio?.estadoSuscripcion as keyof typeof estadoColor] ||
-                'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {estadoTexto[user.negocio?.estadoSuscripcion as keyof typeof estadoTexto] ||
-                user.negocio?.estadoSuscripcion}
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Estado</p>
+                <span
+                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                    estadoColor[user.negocio?.estadoSuscripcion as keyof typeof estadoColor] ||
+                    'bg-gray-100 text-gray-800 border border-gray-200'
+                  }`}
+                >
+                  {estadoTexto[user.negocio?.estadoSuscripcion as keyof typeof estadoTexto] ||
+                    user.negocio?.estadoSuscripcion}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Card Días Restantes */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">Días Restantes</h3>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0490C8]/10 flex items-center justify-center">
-                <svg
-                  className="h-5 w-5 sm:h-6 sm:w-6 text-[#0490C8]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-            </div>
-            {diasRestantes !== null && diasRestantes > 0 ? (
-              <div>
-                <p className="text-3xl sm:text-4xl font-bold text-gray-900">{diasRestantes}</p>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">
-                  {diasRestantes === 1 ? 'día' : 'días'}
-                </p>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Días Restantes</p>
+                {diasRestantes !== null && diasRestantes > 0 ? (
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-bold text-gray-900">{diasRestantes}</span>
+                    <span className="text-sm text-gray-600">
+                      {diasRestantes === 1 ? 'día' : 'días'}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-700">No disponible</p>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-gray-500">No disponible</p>
-            )}
+            </div>
           </div>
 
           {/* Card Fecha Vencimiento */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 hover:shadow-lg transition-all duration-300 sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">Vencimiento</h3>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0490C8]/10 flex items-center justify-center">
-                <svg
-                  className="h-5 w-5 sm:h-6 sm:w-6 text-[#0490C8]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all sm:col-span-2 lg:col-span-1">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Vencimiento</p>
+                {user.negocio?.fechaVencimiento ? (
+                  <p className="text-sm text-gray-900 font-semibold">
+                    {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-700">No disponible</p>
+                )}
+              </div>
             </div>
-            {user.negocio?.fechaVencimiento ? (
-              <p className="text-sm sm:text-base font-semibold text-gray-900">
-                {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
-            ) : (
-              <p className="text-sm text-gray-500">No disponible</p>
-            )}
           </div>
         </div>
 
@@ -264,10 +240,10 @@ export default function DashboardUsuarioPage() {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm sm:text-base font-bold text-yellow-900 mb-1">
+                <h3 className="text-sm font-bold text-yellow-900 mb-1">
                   ⏰ Tu suscripción está por vencer
                 </h3>
-                <p className="text-xs sm:text-sm text-yellow-800">
+                <p className="text-sm text-yellow-800">
                   Te quedan <span className="font-bold">{diasRestantes}</span> {diasRestantes === 1 ? 'día' : 'días'}. 
                   Contacta al administrador para renovar tu suscripción y seguir disfrutando del servicio.
                 </p>
@@ -277,152 +253,105 @@ export default function DashboardUsuarioPage() {
         )}
 
         {/* Información del Negocio */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6 sm:mb-8 shadow-sm hover:shadow-lg transition-all duration-300">
-          <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0490C8]/10 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
+        <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-gray-900">Información del Negocio</h2>
-                <p className="text-xs sm:text-sm text-gray-600">Detalles de tu empresa</p>
+                <h2 className="text-lg font-medium text-gray-900">Información del Negocio</h2>
+                <p className="text-sm text-gray-500 mt-1">Detalles de tu empresa</p>
+              </div>
+              <button
+                onClick={() => router.push('/dashboard-usuario/configuracion')}
+                className="px-4 py-2 text-sm font-medium text-[#0490C8] hover:text-[#023664] bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Editar
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Nombre del Negocio */}
+              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nombre del Negocio</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{user.negocio?.nombre}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Teléfono */}
+              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Teléfono</p>
+                    <p className="text-sm text-gray-900">{user.negocio?.telefono}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Email</p>
+                    <p className="text-sm text-gray-900 break-all">{user.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ID del Negocio */}
+              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">ID del Negocio</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-900 break-all flex-1">{user.negocio?.id}</p>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(user.negocio?.id || '');
+                          // Opcional: mostrar toast de copiado
+                        }}
+                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                        title="Copiar ID"
+                      >
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="px-5 sm:px-6 py-5 sm:py-6">
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-x-6 sm:gap-y-5">
-              <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                <dt className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  Nombre del Negocio
-                </dt>
-                <dd className="text-sm sm:text-base font-semibold text-gray-900">{user.negocio?.nombre}</dd>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                <dt className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  Teléfono
-                </dt>
-                <dd className="text-sm sm:text-base font-semibold text-gray-900">{user.negocio?.telefono}</dd>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                <dt className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Email
-                </dt>
-                <dd className="text-sm sm:text-base font-semibold text-gray-900 break-all">{user.email}</dd>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                <dt className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                  </svg>
-                  ID del Negocio
-                </dt>
-                <dd className="text-xs sm:text-sm font-mono font-semibold text-gray-900 break-all">{user.negocio?.id}</dd>
-              </div>
-            </dl>
           </div>
         </div>
 
         {/* Dashboard de uso de recursos */}
         <div className="mb-6 sm:mb-8">
           <UsageDashboard />
-        </div>
-
-        {/* Acciones rápidas */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
-          <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0490C8]/10 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-gray-900">Próximamente</h2>
-                <p className="text-xs sm:text-sm text-gray-600">Funciones en desarrollo</p>
-              </div>
-            </div>
-          </div>
-          <div className="px-5 sm:px-6 py-5 sm:py-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {/* Card Citas */}
-              <div className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-[#0490C8]/50 hover:from-[#0490C8]/5 hover:to-[#0490C8]/10 transition-all duration-300 cursor-not-allowed opacity-60">
-                <div className="flex flex-col items-center justify-center text-center space-y-2 sm:space-y-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 group-hover:text-[#0490C8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold text-gray-700">Citas</span>
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-                    Pronto
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Clientes */}
-              <div className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-[#0490C8]/50 hover:from-[#0490C8]/5 hover:to-[#0490C8]/10 transition-all duration-300 cursor-not-allowed opacity-60">
-                <div className="flex flex-col items-center justify-center text-center space-y-2 sm:space-y-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 group-hover:text-[#0490C8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold text-gray-700">Clientes</span>
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-                    Pronto
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Servicios */}
-              <div className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-[#0490C8]/50 hover:from-[#0490C8]/5 hover:to-[#0490C8]/10 transition-all duration-300 cursor-not-allowed opacity-60">
-                <div className="flex flex-col items-center justify-center text-center space-y-2 sm:space-y-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 group-hover:text-[#0490C8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold text-gray-700">Servicios</span>
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-                    Pronto
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Reportes */}
-              <div className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300 p-4 sm:p-6 hover:border-[#0490C8]/50 hover:from-[#0490C8]/5 hover:to-[#0490C8]/10 transition-all duration-300 cursor-not-allowed opacity-60">
-                <div className="flex flex-col items-center justify-center text-center space-y-2 sm:space-y-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow">
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 group-hover:text-[#0490C8] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold text-gray-700">Reportes</span>
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-                    Pronto
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Mensaje adicional */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-[#0490C8]/5 to-[#023664]/5 rounded-xl border border-[#0490C8]/20">
-              <p className="text-xs sm:text-sm text-center text-gray-700">
-                <span className="font-semibold">✨ Estamos trabajando para ti.</span> Estas funcionalidades estarán disponibles muy pronto.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 

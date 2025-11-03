@@ -19,7 +19,7 @@ interface CrearCitaModalProps {
 }
 
 export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: CrearCitaModalProps) {
-  const [step, setStep] = useState<1 | 2>(1); // Paso 1: Selección básica, Paso 2: Fecha y hora
+  const [step, setStep] = useState<1 | 2 | 3>(1); // Paso 1: Selección básica, Paso 2: Fecha y hora, Paso 3: Confirmación
   
   const [formData, setFormData] = useState<CreateCitaDto>({
     fecha: '',
@@ -513,8 +513,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     setStep(2);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStep2Next = () => {
     setErrors('');
 
     // Validar hora
@@ -529,23 +528,27 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       return;
     }
 
+    // Verificar que no haya conflicto
+    if (hayConflicto) {
+      setErrors('El horario seleccionado tiene conflictos con otra cita');
+      return;
+    }
+
+    setStep(3);
+  };
+
+  const handleFinalSubmit = async () => {
+    setErrors('');
+
     try {
       // Crear el objeto con la fecha formateada en el momento del submit
       const dataToSubmit: CreateCitaDto = {
         ...formData,
-        fecha: formatDateInput(fechaSeleccionada!), // El ! asegura que fechaSeleccionada no es null (siempre tendrá un valor por defecto)
+        fecha: formatDateInput(fechaSeleccionada!),
       };
       
-      // Log removido
       console.log('Fecha seleccionada (Date object):', fechaSeleccionada);
       console.log('Fecha formateada (string):', dataToSubmit.fecha);
-      // Log removido
-      // Log removido
-      // Log removido
-      // Log removido
-      // Log removido
-      // Log removido
-      // Log removido
       
       await onSubmit(dataToSubmit);
       resetForm();
@@ -554,16 +557,12 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       let errorMessage = 'Error al crear la cita';
       
       if (error.response?.data?.message) {
-        // Formato estándar del backend: { success: false, message: "..." }
         errorMessage = error.response.data.message;
       } else if (error.response?.data?.error) {
-        // Formato alternativo: { error: "..." }
         errorMessage = error.response.data.error;
       } else if (typeof error.response?.data === 'string') {
-        // Si data es un string directamente
         errorMessage = error.response.data;
       } else if (error.message) {
-        // Fallback al mensaje del error
         errorMessage = error.message;
       }
       
@@ -614,13 +613,13 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full shadow-xl overflow-hidden flex flex-col" style={{ maxWidth: step === 2 ? '950px' : '420px', maxHeight: '90vh' }}>
+      <div className="bg-white rounded-2xl w-full shadow-xl overflow-hidden flex flex-col" style={{ maxWidth: step === 2 ? '950px' : '520px', maxHeight: '90vh' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white flex-shrink-0">
           <div>
             <h2 className="text-base font-bold text-gray-900">Nueva Cita</h2>
             <p className="text-[11px] text-gray-600 mt-0.5">
-              Paso {step} de 2: {step === 1 ? 'Información básica' : 'Fecha y hora'}
+              Paso {step} de 3: {step === 1 ? 'Información básica' : step === 2 ? 'Fecha y hora' : 'Confirmar y crear'}
             </p>
           </div>
           <button
@@ -635,7 +634,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-hidden flex flex-col">
           <div className={`flex-1 overflow-y-auto ${step === 1 ? 'px-8 py-4' : 'px-5 py-3'}`}>
             {step === 1 ? (
               /* ==================== PASO 1: Información Básica ==================== */
@@ -897,7 +896,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                   />
                 </div>
               </div>
-            ) : (
+            ) : step === 2 ? (
               /* ==================== PASO 2: Fecha y Hora ==================== */
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Columna Izquierda: Selector de Día */}
@@ -1003,21 +1002,150 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                         </div>
                       </div>
                     ) : (
-                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-center">
-                        <p className="text-xs text-yellow-700 font-semibold mb-1">
-                          {!formData.servicioId 
-                            ? '⚠️ Selecciona un servicio' 
-                            : '⚠️ No hay horarios disponibles'}
-                        </p>
-                        {formData.servicioId && (
-                          <p className="text-[10px] text-yellow-600">
-                            El empleado no tiene espacios libres este día
+                      <div className="bg-gray-50 rounded-xl p-4 text-center space-y-3">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto shadow-sm">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900 mb-1">
+                            {!formData.servicioId 
+                              ? 'Selecciona un servicio' 
+                              : 'No hay horarios disponibles'}
                           </p>
-                        )}
+                          {formData.servicioId && (
+                            <p className="text-xs text-gray-500">
+                              El empleado/sucursal no tiene espacios libres este día
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
                 )}
+              </div>
+            ) : (
+              /* ==================== PASO 3: Resumen y Confirmación ==================== */
+              <div className="space-y-4">
+                {/* Título del resumen */}
+                <div className="text-center pb-2">
+                  <h3 className="text-sm font-bold text-gray-900">Confirma los detalles de la cita</h3>
+                  <p className="text-xs text-gray-500 mt-1">Revisa que toda la información sea correcta</p>
+                </div>
+
+                {/* Resumen de la cita - Grid de 2 columnas */}
+                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                  {/* Cliente */}
+                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Cliente</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {clientes.find(c => c.id === formData.clienteId)?.nombre}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        {clientes.find(c => c.id === formData.clienteId)?.telefono}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Servicio */}
+                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Servicio</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {servicios.find(s => s.id === formData.servicioId)?.nombre}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        {servicios.find(s => s.id === formData.servicioId)?.duracion} min • ${servicios.find(s => s.id === formData.servicioId)?.precio}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sucursal */}
+                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Sucursal</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {sucursales.find(s => s.id === formData.sucursalId)?.nombre}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5 truncate">
+                        {sucursales.find(s => s.id === formData.sucursalId)?.direccion}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Empleado */}
+                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Empleado</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {empleados.find(e => e.id === formData.empleadoId)?.nombre}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        {empleados.find(e => e.id === formData.empleadoId)?.cargo}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Fecha y Hora */}
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Fecha y Hora</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {fechaSeleccionada?.toLocaleDateString('es-ES', { 
+                          weekday: 'long', 
+                          day: 'numeric',
+                          month: 'long', 
+                          year: 'numeric' 
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        {formData.horaInicio} - {formData.horaFin}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Notas (si existen) */}
+                  {formData.notas && (
+                    <div className="flex items-start gap-2.5 pt-3 border-t border-gray-200">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Notas</p>
+                        <p className="text-xs text-gray-700">{formData.notas}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1034,10 +1162,10 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
 
             {/* Actions */}
             <div className="flex gap-2">
-              {step === 2 && (
+              {(step === 2 || step === 3) && (
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(step === 2 ? 1 : 2)}
                   disabled={loading}
                   className="px-3 py-2 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 text-xs"
                 >
@@ -1063,11 +1191,21 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                 >
                   Siguiente →
                 </button>
+              ) : step === 2 ? (
+                <button
+                  type="button"
+                  onClick={handleStep2Next}
+                  disabled={loadingData || !formData.horaInicio || !formData.horaFin || hayConflicto}
+                  className="flex-1 px-3 py-2 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all disabled:opacity-50 text-xs"
+                >
+                  Continuar →
+                </button>
               ) : (
                 <button
-                  type="submit"
-                  disabled={loading || hayConflicto}
-                  className="flex-1 px-3 py-2 bg-[#0490C8] hover:bg-[#023664] text-white font-medium rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 text-xs"
+                  type="button"
+                  onClick={handleFinalSubmit}
+                  disabled={loading}
+                  className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 text-xs"
                 >
                   {loading ? (
                     <>
@@ -1075,13 +1213,18 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                       Creando...
                     </>
                   ) : (
-                    'Crear Cita'
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Confirmar y Crear Cita
+                    </>
                   )}
                 </button>
               )}
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Modal para crear nuevo cliente */}
