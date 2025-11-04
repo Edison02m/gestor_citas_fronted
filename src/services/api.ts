@@ -17,22 +17,22 @@ function handleSubscriptionError(error: any): void {
   if (error.code) {
     switch (error.code) {
       case 'SUBSCRIPTION_EXPIRED':
-        // Redirigir a página de activación de código
+        // 🔄 NO borrar token - El usuario debe poder renovar su suscripción
+        // Solo redirigir a página de activación de código
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('auth_user');
-          window.location.href = '/activar-codigo?expired=true';
+          window.location.href = '/dashboard-usuario/activar-codigo?expired=true';
         }
         break;
       case 'NO_SUBSCRIPTION':
+        // 🔄 NO borrar token - El usuario debe poder activar su primera suscripción
         // Redirigir a página de activación
         if (typeof window !== 'undefined') {
-          window.location.href = '/activar-codigo';
+          window.location.href = '/dashboard-usuario/activar-codigo';
         }
         break;
       case 'SUBSCRIPTION_BLOCKED':
       case 'SUBSCRIPTION_CANCELLED':
-        // Cerrar sesión y redirigir al login
+        // ❌ ESTOS SÍ requieren cerrar sesión (admin bloqueó la cuenta)
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('auth_user');

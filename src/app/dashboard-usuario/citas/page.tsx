@@ -177,16 +177,17 @@ export default function CitasPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="h-full overflow-hidden flex flex-col">
+        <div className="p-4 sm:p-6 lg:p-8 flex-shrink-0">
         {/* Header */}
-        <div className="mb-6 flex justify-between items-start">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Citas</h1>
-            <p className="text-sm text-gray-600 mt-1">Gestiona todas las citas de tu negocio</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Citas</h1>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Gestiona todas las citas de tu negocio</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             {/* Toggle Vista */}
-            <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+            <div className="flex gap-1 sm:gap-2 bg-gray-100 p-1 rounded-lg flex-1 sm:flex-initial">
               <button
                 onClick={() => setViewMode('mini')}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
@@ -219,19 +220,20 @@ export default function CitasPage() {
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2.5 bg-[#0490C8] text-white text-sm font-medium rounded-xl hover:bg-[#037aa8] transition-colors flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 sm:py-2.5 bg-[#0490C8] text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-[#037aa8] transition-colors flex items-center justify-center gap-2 flex-1 sm:flex-initial whitespace-nowrap"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Nueva Cita
+              <span className="hidden xs:inline">Nueva Cita</span>
+              <span className="xs:hidden">Nueva</span>
             </button>
           </div>
         </div>
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <div className="mb-4 sm:mb-6 bg-green-50 border border-green-200 text-green-700 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -241,18 +243,20 @@ export default function CitasPage() {
 
         {/* Error Message */}
         {errorMessage && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          <div className="mb-4 sm:mb-6 bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm">
             {errorMessage}
           </div>
         )}
 
         {/* Filtros */}
         <CitasFilters onFilterChange={setFilters} />
+        </div>
 
         {/* Content */}
+        <div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
         {viewMode === 'mini' ? (
           /* Vista Compacta - Mini Calendario + Detalle */
-          <div className="h-[calc(100vh-280px)]">
+          <div className="h-full">
             <MiniCalendarView 
               citas={citasFiltradas}
               loading={loading}
@@ -275,29 +279,29 @@ export default function CitasPage() {
             />
           </div>
         ) : loading ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0490C8] mx-auto"></div>
-              <p className="text-sm text-gray-500 mt-4">Cargando citas...</p>
+              <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-[#0490C8] mx-auto"></div>
+              <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">Cargando citas...</p>
             </div>
           </div>
         ) : citasFiltradas.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 text-center">
+            <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
               {citas.length === 0 ? 'No hay citas registradas' : 'No se encontraron citas con los filtros aplicados'}
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
               {citas.length === 0 ? 'Comienza creando tu primera cita' : 'Intenta ajustar los filtros'}
             </p>
             {citas.length === 0 && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-4 py-2 bg-[#0490C8] text-white text-sm font-medium rounded-xl hover:bg-[#037aa8] transition-colors inline-flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 bg-[#0490C8] text-white text-xs sm:text-sm font-medium rounded-xl hover:bg-[#037aa8] transition-colors inline-flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Crear Primera Cita
@@ -306,7 +310,7 @@ export default function CitasPage() {
           </div>
         ) : viewMode === 'calendar' ? (
           /* Vista de Calendario con FullCalendar */
-          <div className="h-[calc(100vh-260px)]">
+          <div className="h-full">
             <CalendarView 
               citas={citasFiltradas}
               onCitaClick={(cita) => {
@@ -317,6 +321,7 @@ export default function CitasPage() {
             />
           </div>
         ) : null}
+        </div>
       </div>
 
       {/* Modal */}

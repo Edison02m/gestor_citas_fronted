@@ -15,6 +15,7 @@ export default function ConfiguracionPage() {
   const [activeTab, setActiveTab] = useState<'basico' | 'agenda' | 'notificaciones' | 'mensajes'>('basico');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showVariables, setShowVariables] = useState(true);
 
   // Formularios
   const [formBasico, setFormBasico] = useState({
@@ -136,7 +137,7 @@ export default function ConfiguracionPage() {
       });
 
       setNegocio(data);
-      setSuccess('Agenda pública actualizada correctamente');
+      setSuccess('Link de agendamiento actualizado correctamente');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al actualizar');
     } finally {
@@ -301,9 +302,9 @@ export default function ConfiguracionPage() {
               >
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
-                  Agenda Pública
+                  Link de agendamiento
                 </div>
               </button>
               <button
@@ -401,20 +402,25 @@ export default function ConfiguracionPage() {
               </form>
             )}
 
-            {/* Tab: Agenda Pública */}
+            {/* Tab: Link de agendamiento */}
             {activeTab === 'agenda' && (
               <form onSubmit={handleGuardarAgenda} className="space-y-5">
-                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
                   <input
                     type="checkbox"
                     id="agendaPublica"
                     checked={formAgenda.agendaPublica}
                     onChange={(e) => setFormAgenda({ ...formAgenda, agendaPublica: e.target.checked })}
-                    className="h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded cursor-pointer"
+                    className="h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded cursor-pointer mt-0.5"
                   />
-                  <label htmlFor="agendaPublica" className="text-sm font-medium text-gray-700 cursor-pointer flex-1">
-                    Activar agenda pública (permite que clientes agenden sin cuenta)
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="agendaPublica" className="text-sm font-medium text-gray-700 cursor-pointer block mb-1">
+                      Permitir que clientes puedan agendar citas a través del enlace público
+                    </label>
+                    <p className="text-xs text-gray-600">
+                      Tus clientes podrán agendar citas directamente desde tu link personalizado
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -445,7 +451,7 @@ export default function ConfiguracionPage() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
-                    Tu agenda pública: <span className="font-mono text-[#0490C8]">https://citaya.com/agenda/{formAgenda.linkPublico || 'tu-link'}</span>
+                    Tu link de agendamiento: <span className="font-mono text-[#0490C8]">https://citaya.com/agenda/{formAgenda.linkPublico || 'tu-link'}</span>
                   </p>
                 </div>
 
@@ -529,7 +535,7 @@ export default function ConfiguracionPage() {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Recordatorio 1 (en minutos)
+                        Recordatorio automático (en minutos)
                       </label>
                       <input
                         type="number"
@@ -546,29 +552,6 @@ export default function ConfiguracionPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           = <span className="font-medium text-[#0490C8]">{convertirMinutosATexto(parseInt(formNotificaciones.recordatorio1))}</span> antes
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Recordatorio 2 (en minutos, opcional)
-                      </label>
-                      <input
-                        type="number"
-                        value={formNotificaciones.recordatorio2}
-                        onChange={(e) => setFormNotificaciones({ ...formNotificaciones, recordatorio2: e.target.value })}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
-                        placeholder="60"
-                        min="0"
-                        max="10080"
-                      />
-                      {formNotificaciones.recordatorio2 && (
-                        <p className="mt-2 text-sm text-gray-600 flex items-center gap-2">
-                          <svg className="w-4 h-4 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          = <span className="font-medium text-[#0490C8]">{convertirMinutosATexto(parseInt(formNotificaciones.recordatorio2))}</span> antes
                         </p>
                       )}
                     </div>
@@ -597,37 +580,137 @@ export default function ConfiguracionPage() {
             {/* Tab: Mensajes WhatsApp */}
             {activeTab === 'mensajes' && (
               <form onSubmit={handleGuardarMensajes} className="space-y-5">
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="text-sm text-yellow-800">
-                      <p className="font-semibold mb-1">Variables disponibles:</p>
-                      <p className="text-yellow-700">
-                        <code className="bg-yellow-100 px-1.5 py-0.5 rounded">{'{cliente}'}</code>,{' '}
-                        <code className="bg-yellow-100 px-1.5 py-0.5 rounded">{'{fecha}'}</code>,{' '}
-                        <code className="bg-yellow-100 px-1.5 py-0.5 rounded">{'{hora}'}</code>,{' '}
-                        <code className="bg-yellow-100 px-1.5 py-0.5 rounded">{'{negocio}'}</code>
-                      </p>
-                      <p className="mt-1 text-yellow-700">
-                        Los mensajes deben incluir al menos: {'{cliente}'}, {'{fecha}'} y {'{hora}'}
-                      </p>
+                {/* Sección de variables - dropdown colapsable */}
+                <div className="bg-gray-50 rounded-xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowVariables(!showVariables)}
+                    className="w-full p-4 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg 
+                        className={`w-4 h-4 text-gray-600 transition-transform ${showVariables ? 'rotate-90' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      <h3 className="text-sm font-bold text-gray-900">Variables disponibles</h3>
                     </div>
-                  </div>
+                    <span className="text-xs text-gray-500">
+                      {showVariables ? 'Ocultar' : 'Mostrar'}
+                    </span>
+                  </button>
+                  
+                  {showVariables && (
+                    <div className="px-4 pb-4 border-t border-gray-200">
+                      <p className="text-xs text-gray-600 mb-3 mt-3">
+                        Usa estas variables en tus mensajes. <span className="font-semibold text-gray-900">Se reemplazan automáticamente</span> con los datos reales de cada cita.
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Nombre completo del cliente"
+                        >{'{cliente}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Fecha de la cita (Ej: Martes 5 de Noviembre, 2025)"
+                        >{'{fecha}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Hora de inicio de la cita (Ej: 10:00)"
+                        >{'{hora_inicio}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Hora de finalización de la cita (Ej: 11:00)"
+                        >{'{hora_fin}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Nombre del servicio contratado"
+                        >{'{servicio}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Nombre del empleado asignado"
+                        >{'{empleado}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Nombre de la sucursal"
+                        >{'{sucursal}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Dirección de la sucursal"
+                        >{'{direccion}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Ciudad de la sucursal"
+                        >{'{ciudad}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Teléfono de contacto de la sucursal"
+                        >{'{telefono_sucursal}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Link de Google Maps de la sucursal"
+                        >{'{maps}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Nombre de tu negocio"
+                        >{'{negocio}'}</code>
+                        <code 
+                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
+                          title="Precio del servicio"
+                        >{'{precio}'}</code>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Mensaje de Recordatorio
+                    Mensaje al agendar cita
                   </label>
                   <textarea
                     value={formMensajes.mensajeRecordatorio}
                     onChange={(e) => setFormMensajes({ ...formMensajes, mensajeRecordatorio: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent font-mono text-sm transition-all text-gray-900 placeholder-gray-400"
                     rows={6}
-                    placeholder="Hola {cliente}, te recordamos tu cita el {fecha} a las {hora} en {negocio}. ¡Te esperamos!"
+                    placeholder="Hola {cliente}, tu cita ha sido agendada para el {fecha} a las {hora_inicio} en {negocio}. ¡Te esperamos!"
                   />
+                  {/* Botones de plantillas */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormMensajes({
+                        ...formMensajes,
+                        mensajeRecordatorio: 'Hola {cliente}, te recordamos tu cita el {fecha} a las {hora_inicio}.\n\n💇 Servicio: {servicio}\n👤 Con: {empleado}\n🏢 En: {sucursal} - {direccion}\n\n¡Te esperamos!'
+                      })}
+                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
+                    >
+                      Plantilla Básica
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormMensajes({
+                        ...formMensajes,
+                        mensajeRecordatorio: '¡Hola {cliente}! 👋\n\nTu cita está confirmada:\n🗓️ {fecha} a las {hora_inicio}\n💇 {servicio} con {empleado}\n📍 {sucursal}: {direccion}, {ciudad}\n📞 {telefono_sucursal}\n\nVer ubicación: {maps}\n\n¡Nos vemos en {negocio}! ✨'
+                      })}
+                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
+                    >
+                      Con Ubicación
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormMensajes({
+                        ...formMensajes,
+                        mensajeRecordatorio: 'Hola {cliente},\n\nTe recordamos tu cita:\n📅 {fecha}\n⏰ {hora_inicio} - {hora_fin}\n💇 {servicio}\n👤 {empleado}\n🏢 {sucursal}\n\n¡Te esperamos en {negocio}!'
+                      })}
+                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
+                    >
+                      Completa
+                    </button>
+                  </div>
                 </div>
 
                 <div>
@@ -639,8 +722,31 @@ export default function ConfiguracionPage() {
                     onChange={(e) => setFormMensajes({ ...formMensajes, mensajeReagendamiento: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent font-mono text-sm transition-all text-gray-900 placeholder-gray-400"
                     rows={6}
-                    placeholder="Hola {cliente}, tu cita ha sido reagendada para el {fecha} a las {hora} en {negocio}."
+                    placeholder="Hola {cliente}, tu cita ha sido reagendada para el {fecha} a las {hora_inicio} en {negocio}."
                   />
+                  {/* Botones de plantillas */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormMensajes({
+                        ...formMensajes,
+                        mensajeReagendamiento: 'Hola {cliente}, tu cita ha sido reagendada.\n\n📅 Nueva fecha: {fecha}\n⏰ Hora: {hora_inicio}\n💇 Servicio: {servicio}\n👤 Con: {empleado}\n🏢 En: {sucursal}\n\nGracias por tu comprensión.'
+                      })}
+                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
+                    >
+                      Plantilla Básica
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormMensajes({
+                        ...formMensajes,
+                        mensajeReagendamiento: '¡Hola {cliente}! 👋\n\n📌 Tu cita ha sido reagendada:\n🗓️ {fecha} a las {hora_inicio}\n💇 {servicio} con {empleado}\n📍 {sucursal}: {direccion}\n\nVer ubicación: {maps}\n\nGracias por tu comprensión 😊'
+                      })}
+                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
+                    >
+                      Con Ubicación
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex justify-end pt-4">

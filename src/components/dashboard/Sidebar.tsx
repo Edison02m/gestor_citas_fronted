@@ -96,7 +96,7 @@ const menuItems = [
   },
   {
     name: 'Activar Código',
-    path: '/activar-codigo',
+    path: '/dashboard-usuario/activar-codigo',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -190,9 +190,24 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
               ? pathname === item.path 
               : pathname === item.path || pathname?.startsWith(item.path + '/');
             
+            // IDs para el tour
+            const getMenuId = (name: string) => {
+              const ids: { [key: string]: string } = {
+                'Citas': 'menu-citas',
+                'Servicios': 'menu-servicios',
+                'Sucursales': 'menu-sucursales',
+                'Empleados': 'menu-empleados',
+                'Clientes': 'menu-clientes',
+                'Configuración': 'menu-configuracion',
+                'WhatsApp': 'menu-whatsapp'
+              };
+              return ids[name] || undefined;
+            };
+            
             return (
               <button
                 key={item.path}
+                id={getMenuId(item.name)}
                 onClick={() => handleNavigation(item.path)}
                 className={`w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${
                   isCollapsed 

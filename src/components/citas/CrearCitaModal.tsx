@@ -1034,89 +1034,16 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                   <p className="text-xs text-gray-500 mt-1">Revisa que toda la información sea correcta</p>
                 </div>
 
-                {/* Resumen de la cita - Grid de 2 columnas */}
-                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                  {/* Cliente */}
-                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Cliente</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {clientes.find(c => c.id === formData.clienteId)?.nombre}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-0.5">
-                        {clientes.find(c => c.id === formData.clienteId)?.telefono}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Servicio */}
-                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Servicio</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {servicios.find(s => s.id === formData.servicioId)?.nombre}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-0.5">
-                        {servicios.find(s => s.id === formData.servicioId)?.duracion} min • ${servicios.find(s => s.id === formData.servicioId)?.precio}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Sucursal */}
-                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Sucursal</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {sucursales.find(s => s.id === formData.sucursalId)?.nombre}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-0.5 truncate">
-                        {sucursales.find(s => s.id === formData.sucursalId)?.direccion}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Empleado */}
-                  <div className="flex items-start gap-2.5 pb-3 border-b border-gray-200">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Empleado</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {empleados.find(e => e.id === formData.empleadoId)?.nombre}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-0.5">
-                        {empleados.find(e => e.id === formData.empleadoId)?.cargo}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Fecha y Hora */}
-                  <div className="flex items-start gap-2.5">
+                {/* Fecha y Hora - Centrado arriba */}
+                <div className="bg-gray-50 rounded-xl p-3">
+                  <div className="flex items-start gap-2.5 justify-center">
                     <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Fecha y Hora</p>
+                    <div className="text-center">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Fecha de la Cita</p>
                       <p className="text-sm font-medium text-gray-900">
                         {fechaSeleccionada?.toLocaleDateString('es-ES', { 
                           weekday: 'long', 
@@ -1130,10 +1057,101 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                       </p>
                     </div>
                   </div>
+                </div>
 
-                  {/* Notas (si existen) */}
-                  {formData.notas && (
-                    <div className="flex items-start gap-2.5 pt-3 border-t border-gray-200">
+                {/* Grid de 2 columnas: Cliente-Servicio | Sucursal-Empleado */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Columna Izquierda: Cliente y Servicio */}
+                  <div className="space-y-3">
+                    {/* Cliente */}
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Cliente</p>
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {clientes.find(c => c.id === formData.clienteId)?.nombre}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            {clientes.find(c => c.id === formData.clienteId)?.telefono}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Servicio */}
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Servicio</p>
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {servicios.find(s => s.id === formData.servicioId)?.nombre}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            {servicios.find(s => s.id === formData.servicioId)?.duracion} min • ${servicios.find(s => s.id === formData.servicioId)?.precio}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Columna Derecha: Sucursal y Empleado */}
+                  <div className="space-y-3">
+                    {/* Sucursal */}
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Sucursal</p>
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {sucursales.find(s => s.id === formData.sucursalId)?.nombre}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-0.5 truncate">
+                            {sucursales.find(s => s.id === formData.sucursalId)?.direccion}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Empleado */}
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Empleado</p>
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {empleados.find(e => e.id === formData.empleadoId)?.nombre}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            {empleados.find(e => e.id === formData.empleadoId)?.cargo}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notas (si existen) - Ancho completo */}
+                {formData.notas && (
+                  <div className="bg-gray-50 rounded-xl p-3">
+                    <div className="flex items-start gap-2.5">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -1144,8 +1162,8 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                         <p className="text-xs text-gray-700">{formData.notas}</p>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 

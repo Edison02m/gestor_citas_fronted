@@ -210,8 +210,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
   const calendarSection = (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden lg:w-1/3 xl:w-1/4">
-      <div className="bg-white border-b border-gray-200 p-4 sm:p-5">
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full lg:w-1/3 xl:w-1/4">
+      <div className="bg-white border-b border-gray-200 p-4 sm:p-5 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => changeMonth('prev')}
@@ -248,7 +248,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-      <div className="p-3 sm:p-4">
+      <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
         <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {monthDays.map((day, index) => {
             const count = getCitasCount(day);
@@ -299,7 +299,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-gray-200 bg-gray-50">
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-gray-200 bg-gray-50 flex-shrink-0">
         <p className="text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 sm:mb-2.5">
           Ocupación
         </p>
@@ -322,8 +322,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
   );
 
   const detailsSection = (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[75vh] lg:flex-1 lg:max-h-full">
-      <div className="bg-white border-b border-gray-200 p-4 sm:p-5">
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full lg:flex-1">
+      <div className="bg-white border-b border-gray-200 p-4 sm:p-5 flex-shrink-0">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900">
@@ -341,9 +341,9 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-  <div className="flex-1 overflow-auto p-4 sm:p-5 lg:overflow-visible">
+  <div className="flex-1 overflow-y-auto p-4 sm:p-5">
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-full py-10 sm:py-0">
+          <div className="flex flex-col items-center justify-center h-full py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0490C8] mb-4" />
             <p className="text-sm text-gray-500">Cargando citas...</p>
           </div>
@@ -363,12 +363,12 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
             <p className="text-sm text-gray-600 text-center">Este día está disponible</p>
           </div>
         ) : (
-          <div className="space-y-3 sm:space-y-4 lg:max-h-[540px] lg:overflow-y-auto lg:pr-2">
+          <div className="space-y-2 sm:space-y-3">
             {sortedDayCitas.map((cita) => (
               <button
                 key={cita.id}
                 onClick={() => handleCitaClick(cita)}
-                className="w-full text-left rounded-2xl border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 bg-white overflow-hidden lg:min-h-[160px]"
+                className="w-full text-left rounded-xl border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 bg-white overflow-hidden"
               >
                 <div className="flex">
                   <div
@@ -376,9 +376,9 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                     style={{ backgroundColor: cita.servicio?.color || '#0490C8' }}
                   />
 
-                  <div className="flex-1 p-4 sm:p-5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-900">
+                  <div className="flex-1 p-3 sm:p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-900">
                         <span>{cita.horaInicio}</span>
                         <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -396,8 +396,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                           onClick={(e) => e.stopPropagation()}
                           disabled={changingStatusCitaId === cita.id}
                           className={`
-                            text-xs font-semibold px-2 py-1 rounded-full border transition-all duration-200
-                            min-w-[128px] text-center
+                            text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:py-1 rounded-full border transition-all duration-200
+                            min-w-[100px] sm:min-w-[120px] text-center
                             ${getStatusColor(cita.estado)}
                             ${changingStatusCitaId === cita.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-sm'}
                           `}
@@ -416,20 +416,20 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                       </div>
                     </div>
 
-                    <h4 className="text-base sm:text-lg font-bold text-gray-900 mt-3 mb-2 sm:mb-3 truncate">
+                    <h4 className="text-sm sm:text-base font-bold text-gray-900 mt-2 mb-1.5 truncate">
                       {cita.cliente?.nombre}
                     </h4>
 
-                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                      <span className="text-sm sm:text-base text-gray-700 font-medium truncate">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-xs sm:text-sm text-gray-700 font-medium truncate">
                         {cita.servicio?.nombre}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-gray-600">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs text-gray-600">
                       {cita.empleado && (
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -442,8 +442,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                       )}
 
                       {cita.cliente?.telefono && (
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -457,8 +457,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                     </div>
 
                     {cita.notas && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 italic line-clamp-2">
+                      <div className="mt-2 pt-2 border-t border-gray-200">
+                        <p className="text-[10px] sm:text-xs text-gray-500 italic line-clamp-1">
                           💬 {cita.notas}
                         </p>
                       </div>
@@ -474,10 +474,10 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
   );
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
       {isMobile ? (
-        <div className="flex flex-col gap-4">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-1.5 flex gap-1">
+        <div className="flex flex-col gap-4 h-full">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-1.5 flex gap-1 flex-shrink-0">
             <button
               type="button"
               onClick={() => setMobileView('list')}
@@ -500,10 +500,12 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
             </button>
           </div>
 
-          {mobileView === 'list' ? detailsSection : calendarSection}
+          <div className="flex-1 overflow-hidden">
+            {mobileView === 'list' ? detailsSection : calendarSection}
+          </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-5 lg:flex-row lg:h-full">
+        <div className="flex flex-col gap-5 lg:flex-row h-full">
           {calendarSection}
           {detailsSection}
         </div>

@@ -201,8 +201,8 @@ export default function AgendaPublicaPage() {
         );
         setEmpleados(empleadosRes.data);
         
-        // Auto-seleccionar el primer empleado si hay empleados disponibles
-        if (empleadosRes.data.length > 0) {
+        // Auto-seleccionar el empleado SOLO si hay exactamente uno
+        if (empleadosRes.data.length === 1) {
           setFormData(prev => ({ ...prev, empleadoId: empleadosRes.data[0].id }));
           setEmpleadoSearch(empleadosRes.data[0].nombre);
         }
@@ -229,8 +229,8 @@ export default function AgendaPublicaPage() {
       );
       setEmpleados(empleadosRes.data);
       
-      // Auto-seleccionar el primer empleado si hay empleados disponibles
-      if (empleadosRes.data.length > 0 && !formData.empleadoId) {
+      // Auto-seleccionar el empleado SOLO si hay exactamente uno y no está ya seleccionado
+      if (empleadosRes.data.length === 1 && !formData.empleadoId) {
         setFormData(prev => ({ ...prev, empleadoId: empleadosRes.data[0].id }));
         setEmpleadoSearch(empleadosRes.data[0].nombre);
       }
@@ -315,7 +315,23 @@ export default function AgendaPublicaPage() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Validación especial para teléfono
+    if (field === 'clienteTelefono') {
+      // Solo permitir números
+      let valorLimpio = value.replace(/\D/g, '');
+      
+      // Si empieza con 0, quitarlo
+      if (valorLimpio.startsWith('0')) {
+        valorLimpio = valorLimpio.substring(1);
+      }
+      
+      // Limitar a 9 dígitos
+      if (valorLimpio.length <= 9) {
+        setFormData((prev) => ({ ...prev, [field]: valorLimpio }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
     setError('');
   };
 
@@ -460,6 +476,18 @@ export default function AgendaPublicaPage() {
       }
       if (!formData.clienteTelefono) {
         setError('El teléfono es obligatorio');
+        return;
+      }
+      if (formData.clienteTelefono.length !== 9) {
+        setError('El teléfono debe tener exactamente 9 dígitos');
+        return;
+      }
+      if (!/^\d{9}$/.test(formData.clienteTelefono)) {
+        setError('El teléfono debe contener solo números');
+        return;
+      }
+      if (formData.clienteTelefono.startsWith('0')) {
+        setError('El teléfono no debe empezar con 0');
         return;
       }
       if (!formData.clienteEmail) {

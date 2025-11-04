@@ -7,6 +7,10 @@ import { Usuario } from '@/interfaces';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import UsageDashboard from '@/components/dashboard/UsageDashboard';
 import LimitReachedModal from '@/components/dashboard/LimitReachedModal';
+import { useTour } from '@/hooks/useTour';
+import { TOURS } from '@/utils/tours';
+import { DriveStep } from 'driver.js';
+import HelpButton from '@/components/shared/HelpButton';
 
 // Helper para verificar si es Usuario (no SuperAdmin)
 const isUsuario = (user: any): user is Usuario => {
@@ -17,6 +21,79 @@ export default function DashboardUsuarioPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [diasRestantes, setDiasRestantes] = useState<number | null>(null);
+  
+  // Estados para controlar los dropdowns
+  const [suscripcionOpen, setSuscripcionOpen] = useState(true);
+  const [negocioOpen, setNegocioOpen] = useState(true);
+  const [usageOpen, setUsageOpen] = useState(true);
+
+  // Definir pasos del tour general - simplificado
+  const tourSteps: DriveStep[] = [
+    {
+      popover: {
+        title: '¡Bienvenido a CitaYA! 👋',
+        description: 'Te voy a mostrar las secciones principales para que empieces a gestionar tu negocio.',
+      }
+    },
+    // Menú - Citas
+    {
+      element: '#menu-citas',
+      popover: {
+        title: '📅 Citas',
+        description: 'Aquí podrás ver todas tus citas, crear nuevas y gestionar tu agenda diaria.',
+        side: 'right',
+      }
+    },
+    // Menú - Gestión del negocio (Servicios, Sucursales, Empleados, Clientes)
+    {
+      element: '#menu-servicios',
+      popover: {
+        title: '� Gestión del Negocio',
+        description: 'En estas secciones configurarás tus servicios, sucursales, empleados y clientes. Todo lo necesario para que tu negocio funcione.',
+        side: 'right',
+      }
+    },
+    // Menú - Configuración
+    {
+      element: '#menu-configuracion',
+      popover: {
+        title: '⚙️ Configuración',
+        description: 'Configura los datos básicos de tu negocio, link de agendamiento, notificaciones y mensajes personalizados.',
+        side: 'right',
+      }
+    },
+    // Menú - WhatsApp
+    {
+      element: '#menu-whatsapp',
+      popover: {
+        title: '💬 WhatsApp',
+        description: 'Vincula tu número de WhatsApp para enviar notificaciones automáticas a tus clientes.',
+        side: 'right',
+      }
+    },
+    // Dashboard - Uso de Recursos
+    {
+      element: '#usage-dashboard',
+      popover: {
+        title: '📊 Uso de Recursos',
+        description: 'Monitorea cuántas citas, clientes, empleados y servicios has creado según los límites de tu plan.',
+        side: 'top',
+      }
+    },
+    {
+      popover: {
+        title: '¡Listo para empezar! 🚀',
+        description: '¡Ahora ya conoces las herramientas principales! Comienza a gestionar tu negocio con CitaYA.',
+      }
+    }
+  ];
+
+  // Activar tour automáticamente
+  useTour({ 
+    tourKey: TOURS.GENERAL, 
+    steps: tourSteps,
+    autoStart: true 
+  });
 
   useEffect(() => {
     // Redirigir si no está autenticado
@@ -40,12 +117,12 @@ export default function DashboardUsuarioPage() {
     // Redirigir si no tiene suscripción activa
     if (isUsuario(user)) {
       if (user.negocio?.estadoSuscripcion === 'SIN_SUSCRIPCION') {
-        router.push('/activar-codigo');
+        router.push('/dashboard-usuario/activar-codigo');
         return;
       }
 
       if (user.negocio?.estadoSuscripcion === 'VENCIDA') {
-        router.push('/activar-codigo?expired=true');
+        router.push('/dashboard-usuario/activar-codigo?expired=true');
         return;
       }
 
@@ -95,7 +172,7 @@ export default function DashboardUsuarioPage() {
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Header con bienvenida */}
-        <div className="mb-6 sm:mb-8">
+        <div id="dashboard-header" className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             ¡Hola, {user.nombre}! 👋
           </h1>
@@ -145,8 +222,36 @@ export default function DashboardUsuarioPage() {
           </div>
         )}
 
-        {/* Estado de Suscripción - Grid Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
+        {/* Estado de Suscripción - Con Dropdown */}
+        <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
+          <button
+            onClick={() => setSuscripcionOpen(!suscripcionOpen)}
+            className="w-full p-5 sm:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">Estado de Suscripción</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Detalles de tu plan actual</p>
+              </div>
+            </div>
+            <svg 
+              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${suscripcionOpen ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {suscripcionOpen && (
+            <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100">
+              <div id="suscripcion-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
           {/* Card Estado */}
           <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all">
             <div className="flex items-start gap-3">
@@ -219,6 +324,9 @@ export default function DashboardUsuarioPage() {
             </div>
           </div>
         </div>
+            </div>
+          )}
+        </div>
 
         {/* Alerta si está por vencer */}
         {diasRestantes !== null && diasRestantes > 0 && diasRestantes <= 7 && (
@@ -252,26 +360,45 @@ export default function DashboardUsuarioPage() {
           </div>
         )}
 
-        {/* Información del Negocio */}
-        <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Información del Negocio</h2>
-                <p className="text-sm text-gray-500 mt-1">Detalles de tu empresa</p>
+        {/* Información del Negocio - Con Dropdown */}
+        <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
+          <div className="p-5 sm:p-6 flex items-center justify-between border-b border-gray-100">
+            <button
+              onClick={() => setNegocioOpen(!negocioOpen)}
+              className="flex-1 flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
               </div>
-              <button
-                onClick={() => router.push('/dashboard-usuario/configuracion')}
-                className="px-4 py-2 text-sm font-medium text-[#0490C8] hover:text-[#023664] bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all flex items-center gap-2"
+              <div className="text-left flex-1">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">Información del Negocio</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Detalles de tu empresa</p>
+              </div>
+              <svg 
+                className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${negocioOpen ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
               >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => router.push('/dashboard-usuario/configuracion')}
+              className="ml-3 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#0490C8] hover:text-[#023664] bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all flex items-center gap-2"
+            >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Editar
               </button>
-            </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {negocioOpen && (
+            <div className="p-5 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nombre del Negocio */}
               <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
                 <div className="flex items-start gap-3">
@@ -346,17 +473,52 @@ export default function DashboardUsuarioPage() {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Dashboard de uso de recursos */}
-        <div className="mb-6 sm:mb-8">
-          <UsageDashboard />
+        {/* Dashboard de uso de recursos - Con Dropdown */}
+        <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
+          <button
+            onClick={() => setUsageOpen(!usageOpen)}
+            className="w-full p-5 sm:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">Uso de Recursos</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Monitorea el uso de tu plan</p>
+              </div>
+            </div>
+            <svg 
+              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${usageOpen ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {usageOpen && (
+            <div id="usage-dashboard" className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100">
+              <div className="mt-4">
+                <UsageDashboard />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Modal de límite alcanzado (se muestra globalmente) */}
       <LimitReachedModal />
+      
+      {/* Botón de ayuda flotante */}
+      <HelpButton tourKey={TOURS.GENERAL} tooltip="Ver tour guiado nuevamente" />
     </DashboardLayout>
   );
 }
