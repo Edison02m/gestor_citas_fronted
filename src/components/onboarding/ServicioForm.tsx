@@ -97,6 +97,19 @@ export default function ServicioForm({ onSuccess }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Header explicativo */}
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
+          Servicios que ofreces
+        </h2>
+        <p className="text-sm text-gray-600">
+          Agrega al menos un servicio que ofreces.{' '}
+          <span className="text-gray-500 text-xs">
+            (Podrás agregar más servicios después)
+          </span>
+        </p>
+      </div>
+
       <div className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -108,9 +121,12 @@ export default function ServicioForm({ onSuccess }: Props) {
             value={formData.nombre}
             onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-            placeholder="Ej: Corte de Cabello"
+            placeholder="Ej: Corte de Cabello, Manicure, Consulta..."
             disabled={loading}
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Este nombre será visible para tus clientes al agendar
+          </p>
         </div>
 
         <div>
@@ -147,7 +163,7 @@ export default function ServicioForm({ onSuccess }: Props) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Duración (min)
+              Duración (minutos)
             </label>
             <input
               type="number"
@@ -231,7 +247,7 @@ export default function ServicioForm({ onSuccess }: Props) {
         disabled={loading}
         className="w-full bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? 'Creando servicio...' : 'Continuar'}
+        {loading ? 'Guardando...' : 'Continuar'}
       </button>
     </form>
   );

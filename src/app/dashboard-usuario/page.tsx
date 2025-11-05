@@ -310,13 +310,22 @@ export default function DashboardUsuarioPage() {
               <div className="flex-1">
                 <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Vencimiento</p>
                 {user.negocio?.fechaVencimiento ? (
-                  <p className="text-sm text-gray-900 font-semibold">
-                    {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
+                  <div className="space-y-0.5">
+                    <p className="text-sm text-gray-900 font-semibold">
+                      {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(user.negocio.fechaVencimiento).toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                      })}
+                    </p>
+                  </div>
                 ) : (
                   <p className="text-sm text-gray-700">No disponible</p>
                 )}

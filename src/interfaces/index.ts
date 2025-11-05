@@ -634,6 +634,7 @@ export interface SucursalPublica {
   nombre: string;
   direccion: string;
   telefono?: string;
+  googleMapsUrl?: string;
   ciudad: string;
   estado: string;
   horarios?: HorarioSucursal[]; // Horarios de la sucursal

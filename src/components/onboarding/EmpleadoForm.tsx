@@ -16,7 +16,26 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
   const [sucursales, setSucursales] = useState<Sucursal[]>([]);
   const [loadingSucursales, setLoadingSucursales] = useState(true);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
   const { user } = useAuth();
+
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
   
   const [formData, setFormData] = useState<CreateEmpleadoDto>({
     nombre: '',
@@ -30,6 +49,24 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
   useEffect(() => {
     loadSucursales();
   }, []);
+
+  // Cerrar dropdown de código de país al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showCodigoPaisDropdown]);
 
   const loadSucursales = async () => {
     try {
@@ -61,11 +98,21 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       return;
     }
 
+    // Validar teléfono
+    if (formData.telefono && !/^\d{9}$/.test(formData.telefono)) {
+      setError('El teléfono debe tener exactamente 9 dígitos');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 1. Crear el empleado
-      await OnboardingService.createEmpleado(formData);
+      // 1. Crear el empleado con teléfono concatenado
+      const empleadoData = {
+        ...formData,
+        telefono: formData.telefono ? `${codigoPais}${formData.telefono}` : formData.telefono
+      };
+      await OnboardingService.createEmpleado(empleadoData);
       
       // 2. Completar el onboarding (ya que este es el último paso opcional)
       await OnboardingService.completar();
@@ -184,6 +231,19 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Header explicativo */}
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
+          Empleados de tu negocio
+        </h2>
+        <p className="text-sm text-gray-600">
+          Agrega a las personas que trabajan contigo.{' '}
+          <span className="text-gray-500 text-xs">
+            (Si trabajas solo, puedes omitir este paso)
+          </span>
+        </p>
+      </div>
+
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -222,15 +282,75 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Teléfono
             </label>
-            <input
-              type="tel"
-              required
-              value={formData.telefono}
-              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-              placeholder="+593 999 888 777"
-              disabled={loading}
-            />
+            <div className="flex gap-2">
+              <div className="relative w-32 codigo-pais-dropdown-container">
+                <button
+                  type="button"
+                  onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                  className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl hover:border-[#0490C8] focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                  disabled={loading}
+                >
+                  <span className="flex items-center gap-1.5 truncate">
+                    <span>{codigosPaises.find(c => c.codigo === codigoPais)?.bandera}</span>
+                    <span className="text-xs font-medium">{codigoPais}</span>
+                  </span>
+                  <svg 
+                    className={`w-3.5 h-3.5 text-gray-500 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showCodigoPaisDropdown && (
+                  <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {codigosPaises.map((pais) => (
+                      <button
+                        key={pais.codigo}
+                        type="button"
+                        onClick={() => {
+                          setCodigoPais(pais.codigo);
+                          setShowCodigoPaisDropdown(false);
+                        }}
+                        className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${
+                          codigoPais === pais.codigo ? 'bg-blue-50 text-[#0490C8] font-medium' : 'text-gray-700'
+                        }`}
+                      >
+                        <span className="text-base">{pais.bandera}</span>
+                        <span className="flex-1">{pais.pais}</span>
+                        <span className="text-xs text-gray-500">{pais.codigo}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <input
+                type="tel"
+                required
+                value={formData.telefono}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, '');
+                  if (value.startsWith('0')) {
+                    value = value.substring(1);
+                  }
+                  if (value.length <= 9) {
+                    setFormData({ ...formData, telefono: value });
+                  }
+                }}
+                className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+                placeholder="999888777"
+                disabled={loading}
+                maxLength={9}
+              />
+            </div>
+            {formData.telefono && formData.telefono.length !== 9 && (
+              <p className="mt-1 text-xs text-red-500">
+                El teléfono debe tener exactamente 9 dígitos
+              </p>
+            )}
           </div>
 
           <div>
@@ -266,56 +386,72 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
         </div>
       </div>
 
-      {/* Aviso sobre horarios */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-        <div className="flex items-start gap-2">
-          <svg className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <p className="text-sm text-blue-800 font-medium">Horarios del empleado</p>
-            <p className="text-xs text-blue-700 mt-0.5">
-              Los horarios de trabajo se podrán configurar después desde el panel de control.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Sucursales */}
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-        <label className="block text-xs font-medium text-gray-700 mb-2">
-          Sucursales donde trabaja
-        </label>
-        <div className="space-y-1.5">
-          {sucursales.map((sucursal) => (
-            <label 
-              key={sucursal.id} 
-              className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all text-xs ${
-                formData.sucursalIds.includes(sucursal.id)
-                  ? 'border-[#0490C8] bg-blue-50'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={formData.sucursalIds.includes(sucursal.id)}
-                onChange={() => toggleSucursal(sucursal.id)}
-                className="w-3.5 h-3.5 text-[#0490C8] rounded"
-                disabled={loading}
-              />
-              <div className="flex-1">
-                <div className="font-medium text-gray-900">{sucursal.nombre}</div>
+      {/* Aviso sobre horarios y sucursales - Solo se muestra cuando hay nombre */}
+      {formData.nombre && (
+        <>
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <div className="flex items-start gap-2">
+              <svg className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm text-blue-800 font-medium">Horarios del empleado</p>
+                <p className="text-xs text-blue-700 mt-0.5">
+                  Los horarios de trabajo se podrán configurar después desde el panel de control.
+                </p>
               </div>
+            </div>
+          </div>
+
+          {/* Sucursales */}
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
+            <label className="block text-xs font-medium text-gray-700 mb-2">
+              Sucursales donde trabaja
             </label>
-          ))}
-        </div>
-      </div>
+            <div className="space-y-1.5">
+              {sucursales.map((sucursal) => (
+                <label 
+                  key={sucursal.id} 
+                  className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all text-xs ${
+                    formData.sucursalIds.includes(sucursal.id)
+                      ? 'border-[#0490C8] bg-blue-50'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.sucursalIds.includes(sucursal.id)}
+                    onChange={() => toggleSucursal(sucursal.id)}
+                    className="w-3.5 h-3.5 text-[#0490C8] rounded"
+                    disabled={loading}
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">{sucursal.nombre}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs">
           {error}
         </div>
       )}
+
+      {/* Nota informativa */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+        <div className="flex items-start gap-2">
+          <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-xs text-blue-700">
+            <span className="font-semibold">Paso opcional:</span> Si trabajas solo, puedes omitir este paso. Podrás agregar empleados más tarde desde el panel de control.
+          </p>
+        </div>
+      </div>
 
       <div className="flex gap-3">
         <button
@@ -332,7 +468,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
           disabled={loading}
           className="flex-1 bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Creando...' : 'Continuar'}
+          {loading ? 'Guardando...' : 'Continuar'}
         </button>
       </div>
     </form>

@@ -97,6 +97,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       const empleadosActivos = empleadosData.data.empleados.filter((e: Empleado) => e.estado === 'ACTIVO');
       if (empleadosActivos.length === 1) {
         setFormData(prev => ({ ...prev, empleadoId: empleadosActivos[0].id }));
+        setEmpleadoSearch(empleadosActivos[0].nombre);
       }
 
     } catch (error) {
@@ -831,7 +832,6 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                   <div className="relative">
                     <label className="block text-sm font-medium text-gray-600 mb-1.5">
                       Empleado {empleados.length > 1 && <span className="text-red-500">*</span>}
-                      {empleados.length === 1 && <span className="text-gray-500 text-xs ml-1">(Auto-seleccionado)</span>}
                     </label>
                     <div className="relative">
                       <input

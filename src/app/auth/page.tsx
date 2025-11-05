@@ -11,6 +11,8 @@ export default function AuthPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [registerStep, setRegisterStep] = useState(1); // Paso del registro (1, 2, 3)
   const [isScrolled, setIsScrolled] = useState(false);
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
 
   // Login state
   const [loginData, setLoginData] = useState({
@@ -43,6 +45,23 @@ export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
+
   // Detectar scroll para cambiar el navbar
   useEffect(() => {
     const handleScroll = () => {
@@ -52,6 +71,24 @@ export default function AuthPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Cerrar dropdown de código de país al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showCodigoPaisDropdown]);
 
   // Detectar modo inicial (login o register)
   useEffect(() => {
@@ -126,6 +163,14 @@ export default function AuthPage() {
         setError('El nombre debe tener al menos 2 caracteres');
         return;
       }
+      if (registerData.telefono.length !== 9) {
+        setError('El teléfono debe tener exactamente 9 dígitos');
+        return;
+      }
+      if (!/^\d{9}$/.test(registerData.telefono)) {
+        setError('El teléfono debe contener solo números');
+        return;
+      }
       nextStep();
       return;
     }
@@ -170,13 +215,13 @@ export default function AuthPage() {
       }
 
       try {
-        // Registrar usuario
+        // Registrar usuario con teléfono completo (código + número)
         await UsuariosService.register({
           email: registerData.email,
           password: registerData.password,
           nombre: registerData.nombre,
           nombreNegocio: registerData.nombreNegocio,
-          telefono: registerData.telefono,
+          telefono: `${codigoPais}${registerData.telefono}`, // Concatenar código + teléfono
           logo: registerData.logo || undefined,
           descripcion: registerData.descripcion || undefined,
         });
@@ -465,15 +510,81 @@ export default function AuthPage() {
                         <label className="block text-sm font-medium text-gray-900 mb-2">
                           Teléfono de contacto *
                         </label>
-                        <input
-                          type="tel"
-                          required
-                          value={registerData.telefono}
-                          onChange={(e) => setRegisterData({ ...registerData, telefono: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 bg-white transition-all"
-                          placeholder="+593 999 888 777"
-                          disabled={isLoading}
-                        />
+                        <div className="flex gap-2">
+                          {/* Selector de código de país */}
+                          <div className="relative codigo-pais-dropdown-container">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowCodigoPaisDropdown(!showCodigoPaisDropdown);
+                              }}
+                              disabled={isLoading}
+                              className="flex items-center justify-between gap-1.5 px-3 py-3 bg-white border border-gray-200 rounded-2xl hover:bg-gray-50 focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            >
+                              <span className="text-lg leading-none">
+                                {codigosPaises.find(p => p.codigo === codigoPais)?.bandera}
+                              </span>
+                              <span className="text-sm font-medium text-gray-700">{codigoPais}</span>
+                              <svg 
+                                className={`w-4 h-4 text-gray-400 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+
+                            {/* Dropdown de códigos de país */}
+                            {showCodigoPaisDropdown && (
+                              <div className="absolute z-50 top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-2xl shadow-lg max-h-64 overflow-y-auto">
+                                {codigosPaises.map((pais) => (
+                                  <button
+                                    key={pais.codigo}
+                                    type="button"
+                                    onClick={() => {
+                                      setCodigoPais(pais.codigo);
+                                      setShowCodigoPaisDropdown(false);
+                                    }}
+                                    className="w-full px-3 py-2.5 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-lg">{pais.bandera}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-gray-900">{pais.pais}</div>
+                                        <div className="text-xs text-gray-500">{pais.codigo}</div>
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Input de teléfono */}
+                          <input
+                            type="tel"
+                            required
+                            value={registerData.telefono}
+                            onChange={(e) => {
+                              let value = e.target.value.replace(/\D/g, ''); // Solo números
+                              
+                              // Si el primer caracter es 0, quitarlo automáticamente
+                              if (value.startsWith('0')) {
+                                value = value.substring(1);
+                              }
+                              
+                              // Limitar a 9 dígitos
+                              if (value.length <= 9) {
+                                setRegisterData({ ...registerData, telefono: value });
+                              }
+                            }}
+                            className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 bg-white transition-all placeholder:text-gray-400"
+                            placeholder="999999999"
+                            disabled={isLoading}
+                          />
+                        </div>
                       </div>
                     </>
                   )}

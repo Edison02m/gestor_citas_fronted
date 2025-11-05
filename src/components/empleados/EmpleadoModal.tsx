@@ -26,6 +26,32 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
   const [sucursalSeleccionada, setSucursalSeleccionada] = useState<string>(''); // Solo UNA sucursal
   const [loadingSucursales, setLoadingSucursales] = useState(false);
   const [errors, setErrors] = useState<string>('');
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
+
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+53', pais: 'Cuba', bandera: '🇨🇺' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+502', pais: 'Guatemala', bandera: '🇬🇹' },
+    { codigo: '+504', pais: 'Honduras', bandera: '🇭🇳' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+505', pais: 'Nicaragua', bandera: '🇳🇮' },
+    { codigo: '+507', pais: 'Panamá', bandera: '🇵🇦' },
+    { codigo: '+595', pais: 'Paraguay', bandera: '🇵🇾' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+1', pais: 'Puerto Rico', bandera: '🇵🇷' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
 
   // Cargar sucursales al abrir el modal
   useEffect(() => {
@@ -49,16 +75,31 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
 
   useEffect(() => {
     if (empleado) {
+      // Extraer código de país del teléfono si existe
+      let telefonoSinCodigo = empleado.telefono || '';
+      let codigoPaisDetectado = '+593'; // Ecuador por defecto
+      
+      if (telefonoSinCodigo && telefonoSinCodigo.startsWith('+')) {
+        // El teléfono tiene código de país, extraerlo
+        const codigoEncontrado = codigosPaises.find(p => telefonoSinCodigo.startsWith(p.codigo));
+        if (codigoEncontrado) {
+          codigoPaisDetectado = codigoEncontrado.codigo;
+          telefonoSinCodigo = telefonoSinCodigo.substring(codigoEncontrado.codigo.length);
+        }
+      }
+      
+      setCodigoPais(codigoPaisDetectado);
       setFormData({
         nombre: empleado.nombre,
         cargo: empleado.cargo,
-        telefono: empleado.telefono,
+        telefono: telefonoSinCodigo,
         email: empleado.email,
         foto: empleado.foto || '',
         estado: empleado.estado
       });
       setSucursalSeleccionada(''); // No pre-seleccionamos en edición
     } else {
+      setCodigoPais('+593');
       setFormData({
         nombre: '',
         cargo: '',
@@ -71,6 +112,24 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
     }
     setErrors('');
   }, [empleado, isOpen]);
+
+  // Cerrar dropdown de código de país al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showCodigoPaisDropdown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,8 +151,13 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
       return;
     }
 
-    if (formData.telefono.replace(/\D/g, '').length < 7) {
-      setErrors('El teléfono debe tener al menos 7 dígitos');
+    if (formData.telefono.length !== 9) {
+      setErrors('El teléfono debe tener exactamente 9 dígitos');
+      return;
+    }
+
+    if (!/^\d{9}$/.test(formData.telefono)) {
+      setErrors('El teléfono debe contener solo números');
       return;
     }
 
@@ -117,7 +181,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
       const dataToSend: any = {
         nombre: formData.nombre.trim(),
         cargo: formData.cargo.trim(),
-        telefono: formData.telefono.trim(),
+        telefono: `${codigoPais}${formData.telefono.trim()}`,
         email: formData.email.trim()
       };
 
@@ -240,15 +304,71 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
-                    <input
-                      type="tel"
-                      value={formData.telefono}
-                      onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 text-sm bg-white"
-                      placeholder="0987654321"
-                      disabled={loading}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      {/* Selector de código de país */}
+                      <div className="w-24 relative codigo-pais-dropdown-container">
+                        <button
+                          type="button"
+                          onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                          className="w-full px-2 py-2 text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                          disabled={loading}
+                        >
+                          <span className="truncate text-[10px]">
+                            {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
+                          </span>
+                          <svg className={`w-3 h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        
+                        {showCodigoPaisDropdown && (
+                          <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                            {codigosPaises.map((pais) => (
+                              <button
+                                key={`${pais.codigo}-${pais.pais}`}
+                                type="button"
+                                onClick={() => {
+                                  setCodigoPais(pais.codigo);
+                                  setShowCodigoPaisDropdown(false);
+                                }}
+                                className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">{pais.bandera}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
+                                    <div className="text-[10px] text-gray-500">{pais.codigo}</div>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Input de teléfono */}
+                      <input
+                        type="tel"
+                        required
+                        value={formData.telefono}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/\D/g, ''); // Solo números
+                          
+                          // Si el primer caracter es 0, quitarlo
+                          if (value.startsWith('0')) {
+                            value = value.substring(1);
+                          }
+                          
+                          // Limitar a 9 dígitos
+                          if (value.length <= 9) {
+                            setFormData({ ...formData, telefono: value });
+                          }
+                        }}
+                        className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+                        placeholder="999999999"
+                        disabled={loading}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Email</label>
@@ -366,15 +486,71 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                       <label className="block text-xs font-medium text-gray-600 mb-1">
                         Teléfono <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="tel"
-                        value={formData.telefono}
-                        onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 text-sm bg-white"
-                        placeholder="0987654321"
-                        disabled={loading}
-                        required
-                      />
+                      <div className="flex gap-2">
+                        {/* Selector de código de país */}
+                        <div className="w-20 relative codigo-pais-dropdown-container">
+                          <button
+                            type="button"
+                            onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                            className="w-full px-1.5 py-2 text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                            disabled={loading}
+                          >
+                            <span className="truncate text-[10px]">
+                              {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
+                            </span>
+                            <svg className={`w-2.5 h-2.5 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          
+                          {showCodigoPaisDropdown && (
+                            <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto left-0">
+                              {codigosPaises.map((pais) => (
+                                <button
+                                  key={`crear-${pais.codigo}-${pais.pais}`}
+                                  type="button"
+                                  onClick={() => {
+                                    setCodigoPais(pais.codigo);
+                                    setShowCodigoPaisDropdown(false);
+                                  }}
+                                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">{pais.bandera}</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
+                                      <div className="text-[10px] text-gray-500">{pais.codigo}</div>
+                                    </div>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Input de teléfono */}
+                        <input
+                          type="tel"
+                          required
+                          value={formData.telefono}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, ''); // Solo números
+                            
+                            // Si el primer caracter es 0, quitarlo
+                            if (value.startsWith('0')) {
+                              value = value.substring(1);
+                            }
+                            
+                            // Limitar a 9 dígitos
+                            if (value.length <= 9) {
+                              setFormData({ ...formData, telefono: value });
+                            }
+                          }}
+                          className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+                          placeholder="999999999"
+                          disabled={loading}
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -466,12 +642,17 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                     </div>
                   )}
                   
-                  <p className="text-xs text-gray-500 mt-3 flex items-start gap-1.5">
-                    <svg className="w-3.5 h-3.5 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                    <span>Podrás configurar horarios de trabajo después de crear el empleado</span>
-                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-3">
+                    <div className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="text-xs text-blue-700">
+                        <p className="font-medium mb-1">Nota sobre horarios:</p>
+                        <p>Los horarios de trabajo del empleado se configurarán posteriormente. Podrás definir su disponibilidad después de crearlo.</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

@@ -16,6 +16,32 @@ export default function ConfiguracionPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showVariables, setShowVariables] = useState(true);
+  const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
+  const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
+
+  // Lista de códigos de países más comunes
+  const codigosPaises = [
+    { codigo: '+593', pais: 'Ecuador', bandera: '🇪🇨' },
+    { codigo: '+54', pais: 'Argentina', bandera: '🇦🇷' },
+    { codigo: '+591', pais: 'Bolivia', bandera: '🇧🇴' },
+    { codigo: '+55', pais: 'Brasil', bandera: '🇧🇷' },
+    { codigo: '+56', pais: 'Chile', bandera: '🇨🇱' },
+    { codigo: '+57', pais: 'Colombia', bandera: '🇨🇴' },
+    { codigo: '+506', pais: 'Costa Rica', bandera: '🇨🇷' },
+    { codigo: '+53', pais: 'Cuba', bandera: '🇨🇺' },
+    { codigo: '+34', pais: 'España', bandera: '🇪🇸' },
+    { codigo: '+1', pais: 'Estados Unidos', bandera: '🇺🇸' },
+    { codigo: '+502', pais: 'Guatemala', bandera: '🇬🇹' },
+    { codigo: '+504', pais: 'Honduras', bandera: '🇭🇳' },
+    { codigo: '+52', pais: 'México', bandera: '🇲🇽' },
+    { codigo: '+505', pais: 'Nicaragua', bandera: '🇳🇮' },
+    { codigo: '+507', pais: 'Panamá', bandera: '🇵🇦' },
+    { codigo: '+595', pais: 'Paraguay', bandera: '🇵🇾' },
+    { codigo: '+51', pais: 'Perú', bandera: '🇵🇪' },
+    { codigo: '+1', pais: 'Puerto Rico', bandera: '🇵🇷' },
+    { codigo: '+598', pais: 'Uruguay', bandera: '🇺🇾' },
+    { codigo: '+58', pais: 'Venezuela', bandera: '🇻🇪' },
+  ];
 
   // Formularios
   const [formBasico, setFormBasico] = useState({
@@ -47,6 +73,24 @@ export default function ConfiguracionPage() {
     }
   }, [user]);
 
+  // Cerrar dropdown de código de país al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.codigo-pais-dropdown-container')) {
+        setShowCodigoPaisDropdown(false);
+      }
+    };
+    
+    if (showCodigoPaisDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showCodigoPaisDropdown]);
+
   // Auto-ocultar mensajes después de 5 segundos
   useEffect(() => {
     if (error) {
@@ -72,10 +116,25 @@ export default function ConfiguracionPage() {
       const data = await negocioService.obtenerNegocio();
       setNegocio(data);
 
+      // Extraer código de país del teléfono si existe
+      let telefonoSinCodigo = data.telefono || '';
+      let codigoPaisDetectado = '+593'; // Ecuador por defecto
+      
+      if (telefonoSinCodigo && telefonoSinCodigo.startsWith('+')) {
+        // El teléfono tiene código de país, extraerlo
+        const codigoEncontrado = codigosPaises.find(p => telefonoSinCodigo.startsWith(p.codigo));
+        if (codigoEncontrado) {
+          codigoPaisDetectado = codigoEncontrado.codigo;
+          telefonoSinCodigo = telefonoSinCodigo.substring(codigoEncontrado.codigo.length);
+        }
+      }
+      
+      setCodigoPais(codigoPaisDetectado);
+
       // Cargar formularios
       setFormBasico({
         nombre: data.nombre,
-        telefono: data.telefono,
+        telefono: telefonoSinCodigo,
         descripcion: data.descripcion || '',
       });
 
@@ -109,9 +168,12 @@ export default function ConfiguracionPage() {
       setError('');
       setSuccess('');
 
+      // Combinar código de país con teléfono antes de enviar
+      const telefonoCompleto = `${codigoPais}${formBasico.telefono}`;
+
       const data = await negocioService.actualizarNegocio({
         nombre: formBasico.nombre,
-        telefono: formBasico.telefono,
+        telefono: telefonoCompleto,
         descripcion: formBasico.descripcion || null,
       });
 
@@ -361,13 +423,69 @@ export default function ConfiguracionPage() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Teléfono *
                   </label>
-                  <input
-                    type="tel"
-                    value={formBasico.telefono}
-                    onChange={(e) => setFormBasico({ ...formBasico, telefono: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
-                    required
-                  />
+                  <div className="flex gap-2">
+                    {/* Selector de código de país */}
+                    <div className="w-32 relative codigo-pais-dropdown-container">
+                      <button
+                        type="button"
+                        onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
+                        className="w-full px-2 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0490C8] focus:border-transparent transition-all flex items-center justify-between"
+                      >
+                        <span className="truncate">
+                          {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
+                        </span>
+                        <svg className={`w-3 h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      
+                      {showCodigoPaisDropdown && (
+                        <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                          {codigosPaises.map((pais) => (
+                            <button
+                              key={`${pais.codigo}-${pais.pais}`}
+                              type="button"
+                              onClick={() => {
+                                setCodigoPais(pais.codigo);
+                                setShowCodigoPaisDropdown(false);
+                              }}
+                              className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{pais.bandera}</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
+                                  <div className="text-[10px] text-gray-500">{pais.codigo}</div>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Input de teléfono */}
+                    <input
+                      type="tel"
+                      required
+                      value={formBasico.telefono}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, ''); // Solo números
+                        
+                        // Si el primer caracter es 0, quitarlo
+                        if (value.startsWith('0')) {
+                          value = value.substring(1);
+                        }
+                        
+                        // Limitar a 9 dígitos
+                        if (value.length <= 9) {
+                          setFormBasico({ ...formBasico, telefono: value });
+                        }
+                      }}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
+                      placeholder="999999999"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -414,12 +532,9 @@ export default function ConfiguracionPage() {
                     className="h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded cursor-pointer mt-0.5"
                   />
                   <div className="flex-1">
-                    <label htmlFor="agendaPublica" className="text-sm font-medium text-gray-700 cursor-pointer block mb-1">
+                    <label htmlFor="agendaPublica" className="text-sm font-medium text-gray-700 cursor-pointer">
                       Permitir que clientes puedan agendar citas a través del enlace público
                     </label>
-                    <p className="text-xs text-gray-600">
-                      Tus clientes podrán agendar citas directamente desde tu link personalizado
-                    </p>
                   </div>
                 </div>
 
