@@ -106,4 +106,34 @@ export class AuthService {
     const user = this.getUser();
     return user?.rol === 'ADMIN_NEGOCIO';
   }
+
+  /**
+   * FORGOT PASSWORD - Solicitar recuperación de contraseña
+   */
+  static async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string }>(
+        '/auth/forgot-password',
+        { email }
+      );
+      return response;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al solicitar recuperación de contraseña');
+    }
+  }
+
+  /**
+   * RESET PASSWORD - Restablecer contraseña con token
+   */
+  static async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string }>(
+        '/auth/reset-password',
+        { token, newPassword }
+      );
+      return response;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al restablecer contraseña');
+    }
+  }
 }

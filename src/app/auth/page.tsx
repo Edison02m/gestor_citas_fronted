@@ -401,6 +401,21 @@ export default function AuthPage() {
                       </div>
                     </div>
 
+                    {/* Link de recuperación de contraseña */}
+                    <div className="text-right">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          document.body.style.transition = 'opacity 0.3s ease-out';
+                          document.body.style.opacity = '0.95';
+                          setTimeout(() => router.push('/recuperar-contrasena'), 200);
+                        }}
+                        className="text-sm text-[#0490C8] hover:text-[#023664] font-medium transition-colors"
+                      >
+                        ¿Olvidaste tu contraseña?
+                      </button>
+                    </div>
+
                     {/* Error/Success Messages */}
                     {error && (
                       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm">
