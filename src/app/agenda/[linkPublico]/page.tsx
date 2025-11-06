@@ -1230,7 +1230,8 @@ export default function AgendaPublicaPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-medium text-gray-900 truncate">{servicio.nombre}</div>
                                 <div className="text-xs text-gray-500 mt-0.5">
-                                  {formatearDuracion(servicio.duracion)} • {formatearPrecio(servicio.precio)}
+                                  {formatearDuracion(servicio.duracion)}
+                                  {negocio?.mostrarPreciosPublico && ` • ${formatearPrecio(servicio.precio)}`}
                                 </div>
                               </div>
                             </button>
@@ -1540,7 +1541,8 @@ export default function AgendaPublicaPage() {
                               {servicios.find(s => s.id === formData.servicioId)?.nombre}
                             </p>
                             <p className="text-xs text-gray-600 mt-0.5">
-                              {servicios.find(s => s.id === formData.servicioId)?.duracion} min • {formatearPrecio(servicios.find(s => s.id === formData.servicioId)?.precio || 0)}
+                              {servicios.find(s => s.id === formData.servicioId)?.duracion} min
+                              {negocio?.mostrarPreciosPublico && ` • ${formatearPrecio(servicios.find(s => s.id === formData.servicioId)?.precio || 0)}`}
                             </p>
                           </div>
                         </div>

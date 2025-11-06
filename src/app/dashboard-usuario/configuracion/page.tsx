@@ -12,10 +12,9 @@ export default function ConfiguracionPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [negocio, setNegocio] = useState<NegocioResponse | null>(null);
-  const [activeTab, setActiveTab] = useState<'basico' | 'agenda' | 'notificaciones' | 'mensajes'>('basico');
+  const [activeTab, setActiveTab] = useState<'basico' | 'agenda' | 'notificaciones'>('basico');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showVariables, setShowVariables] = useState(true);
   const [codigoPais, setCodigoPais] = useState('+593'); // Ecuador por defecto
   const [showCodigoPaisDropdown, setShowCodigoPaisDropdown] = useState(false);
 
@@ -53,6 +52,7 @@ export default function ConfiguracionPage() {
   const [formAgenda, setFormAgenda] = useState({
     linkPublico: '',
     agendaPublica: false,
+    mostrarPreciosPublico: true,
   });
 
   const [formNotificaciones, setFormNotificaciones] = useState({
@@ -62,12 +62,11 @@ export default function ConfiguracionPage() {
     recordatorio2: '',
   });
 
-  const [formMensajes, setFormMensajes] = useState({
-    mensajeRecordatorio: '',
-    mensajeReagendamiento: '',
-  });
-
   useEffect(() => {
+    if (user) {
+      cargarNegocio();
+    }
+  }, [user]);  useEffect(() => {
     if (user) {
       cargarNegocio();
     }
@@ -141,6 +140,7 @@ export default function ConfiguracionPage() {
       setFormAgenda({
         linkPublico: data.linkPublico || '',
         agendaPublica: data.agendaPublica,
+        mostrarPreciosPublico: data.mostrarPreciosPublico ?? true,
       });
 
       setFormNotificaciones({
@@ -148,11 +148,6 @@ export default function ConfiguracionPage() {
         notificacionesEmail: data.notificacionesEmail,
         recordatorio1: data.recordatorio1?.toString() || '',
         recordatorio2: data.recordatorio2?.toString() || '',
-      });
-
-      setFormMensajes({
-        mensajeRecordatorio: data.mensajeRecordatorio || '',
-        mensajeReagendamiento: data.mensajeReagendamiento || '',
       });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar el negocio');
@@ -196,6 +191,7 @@ export default function ConfiguracionPage() {
       const data = await negocioService.actualizarAgendaPublica({
         linkPublico: formAgenda.linkPublico || null,
         agendaPublica: formAgenda.agendaPublica,
+        mostrarPreciosPublico: formAgenda.mostrarPreciosPublico,
       });
 
       setNegocio(data);
@@ -239,27 +235,6 @@ export default function ConfiguracionPage() {
 
       setNegocio(data);
       setSuccess('Notificaciones actualizadas correctamente');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al actualizar');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleGuardarMensajes = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      setError('');
-      setSuccess('');
-
-      const data = await negocioService.actualizarMensajesWhatsApp({
-        mensajeRecordatorio: formMensajes.mensajeRecordatorio,
-        mensajeReagendamiento: formMensajes.mensajeReagendamiento,
-      });
-
-      setNegocio(data);
-      setSuccess('Mensajes de WhatsApp actualizados correctamente');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al actualizar');
     } finally {
@@ -382,21 +357,6 @@ export default function ConfiguracionPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   Notificaciones
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('mensajes')}
-                className={`px-6 py-4 text-sm font-semibold transition-all ${
-                  activeTab === 'mensajes'
-                    ? 'border-b-2 border-[#0490C8] text-[#0490C8]'
-                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Mensajes WhatsApp
                 </div>
               </button>
             </nav>
@@ -538,6 +498,24 @@ export default function ConfiguracionPage() {
                   </div>
                 </div>
 
+                <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="mostrarPreciosPublico"
+                    checked={formAgenda.mostrarPreciosPublico}
+                    onChange={(e) => setFormAgenda({ ...formAgenda, mostrarPreciosPublico: e.target.checked })}
+                    className="h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded cursor-pointer mt-0.5"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="mostrarPreciosPublico" className="text-sm font-medium text-gray-700 cursor-pointer">
+                      Mostrar precios de servicios en la agenda pública
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Si desactivas esta opción, los clientes no verán los precios de los servicios al agendar citas
+                    </p>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Link Público Personalizado
@@ -670,197 +648,6 @@ export default function ConfiguracionPage() {
                         </p>
                       )}
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4">
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="px-6 py-2.5 bg-[#0490C8] text-white font-semibold rounded-xl hover:bg-[#037ab0] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-                  >
-                    {saving ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Guardando...
-                      </>
-                    ) : (
-                      'Guardar Cambios'
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Tab: Mensajes WhatsApp */}
-            {activeTab === 'mensajes' && (
-              <form onSubmit={handleGuardarMensajes} className="space-y-5">
-                {/* Sección de variables - dropdown colapsable */}
-                <div className="bg-gray-50 rounded-xl overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowVariables(!showVariables)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      <svg 
-                        className={`w-4 h-4 text-gray-600 transition-transform ${showVariables ? 'rotate-90' : ''}`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                      <h3 className="text-sm font-bold text-gray-900">Variables disponibles</h3>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {showVariables ? 'Ocultar' : 'Mostrar'}
-                    </span>
-                  </button>
-                  
-                  {showVariables && (
-                    <div className="px-4 pb-4 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 mb-3 mt-3">
-                        Usa estas variables en tus mensajes. <span className="font-semibold text-gray-900">Se reemplazan automáticamente</span> con los datos reales de cada cita.
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Nombre completo del cliente"
-                        >{'{cliente}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Fecha de la cita (Ej: Martes 5 de Noviembre, 2025)"
-                        >{'{fecha}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Hora de inicio de la cita (Ej: 10:00)"
-                        >{'{hora_inicio}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Hora de finalización de la cita (Ej: 11:00)"
-                        >{'{hora_fin}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Nombre del servicio contratado"
-                        >{'{servicio}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Nombre del empleado asignado"
-                        >{'{empleado}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Nombre de la sucursal"
-                        >{'{sucursal}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Dirección de la sucursal"
-                        >{'{direccion}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Ciudad de la sucursal"
-                        >{'{ciudad}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Teléfono de contacto de la sucursal"
-                        >{'{telefono_sucursal}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Link de Google Maps de la sucursal"
-                        >{'{maps}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Nombre de tu negocio"
-                        >{'{negocio}'}</code>
-                        <code 
-                          className="bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-mono hover:bg-gray-100 hover:border-gray-300 cursor-help transition-all" 
-                          title="Precio del servicio"
-                        >{'{precio}'}</code>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Mensaje al agendar cita
-                  </label>
-                  <textarea
-                    value={formMensajes.mensajeRecordatorio}
-                    onChange={(e) => setFormMensajes({ ...formMensajes, mensajeRecordatorio: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent font-mono text-sm transition-all text-gray-900 placeholder-gray-400"
-                    rows={6}
-                    placeholder="Hola {cliente}, tu cita ha sido agendada para el {fecha} a las {hora_inicio} en {negocio}. ¡Te esperamos!"
-                  />
-                  {/* Botones de plantillas */}
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormMensajes({
-                        ...formMensajes,
-                        mensajeRecordatorio: 'Hola {cliente}, te recordamos tu cita el {fecha} a las {hora_inicio}.\n\n💇 Servicio: {servicio}\n👤 Con: {empleado}\n🏢 En: {sucursal} - {direccion}\n\n¡Te esperamos!'
-                      })}
-                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
-                    >
-                      Plantilla Básica
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormMensajes({
-                        ...formMensajes,
-                        mensajeRecordatorio: '¡Hola {cliente}! 👋\n\nTu cita está confirmada:\n🗓️ {fecha} a las {hora_inicio}\n💇 {servicio} con {empleado}\n📍 {sucursal}: {direccion}, {ciudad}\n📞 {telefono_sucursal}\n\nVer ubicación: {maps}\n\n¡Nos vemos en {negocio}! ✨'
-                      })}
-                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
-                    >
-                      Con Ubicación
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormMensajes({
-                        ...formMensajes,
-                        mensajeRecordatorio: 'Hola {cliente},\n\nTe recordamos tu cita:\n📅 {fecha}\n⏰ {hora_inicio} - {hora_fin}\n💇 {servicio}\n👤 {empleado}\n🏢 {sucursal}\n\n¡Te esperamos en {negocio}!'
-                      })}
-                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
-                    >
-                      Completa
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Mensaje de Reagendamiento
-                  </label>
-                  <textarea
-                    value={formMensajes.mensajeReagendamiento}
-                    onChange={(e) => setFormMensajes({ ...formMensajes, mensajeReagendamiento: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#0490C8] focus:border-transparent font-mono text-sm transition-all text-gray-900 placeholder-gray-400"
-                    rows={6}
-                    placeholder="Hola {cliente}, tu cita ha sido reagendada para el {fecha} a las {hora_inicio} en {negocio}."
-                  />
-                  {/* Botones de plantillas */}
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormMensajes({
-                        ...formMensajes,
-                        mensajeReagendamiento: 'Hola {cliente}, tu cita ha sido reagendada.\n\n📅 Nueva fecha: {fecha}\n⏰ Hora: {hora_inicio}\n💇 Servicio: {servicio}\n👤 Con: {empleado}\n🏢 En: {sucursal}\n\nGracias por tu comprensión.'
-                      })}
-                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
-                    >
-                      Plantilla Básica
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormMensajes({
-                        ...formMensajes,
-                        mensajeReagendamiento: '¡Hola {cliente}! 👋\n\n📌 Tu cita ha sido reagendada:\n🗓️ {fecha} a las {hora_inicio}\n💇 {servicio} con {empleado}\n📍 {sucursal}: {direccion}\n\nVer ubicación: {maps}\n\nGracias por tu comprensión 😊'
-                      })}
-                      className="text-xs px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-all"
-                    >
-                      Con Ubicación
-                    </button>
                   </div>
                 </div>
 

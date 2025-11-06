@@ -11,6 +11,7 @@ export interface NegocioResponse {
   usuarioId: string;
   linkPublico: string | null;
   agendaPublica: boolean;
+  mostrarPreciosPublico: boolean;
   notificacionesWhatsApp: boolean;
   notificacionesEmail: boolean;
   recordatorio1: number | null;
@@ -34,6 +35,7 @@ export interface UpdateNegocioDto {
 export interface UpdateAgendaPublicaDto {
   linkPublico?: string | null;
   agendaPublica?: boolean;
+  mostrarPreciosPublico?: boolean;
 }
 
 export interface UpdateNotificacionesDto {

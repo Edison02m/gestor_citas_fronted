@@ -163,25 +163,25 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
   // Modal de confirmación para omitir
   if (showSkipConfirm) {
     return (
-      <div className="text-center space-y-6">
-        <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="text-center space-y-4 sm:space-y-6">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
+          <svg className="w-6 h-6 sm:w-8 sm:h-8 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">¿Continuar sin empleados?</h3>
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 max-w-md mx-auto border border-blue-100">
-            <p className="text-sm text-gray-700 mb-3">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">¿Continuar sin empleados?</h3>
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-3 sm:p-4 max-w-md mx-auto border border-blue-100">
+            <p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-3">
               Puedes agregar empleados más tarde desde el panel de control.
             </p>
             <div className="flex items-start gap-2 text-left">
-              <div className="w-8 h-8 bg-[#0490C8] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#0490C8] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Los empleados son <span className="font-semibold text-gray-900">opcionales</span>. Puedes gestionar citas sin asignarlas a un empleado específico.
               </p>
             </div>
@@ -189,20 +189,20 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm flex items-center gap-2 max-w-md mx-auto">
-            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm flex items-center gap-2 max-w-md mx-auto">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <span>{error}</span>
           </div>
         )}
 
-        <div className="flex gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
           <button
             type="button"
             onClick={() => setShowSkipConfirm(false)}
             disabled={loading}
-            className="px-6 py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-all disabled:opacity-50"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-all disabled:opacity-50"
           >
             Volver
           </button>
@@ -210,11 +210,11 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
             type="button"
             onClick={confirmSkip}
             disabled={loading}
-            className="px-6 py-3 bg-[#0490C8] text-white font-semibold rounded-2xl hover:bg-[#023664] transition-all shadow-sm disabled:opacity-50 flex items-center gap-2"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-[#0490C8] text-white font-semibold rounded-2xl hover:bg-[#023664] transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 h-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -233,21 +233,21 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Header explicativo */}
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
           Empleados de tu negocio
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-xs sm:text-sm text-gray-600">
           Agrega a las personas que trabajan contigo.{' '}
-          <span className="text-gray-500 text-xs">
+          <span className="text-gray-500 text-[10px] sm:text-xs">
             (Si trabajas solo, puedes omitir este paso)
           </span>
         </p>
       </div>
 
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
               Nombre completo
             </label>
             <input
@@ -255,14 +255,14 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
               required
               value={formData.nombre}
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="Ej: Carlos Martínez"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
               Cargo
             </label>
             <input
@@ -270,32 +270,32 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
               required
               value={formData.cargo}
               onChange={(e) => setFormData({ ...formData, cargo: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="Ej: Estilista"
               disabled={loading}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
               Teléfono
             </label>
             <div className="flex gap-2">
-              <div className="relative w-32 codigo-pais-dropdown-container">
+              <div className="relative w-24 sm:w-28 md:w-32 codigo-pais-dropdown-container">
                 <button
                   type="button"
                   onClick={() => setShowCodigoPaisDropdown(!showCodigoPaisDropdown)}
-                  className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl hover:border-[#0490C8] focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
+                  className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl hover:border-[#0490C8] focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between"
                   disabled={loading}
                 >
-                  <span className="flex items-center gap-1.5 truncate">
-                    <span>{codigosPaises.find(c => c.codigo === codigoPais)?.bandera}</span>
-                    <span className="text-xs font-medium">{codigoPais}</span>
+                  <span className="flex items-center gap-1 sm:gap-1.5 truncate">
+                    <span className="text-sm sm:text-base">{codigosPaises.find(c => c.codigo === codigoPais)?.bandera}</span>
+                    <span className="text-[10px] sm:text-xs font-medium">{codigoPais}</span>
                   </span>
                   <svg 
-                    className={`w-3.5 h-3.5 text-gray-500 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`}
+                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`}
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -305,7 +305,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
                 </button>
 
                 {showCodigoPaisDropdown && (
-                  <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 w-48 sm:w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {codigosPaises.map((pais) => (
                       <button
                         key={pais.codigo}
@@ -314,13 +314,13 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
                           setCodigoPais(pais.codigo);
                           setShowCodigoPaisDropdown(false);
                         }}
-                        className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${
+                        className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-left text-xs sm:text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 ${
                           codigoPais === pais.codigo ? 'bg-blue-50 text-[#0490C8] font-medium' : 'text-gray-700'
                         }`}
                       >
-                        <span className="text-base">{pais.bandera}</span>
-                        <span className="flex-1">{pais.pais}</span>
-                        <span className="text-xs text-gray-500">{pais.codigo}</span>
+                        <span className="text-sm sm:text-base">{pais.bandera}</span>
+                        <span className="flex-1 truncate">{pais.pais}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-500">{pais.codigo}</span>
                       </button>
                     ))}
                   </div>
@@ -340,21 +340,21 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
                     setFormData({ ...formData, telefono: value });
                   }
                 }}
-                className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+                className="flex-1 px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
                 placeholder="999888777"
                 disabled={loading}
                 maxLength={9}
               />
             </div>
             {formData.telefono && formData.telefono.length !== 9 && (
-              <p className="mt-1 text-xs text-red-500">
+              <p className="mt-1 text-[10px] sm:text-xs text-red-500">
                 El teléfono debe tener exactamente 9 dígitos
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
               Email
             </label>
             <input
@@ -362,23 +362,23 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="correo@ejemplo.com"
               disabled={loading}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
               Foto (URL - opcional)
             </label>
             <input
               type="url"
               value={formData.foto}
               onChange={(e) => setFormData({ ...formData, foto: e.target.value })}
-              className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="https://ejemplo.com/foto.jpg"
               disabled={loading}
             />
@@ -389,14 +389,14 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       {/* Aviso sobre horarios y sucursales - Solo se muestra cuando hay nombre */}
       {formData.nombre && (
         <>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 sm:p-3">
             <div className="flex items-start gap-2">
-              <svg className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm text-blue-800 font-medium">Horarios del empleado</p>
-                <p className="text-xs text-blue-700 mt-0.5">
+                <p className="text-xs sm:text-sm text-blue-800 font-medium">Horarios del empleado</p>
+                <p className="text-[10px] sm:text-xs text-blue-700 mt-0.5">
                   Los horarios de trabajo se podrán configurar después desde el panel de control.
                 </p>
               </div>
@@ -405,14 +405,14 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
 
           {/* Sucursales */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-            <label className="block text-xs font-medium text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Sucursales donde trabaja
             </label>
             <div className="space-y-1.5">
               {sucursales.map((sucursal) => (
                 <label 
                   key={sucursal.id} 
-                  className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all text-xs ${
+                  className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all text-[10px] sm:text-xs ${
                     formData.sucursalIds.includes(sucursal.id)
                       ? 'border-[#0490C8] bg-blue-50'
                       : 'border-gray-200 bg-white hover:border-gray-300'
@@ -422,7 +422,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
                     type="checkbox"
                     checked={formData.sucursalIds.includes(sucursal.id)}
                     onChange={() => toggleSucursal(sucursal.id)}
-                    className="w-3.5 h-3.5 text-[#0490C8] rounded"
+                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#0490C8] rounded"
                     disabled={loading}
                   />
                   <div className="flex-1">
@@ -436,29 +436,29 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-xs">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-xl text-[10px] sm:text-xs">
           {error}
         </div>
       )}
 
       {/* Nota informativa */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 sm:p-3">
         <div className="flex items-start gap-2">
-          <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-xs text-blue-700">
+          <p className="text-[10px] sm:text-xs text-blue-700">
             <span className="font-semibold">Paso opcional:</span> Si trabajas solo, puedes omitir este paso. Podrás agregar empleados más tarde desde el panel de control.
           </p>
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           type="button"
           onClick={handleSkipClick}
           disabled={loading}
-          className="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50"
+          className="flex-1 border border-gray-300 text-gray-700 font-semibold py-2.5 sm:py-3 px-4 rounded-xl text-sm sm:text-base hover:bg-gray-50 transition-all disabled:opacity-50"
         >
           Omitir paso
         </button>
@@ -466,7 +466,7 @@ export default function EmpleadoForm({ onSuccess, onSkip }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-2.5 sm:py-3 px-4 rounded-xl text-sm sm:text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardando...' : 'Continuar'}
         </button>

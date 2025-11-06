@@ -627,6 +627,7 @@ export interface NegocioPublico {
   logo?: string;
   descripcion?: string;
   agendaPublica: boolean;
+  mostrarPreciosPublico: boolean;
 }
 
 export interface SucursalPublica {

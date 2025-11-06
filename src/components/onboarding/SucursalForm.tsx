@@ -211,46 +211,49 @@ export default function SucursalForm({ onSuccess }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Header mejorado */}
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
+      {/* Header simplificado - Responsive */}
+      <div className="mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
           Ubicación de tu negocio
         </h2>
-        <p className="text-sm text-gray-600">
-          Configura la dirección y horarios de tu local.{' '}
-          <span className="text-gray-500 text-xs">
-            (Podrás agregar más ubicaciones después)
-          </span>
+        <p className="text-xs sm:text-sm text-gray-500">
+          Podrás agregar más ubicaciones después
         </p>
       </div>
 
-      {/* Información básica - Layout compacto en 2 columnas */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      {/* Información básica - Responsive: 1 columna en mobile, 2 en desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="sm:col-span-2">
+          <label className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
             Nombre de la ubicación
+            <div className="group relative">
+              <svg className="w-3.5 h-3.5 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="invisible group-hover:visible absolute left-0 bottom-full mb-2 w-48 sm:w-56 p-2 bg-gray-900 text-white text-[10px] sm:text-xs rounded-lg shadow-lg z-10">
+                Será visible para tus clientes al agendar citas
+                <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
           </label>
           <input
             type="text"
             required
             value={formData.nombre}
             onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
-            placeholder="Ej: Matriz, Principal, Centro, Norte, Local Único..."
+            className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+            placeholder="Ej: Matriz, Principal, Centro..."
             disabled={loading}
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Este nombre será visible para tus clientes al agendar citas
-          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <div className="sm:col-span-2 md:col-span-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
             Teléfono
           </label>
           <div className="flex gap-2">
-            {/* Selector de código de país */}
-            <div className="w-32 relative codigo-pais-dropdown-container">
+            {/* Selector de código de país - Responsive */}
+            <div className="w-24 sm:w-28 md:w-32 relative codigo-pais-dropdown-container">
               <button
                 type="button"
                 onClick={(e) => {
@@ -258,18 +261,18 @@ export default function SucursalForm({ onSuccess }: Props) {
                   setShowCodigoPaisDropdown(!showCodigoPaisDropdown);
                 }}
                 disabled={loading}
-                className="w-full px-2 py-2 text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between disabled:opacity-50"
+                className="w-full px-1.5 sm:px-2 py-2 text-[10px] sm:text-xs text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all flex items-center justify-between disabled:opacity-50"
               >
                 <span className="truncate">
                   {codigosPaises.find(p => p.codigo === codigoPais)?.bandera} {codigoPais}
                 </span>
-                <svg className={`w-3 h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-2.5 sm:w-3 h-2.5 sm:h-3 text-gray-400 flex-shrink-0 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               
               {showCodigoPaisDropdown && (
-                <div className="absolute z-50 w-56 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-48 sm:w-56 mt-1 left-0 sm:left-auto bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                   {codigosPaises.map((pais) => (
                     <button
                       key={`${pais.codigo}-${pais.pais}`}
@@ -281,7 +284,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                       className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">{pais.bandera}</span>
+                        <span className="text-base sm:text-lg">{pais.bandera}</span>
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-medium text-gray-900">{pais.pais}</div>
                           <div className="text-[10px] text-gray-500">{pais.codigo}</div>
@@ -311,15 +314,15 @@ export default function SucursalForm({ onSuccess }: Props) {
                   setFormData({ ...formData, telefono: value });
                 }
               }}
-              className="flex-1 px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+              className="flex-1 px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
               placeholder="999999999"
               disabled={loading}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <div className="sm:col-span-2 md:col-span-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
             Dirección
           </label>
           <input
@@ -327,40 +330,47 @@ export default function SucursalForm({ onSuccess }: Props) {
             required
             value={formData.direccion}
             onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
-            className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
             placeholder="Av. Principal 123"
             disabled={loading}
           />
         </div>
 
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            URL de Google Maps (opcional)
+        <div className="sm:col-span-2">
+          <label className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+            URL de Google Maps
+            <span className="text-xs text-gray-400 font-normal">(opcional)</span>
+            <div className="group relative">
+              <svg className="w-3.5 h-3.5 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="invisible group-hover:visible absolute left-0 bottom-full mb-2 w-48 sm:w-56 p-2 bg-gray-900 text-white text-[10px] sm:text-xs rounded-lg shadow-lg z-10">
+                Ayuda a tus clientes a encontrar tu ubicación fácilmente
+                <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
           </label>
           <input
             type="url"
             value={formData.googleMapsUrl}
             onChange={(e) => setFormData({ ...formData, googleMapsUrl: e.target.value })}
-            className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
+            className="w-full px-3 py-2 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all placeholder:text-gray-400"
             placeholder="https://maps.google.com/..."
             disabled={loading}
           />
-          <p className="mt-1.5 text-xs text-gray-500">
-            Enlace para que tus clientes puedan encontrar tu ubicación fácilmente
-          </p>
         </div>
       </div>
 
-      {/* Horarios de atención - Layout de 2 columnas */}
+      {/* Horarios de atención - Responsive */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 mb-3">Horarios de atención</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-3">Horarios de atención</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
           {/* Columna Izquierda: Selector de días y resumen */}
-          <div className="space-y-4">
-            {/* Selector de días - Grid compacto */}
+          <div className="space-y-3 sm:space-y-4">
+            {/* Selector de días - Responsive Grid */}
             <div>
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">Días de la semana</h4>
-              <div className="grid grid-cols-4 gap-2">
+              <h4 className="text-[10px] sm:text-xs font-medium text-gray-700 mb-2">Selecciona el día</h4>
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 sm:gap-2">
                 {diasCompletos.map((dia, index) => {
                   const horario = formData.horarios[index];
                   const esSeleccionado = selectedDay === index;
@@ -374,7 +384,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                         setSelectedDay(index);
                       }}
                       disabled={loading}
-                      className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-semibold transition-all ${
                         esSeleccionado
                           ? 'bg-[#0490C8] text-white shadow-md'
                           : estaAbierto
@@ -384,7 +394,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                     >
                       <div className="text-center">
                         <div className="font-bold">{diasSemana[index]}</div>
-                        <div className="text-[10px] mt-0.5 opacity-90">{dia.slice(0, 3)}</div>
+                        <div className="text-[9px] sm:text-[10px] mt-0.5 opacity-90 hidden sm:block">{dia.slice(0, 3)}</div>
                       </div>
                     </button>
                   );
@@ -392,19 +402,19 @@ export default function SucursalForm({ onSuccess }: Props) {
               </div>
             </div>
 
-            {/* Resumen semanal */}
+            {/* Resumen semanal - Responsive */}
             <div>
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">Resumen semanal</h4>
-              <div className="space-y-1.5">
+              <h4 className="text-[10px] sm:text-xs font-medium text-gray-700 mb-2">Resumen</h4>
+              <div className="space-y-1 sm:space-y-1.5">
                 {formData.horarios.map((horario, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between text-xs px-2 py-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="flex items-center justify-between text-[10px] sm:text-xs px-2 py-1 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => setSelectedDay(index)}
                   >
-                    <span className="font-medium text-gray-700 w-16">{diasCompletos[index].substring(0, 3)}</span>
+                    <span className="font-medium text-gray-700 w-12 sm:w-16">{diasCompletos[index].substring(0, 3)}</span>
                     {horario.abierto ? (
-                      <div className="flex items-center gap-1 font-mono text-[11px]">
+                      <div className="flex items-center gap-0.5 sm:gap-1 font-mono text-[9px] sm:text-[11px]">
                         <span className="text-gray-700">{horario.horaApertura}</span>
                         {horario.tieneDescanso ? (
                           <>
@@ -418,7 +428,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                         <span className="text-gray-700">{horario.horaCierre}</span>
                       </div>
                     ) : (
-                      <span className="text-gray-400 italic text-[11px]">Cerrado</span>
+                      <span className="text-gray-400 italic text-[9px] sm:text-[11px]">Cerrado</span>
                     )}
                   </div>
                 ))}
@@ -429,13 +439,13 @@ export default function SucursalForm({ onSuccess }: Props) {
           {/* Columna Derecha: Configuración del día seleccionado */}
           <div>
             {selectedHorario && (
-              <div className="bg-gray-50 rounded-xl p-4 space-y-3 h-full">
+              <div className="bg-gray-50 rounded-xl p-3 sm:p-4 space-y-3 h-full">
                 <div className="flex items-center justify-between pb-2 border-b border-gray-200">
-                  <h4 className="text-sm font-semibold text-gray-900">
+                  <h4 className="text-sm sm:text-base font-semibold text-gray-900">
                     {diasCompletos[selectedDay]}
                   </h4>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-xs font-medium text-gray-600">
+                  <label className="flex items-center gap-1.5 sm:gap-2 cursor-pointer">
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-600">
                       {selectedHorario.abierto ? 'Abierto' : 'Cerrado'}
                     </span>
                     <div className="relative">
@@ -446,7 +456,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                         disabled={loading}
                         className="sr-only peer"
                       />
-                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
+                      <div className="w-9 h-[18px] sm:w-10 sm:h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[14px] after:w-[14px] sm:after:h-4 sm:after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
                     </div>
                   </label>
                 </div>
@@ -454,25 +464,25 @@ export default function SucursalForm({ onSuccess }: Props) {
                 {selectedHorario.abierto && (
                   <>
                     {/* Horarios principales */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Apertura</label>
+                        <label className="block text-[10px] sm:text-xs font-medium text-gray-600 mb-1">Apertura</label>
                         <input
                           type="time"
                           value={selectedHorario.horaApertura || ''}
                           onChange={(e) => updateHorario(selectedDay, 'horaApertura', e.target.value)}
-                          className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                          className="w-full px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                           disabled={loading}
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Cierre</label>
+                        <label className="block text-[10px] sm:text-xs font-medium text-gray-600 mb-1">Cierre</label>
                         <input
                           type="time"
                           value={selectedHorario.horaCierre || ''}
                           onChange={(e) => updateHorario(selectedDay, 'horaCierre', e.target.value)}
-                          className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                          className="w-full px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                           disabled={loading}
                           required
                         />
@@ -482,7 +492,7 @@ export default function SucursalForm({ onSuccess }: Props) {
                     {/* Descanso */}
                     <div className="pt-2 border-t border-gray-200">
                       <label className="flex items-center justify-between cursor-pointer mb-2">
-                        <span className="text-xs font-medium text-gray-700">Descanso/Almuerzo</span>
+                        <span className="text-[10px] sm:text-xs font-medium text-gray-700">Descanso</span>
                         <div className="relative">
                           <input
                             type="checkbox"
@@ -491,29 +501,29 @@ export default function SucursalForm({ onSuccess }: Props) {
                             disabled={loading}
                             className="sr-only peer"
                           />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#0490C8]"></div>
+                          <div className="w-8 h-[18px] sm:w-9 sm:h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 sm:after:h-3.5 sm:after:w-3.5 after:transition-all peer-checked:bg-[#0490C8]"></div>
                         </div>
                       </label>
 
                       {selectedHorario.tieneDescanso && (
-                        <div className="grid grid-cols-2 gap-3 mt-2">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Inicio</label>
+                            <label className="block text-[10px] sm:text-xs font-medium text-gray-700 mb-1">Inicio</label>
                             <input
                               type="time"
                               value={selectedHorario.descansoInicio || '12:00'}
                               onChange={(e) => updateHorario(selectedDay, 'descansoInicio', e.target.value)}
-                              className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                              className="w-full px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                               disabled={loading}
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Fin</label>
+                            <label className="block text-[10px] sm:text-xs font-medium text-gray-700 mb-1">Fin</label>
                             <input
                               type="time"
                               value={selectedHorario.descansoFin || '13:00'}
                               onChange={(e) => updateHorario(selectedDay, 'descansoFin', e.target.value)}
-                              className="w-full px-3 py-1.5 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
+                              className="w-full px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20"
                               disabled={loading}
                             />
                           </div>
@@ -523,43 +533,46 @@ export default function SucursalForm({ onSuccess }: Props) {
 
                     {/* Acciones rápidas */}
                     <div className="pt-2 border-t border-gray-200">
-                      <p className="text-xs text-gray-600 mb-2">Aplicar a otros días</p>
-                      <div className="flex gap-2">
+                      <p className="text-[10px] sm:text-xs text-gray-500 mb-2">Copiar a:</p>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <button
                           type="button"
                           onClick={applyToAll}
-                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1 sm:gap-1.5"
                           title="Aplicar a todos los días"
                           disabled={loading}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <span>Toda la semana</span>
+                          <span className="hidden sm:inline">Toda la semana</span>
+                          <span className="sm:hidden">Todos</span>
                         </button>
                         <button
                           type="button"
                           onClick={applyToWeekdays}
-                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1 sm:gap-1.5"
                           title="Aplicar de Lunes a Viernes"
                           disabled={loading}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
-                          <span>Entre semana</span>
+                          <span className="hidden sm:inline">Entre semana</span>
+                          <span className="sm:hidden">L-V</span>
                         </button>
                         <button
                           type="button"
                           onClick={applyToWeekend}
-                          className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1 sm:gap-1.5"
                           title="Aplicar Sábado y Domingo"
                           disabled={loading}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                           </svg>
-                          <span>Fin de semana</span>
+                          <span className="hidden sm:inline">Fin de semana</span>
+                          <span className="sm:hidden">S-D</span>
                         </button>
                       </div>
                     </div>
@@ -573,7 +586,7 @@ export default function SucursalForm({ onSuccess }: Props) {
 
       {/* Error Message compacto */}
       {error && (
-        <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm shadow-sm">
+        <div className="bg-red-50 border-2 border-red-300 text-red-800 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm shadow-sm">
           {error}
         </div>
       )}
@@ -582,7 +595,7 @@ export default function SucursalForm({ onSuccess }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-2.5 sm:py-3 px-4 rounded-xl text-sm sm:text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Guardando...' : 'Continuar'}
       </button>
