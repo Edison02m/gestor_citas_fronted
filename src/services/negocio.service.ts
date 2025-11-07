@@ -14,6 +14,7 @@ export interface NegocioResponse {
   mostrarPreciosPublico: boolean;
   notificacionesWhatsApp: boolean;
   notificacionesEmail: boolean;
+  recordatoriosAutomaticos: boolean;
   recordatorio1: number | null;
   recordatorio2: number | null;
   mensajeRecordatorio: string | null;
@@ -41,6 +42,7 @@ export interface UpdateAgendaPublicaDto {
 export interface UpdateNotificacionesDto {
   notificacionesWhatsApp?: boolean;
   notificacionesEmail?: boolean;
+  recordatoriosAutomaticos?: boolean;
   recordatorio1?: number | null;
   recordatorio2?: number | null;
 }

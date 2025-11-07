@@ -58,6 +58,7 @@ export default function ConfiguracionPage() {
   const [formNotificaciones, setFormNotificaciones] = useState({
     notificacionesWhatsApp: false,
     notificacionesEmail: false,
+    recordatoriosAutomaticos: false,
     recordatorio1: '',
     recordatorio2: '',
   });
@@ -146,6 +147,7 @@ export default function ConfiguracionPage() {
       setFormNotificaciones({
         notificacionesWhatsApp: data.notificacionesWhatsApp,
         notificacionesEmail: data.notificacionesEmail,
+        recordatoriosAutomaticos: data.recordatoriosAutomaticos,
         recordatorio1: data.recordatorio1?.toString() || '',
         recordatorio2: data.recordatorio2?.toString() || '',
       });
@@ -229,6 +231,7 @@ export default function ConfiguracionPage() {
       const data = await negocioService.actualizarNotificaciones({
         notificacionesWhatsApp: formNotificaciones.notificacionesWhatsApp,
         notificacionesEmail: formNotificaciones.notificacionesEmail,
+        recordatoriosAutomaticos: formNotificaciones.recordatoriosAutomaticos,
         recordatorio1: formNotificaciones.recordatorio1 ? parseInt(formNotificaciones.recordatorio1) : null,
         recordatorio2: formNotificaciones.recordatorio2 ? parseInt(formNotificaciones.recordatorio2) : null,
       });
@@ -578,7 +581,15 @@ export default function ConfiguracionPage() {
                         type="checkbox"
                         id="notifWhatsApp"
                         checked={formNotificaciones.notificacionesWhatsApp}
-                        onChange={(e) => setFormNotificaciones({ ...formNotificaciones, notificacionesWhatsApp: e.target.checked })}
+                        onChange={(e) => {
+                          const whatsappEnabled = e.target.checked;
+                          setFormNotificaciones({ 
+                            ...formNotificaciones, 
+                            notificacionesWhatsApp: whatsappEnabled,
+                            // Si desactivamos WhatsApp, también desactivamos recordatorios automáticos
+                            recordatoriosAutomaticos: whatsappEnabled ? formNotificaciones.recordatoriosAutomaticos : false
+                          });
+                        }}
                         className="h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded cursor-pointer"
                       />
                       <label htmlFor="notifWhatsApp" className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2">
@@ -587,6 +598,50 @@ export default function ConfiguracionPage() {
                         </svg>
                         Notificaciones por WhatsApp
                       </label>
+                    </div>
+                    
+                    {/* Recordatorios automáticos - sub-opción de WhatsApp */}
+                    <div className={`flex items-center gap-3 p-4 rounded-xl ml-8 transition-colors ${
+                      formNotificaciones.notificacionesWhatsApp ? 'bg-blue-50' : 'bg-gray-100'
+                    }`}>
+                      <input
+                        type="checkbox"
+                        id="recordatoriosAutomaticos"
+                        checked={formNotificaciones.recordatoriosAutomaticos}
+                        disabled={!formNotificaciones.notificacionesWhatsApp}
+                        onChange={(e) => setFormNotificaciones({ 
+                          ...formNotificaciones, 
+                          recordatoriosAutomaticos: e.target.checked 
+                        })}
+                        className={`h-5 w-5 text-[#0490C8] focus:ring-[#0490C8] border-gray-300 rounded ${
+                          formNotificaciones.notificacionesWhatsApp ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <label 
+                          htmlFor="recordatoriosAutomaticos" 
+                          className={`text-sm font-medium flex items-center gap-2 ${
+                            formNotificaciones.notificacionesWhatsApp 
+                              ? 'text-gray-700 cursor-pointer' 
+                              : 'text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Enviar recordatorios automáticos
+                        </label>
+                        {!formNotificaciones.notificacionesWhatsApp && (
+                          <p className="text-xs text-gray-400 mt-1 ml-7">
+                            Debes activar notificaciones por WhatsApp primero
+                          </p>
+                        )}
+                        {formNotificaciones.notificacionesWhatsApp && (
+                          <p className="text-xs text-gray-500 mt-1 ml-7">
+                            El sistema enviará recordatorios automáticos por WhatsApp según la configuración establecida
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
                       <input
