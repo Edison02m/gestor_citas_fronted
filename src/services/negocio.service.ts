@@ -105,6 +105,14 @@ class NegocioService {
     const response = await api.post<{ success: boolean; data: GenerarLinkPublicoResponse }>('/negocio/generar-link', {});
     return response.data;
   }
+
+  /**
+   * Actualizar logo del negocio
+   */
+  async actualizarLogo(logoUrl: string): Promise<NegocioResponse> {
+    const response = await api.patch<{ success: boolean; data: NegocioResponse }>('/negocio/logo', { logoUrl });
+    return response.data;
+  }
 }
 
 export default new NegocioService();

@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -10,6 +11,14 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { user } = useAuth();
+
+  const isUsuario = (user: any): boolean => {
+    return user && 'negocio' in user;
+  };
+
+  const negocioLogo = isUsuario(user) ? (user as any).negocio?.logo : null;
+  const negocioNombre = isUsuario(user) ? (user as any).negocio?.nombre : 'Dashboard';
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -43,9 +52,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           
           <div className="flex items-center gap-2">
             <img 
-              src="/Assets/logo_citaYA.png" 
-              alt="CitaYa Logo" 
-              className="h-8 w-auto"
+              src={negocioLogo || "/Assets/logo_citaYA.png"}
+              alt={negocioLogo ? `Logo ${negocioNombre}` : "CitaYa Logo"}
+              className={`h-8 w-auto object-contain ${negocioLogo ? 'rounded' : ''}`}
             />
           </div>
 

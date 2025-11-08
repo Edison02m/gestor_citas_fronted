@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import negocioService, { NegocioResponse } from '@/services/negocio.service';
+import ImageKitUploader from '@/components/dashboard/ImageKitUploader';
+import ImageKitService from '@/services/imagekit.service';
 
 export default function ConfiguracionPage() {
   const { user } = useAuth();
@@ -62,6 +64,11 @@ export default function ConfiguracionPage() {
     recordatorio1: '',
     recordatorio2: '',
   });
+
+  // Estados para gestión del logo
+  const [showDeleteLogoModal, setShowDeleteLogoModal] = useState(false);
+  const [deletingLogo, setDeletingLogo] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -242,6 +249,41 @@ export default function ConfiguracionPage() {
       setError(err.response?.data?.message || 'Error al actualizar');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Handlers para gestión del logo
+  const handleLogoUploadSuccess = async (url: string) => {
+    try {
+      setUploadingLogo(true);
+      setError('');
+      setSuccess('');
+
+      const data = await negocioService.actualizarLogo(url);
+      setNegocio(data);
+      setSuccess('Logo actualizado correctamente');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al actualizar el logo');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleDeleteLogo = async () => {
+    try {
+      setDeletingLogo(true);
+      setError('');
+      setSuccess('');
+
+      // Actualizar en la base de datos (vaciar el logo)
+      const data = await negocioService.actualizarLogo('');
+      setNegocio(data);
+      setShowDeleteLogoModal(false);
+      setSuccess('Logo eliminado correctamente');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al eliminar el logo');
+    } finally {
+      setDeletingLogo(false);
     }
   };
 
@@ -462,6 +504,51 @@ export default function ConfiguracionPage() {
                     rows={4}
                     placeholder="Describe tu negocio..."
                   />
+                </div>
+
+                {/* Sección de Logo */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Logo del Negocio
+                  </label>
+                  
+                  {negocio?.logo ? (
+                    /* Si hay logo, mostrar preview con botones */
+                    <div className="space-y-3">
+                      <div className="relative inline-block">
+                        <img
+                          src={negocio.logo}
+                          alt="Logo del negocio"
+                          className="h-32 w-auto rounded-lg shadow-md object-contain border border-gray-200"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setNegocio({ ...negocio, logo: null })}
+                          disabled={uploadingLogo}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          Cambiar Logo
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowDeleteLogoModal(true)}
+                          disabled={deletingLogo || uploadingLogo}
+                          className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          {deletingLogo ? 'Eliminando...' : 'Eliminar Logo'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Si no hay logo, mostrar uploader */
+                    <ImageKitUploader
+                      currentLogo={null}
+                      onUploadSuccess={handleLogoUploadSuccess}
+                      onError={(error) => setError(error)}
+                    />
+                  )}
                 </div>
 
                 <div className="flex justify-end pt-4">
@@ -727,6 +814,53 @@ export default function ConfiguracionPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación para eliminar logo */}
+      {showDeleteLogoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-fade-in">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Eliminar Logo</h3>
+                <p className="text-sm text-gray-600 mt-1">¿Estás seguro de que deseas eliminar el logo?</p>
+              </div>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-6">
+              Esta acción no se puede deshacer. El logo será eliminado permanentemente.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteLogoModal(false)}
+                disabled={deletingLogo}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteLogo}
+                disabled={deletingLogo}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              >
+                {deletingLogo ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Eliminando...
+                  </>
+                ) : (
+                  'Eliminar'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

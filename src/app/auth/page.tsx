@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { UsuariosService } from '@/services/usuarios.service';
 import Image from 'next/image';
+import ImageKitUploader from '@/components/dashboard/ImageKitUploader';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -626,13 +627,10 @@ export default function AuthPage() {
                         <label className="block text-sm font-medium text-gray-900 mb-2">
                           Logo del negocio (opcional)
                         </label>
-                        <input
-                          type="url"
-                          value={registerData.logo}
-                          onChange={(e) => setRegisterData({ ...registerData, logo: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 bg-white transition-all"
-                          placeholder="https://ejemplo.com/logo.png"
-                          disabled={isLoading}
+                        <ImageKitUploader
+                          currentLogo={registerData.logo || null}
+                          onUploadSuccess={(url) => setRegisterData({ ...registerData, logo: url })}
+                          onError={(error) => setError(error)}
                         />
                       </div>
 

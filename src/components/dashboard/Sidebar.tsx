@@ -116,6 +116,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
   };
 
   const negocioNombre = isUsuario(user) ? (user as any).negocio?.nombre : 'Dashboard';
+  const negocioLogo = isUsuario(user) ? (user as any).negocio?.logo : null;
   
   // Filtrar menú según características del negocio
   const getFilteredMenuItems = () => {
@@ -179,9 +180,9 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
             {/* Logo centrado arriba */}
             <div className="flex justify-center">
               <img
-                src="/Assets/logo_citaYA.png"
-                alt="CitaYa Logo"
-                className={`w-auto transition-all duration-300 ${isCollapsed ? 'h-6' : 'h-8'}`}
+                src={negocioLogo || "/Assets/logo_citaYA.png"}
+                alt={negocioLogo ? `Logo ${negocioNombre}` : "CitaYa Logo"}
+                className={`w-auto transition-all duration-300 object-contain ${isCollapsed ? 'h-6' : 'h-8'} ${negocioLogo ? 'rounded' : ''}`}
               />
             </div>
 
