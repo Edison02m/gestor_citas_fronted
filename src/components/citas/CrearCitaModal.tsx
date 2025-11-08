@@ -277,7 +277,16 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
 
   // Cuando cambia la fecha seleccionada o los datos necesarios, calcular horarios disponibles
   useEffect(() => {
-    if (fechaSeleccionada && formData.empleadoId && formData.sucursalId && formData.servicioId) {
+    // Si no hay empleados (0), permitir continuar sin validar empleadoId
+    // En este caso, el dueño del negocio atenderá la cita
+    if (fechaSeleccionada && formData.sucursalId && formData.servicioId) {
+      // Si hay empleados, requerir que uno esté seleccionado
+      if (empleados.length > 0 && !formData.empleadoId) {
+        setHorariosDisponibles([]);
+        setCitasOcupadas([]);
+        return;
+      }
+      
       calcularHorariosDisponibles();
     } else {
       setHorariosDisponibles([]);
@@ -286,12 +295,76 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
   }, [fechaSeleccionada, formData.empleadoId, formData.sucursalId, formData.servicioId]);
 
   const calcularHorariosDisponibles = async () => {
-    if (!fechaSeleccionada || !formData.empleadoId || !formData.sucursalId || !formData.servicioId) return;
+    if (!fechaSeleccionada || !formData.sucursalId || !formData.servicioId) return;
 
     try {
       setLoadingCitas(true);
       const fechaStr = formatDateInput(fechaSeleccionada);
       
+      // Obtener el servicio seleccionado para saber la duración
+      const servicio = servicios.find(s => s.id === formData.servicioId);
+      if (!servicio) return;
+
+      // Obtener la sucursal completa
+      const sucursal = sucursales.find(s => s.id === formData.sucursalId);
+      if (!sucursal) return;
+
+      // Obtener el día de la semana (0 = domingo, 6 = sábado)
+      const diaSemana = fechaSeleccionada.getDay();
+
+      console.log('Día de la semana (0=domingo, 6=sábado):', diaSemana);
+
+      // Buscar el horario de la sucursal para ese día
+      const horarioSucursal = sucursal.horarios?.find(h => h.diaSemana === diaSemana && h.abierto);
+      if (!horarioSucursal) {
+        setHorariosDisponibles([]);
+        return;
+      }
+
+      // Si NO hay empleados registrados, usar solo el horario de la sucursal
+      if (empleados.length === 0 || !formData.empleadoId) {
+        // Log removido
+        
+        // Verificar que el horario de la sucursal tenga valores válidos
+        if (!horarioSucursal.horaApertura || !horarioSucursal.horaCierre) {
+          setHorariosDisponibles([]);
+          return;
+        }
+
+        // ✅ IMPORTANTE: Consultar citas de la sucursal (sin filtrar por empleado)
+        // El dueño atiende todas las citas, así que debemos evitar conflictos
+        const citas = await CitasService.getCitas({
+          fechaInicio: fechaStr,
+          fechaFin: fechaStr,
+          sucursalId: formData.sucursalId
+          // NO incluir empleadoId - queremos TODAS las citas de la sucursal
+        });
+
+        // Filtrar solo las citas no canceladas
+        const citasActivas = citas.data.filter((c: Cita) => c.estado !== 'CANCELADA');
+        setCitasOcupadas(citasActivas);
+
+        const horaInicio = horarioSucursal.horaApertura;
+        const horaFin = horarioSucursal.horaCierre;
+
+        console.log('Horario de sucursal - Inicio:', horaInicio, 'Fin:', horaFin);
+        console.log('Citas ocupadas en sucursal:', citasActivas.length);
+
+        // Generar horarios usando el horario de la sucursal
+        // Validar contra todas las citas existentes (el dueño atiende todo)
+        const horarios = generarHorariosPosibles(
+          horaInicio, 
+          horaFin, 
+          servicio.duracion, 
+          citasActivas, // ✅ Validar contra citas existentes
+          horarioSucursal,
+          null // Sin horario de empleado específico
+        );
+        setHorariosDisponibles(horarios);
+        return;
+      }
+
+      // Si HAY empleados, continuar con la lógica normal
       // Obtener las citas del empleado en esa fecha
       const citas = await CitasService.getCitas({
         fechaInicio: fechaStr,
@@ -304,52 +377,20 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       const citasActivas = citas.data.filter((c: Cita) => c.estado !== 'CANCELADA');
       setCitasOcupadas(citasActivas);
 
-      // Obtener el servicio seleccionado para saber la duración
-      const servicio = servicios.find(s => s.id === formData.servicioId);
-      if (!servicio) return;
-
-      // Obtener la sucursal y empleado completos
-      const sucursal = sucursales.find(s => s.id === formData.sucursalId);
+      // Obtener el empleado completo
       const empleado = empleados.find(e => e.id === formData.empleadoId);
-      if (!sucursal || !empleado) return;
-
-      // Obtener el día de la semana (0 = domingo, 6 = sábado)
-      const diaSemana = fechaSeleccionada.getDay();
-
-      // Log removido
-      // Log removido
-      console.log('Día de la semana (0=domingo, 6=sábado):', diaSemana);
-      // Log removido
-      // Log removido
-      // Log removido
-      // Log removido
-
-      // Buscar el horario de la sucursal para ese día
-      const horarioSucursal = sucursal.horarios?.find(h => h.diaSemana === diaSemana && h.abierto);
-      if (!horarioSucursal) {
-      // Log removido
-        setHorariosDisponibles([]);
-        return;
-      }
-
-      // Log removido
+      if (!empleado) return;
 
       // Buscar el horario del empleado para ese día
       const horarioEmpleado = empleado.horarios?.find(h => h.diaSemana === diaSemana);
       if (!horarioEmpleado) {
-      // Log removido
         setHorariosDisponibles([]);
         return;
       }
 
-      // Log removido
-
       // Verificar que los horarios tengan valores válidos
       if (!horarioSucursal.horaApertura || !horarioSucursal.horaCierre || 
           !horarioEmpleado.horaInicio || !horarioEmpleado.horaFin) {
-      // Log removido
-      // Log removido
-      // Log removido
         setHorariosDisponibles([]);
         return;
       }
@@ -363,13 +404,11 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
         ? horarioSucursal.horaCierre 
         : horarioEmpleado.horaFin;
 
-      // Log removido
       console.log('Inicio:', horaInicio, '(sucursal:', horarioSucursal.horaApertura, ', empleado:', horarioEmpleado.horaInicio, ')');
       console.log('Fin:', horaFin, '(sucursal:', horarioSucursal.horaCierre, ', empleado:', horarioEmpleado.horaFin, ')');
 
       // Generar todos los horarios posibles cada 15 minutos
       const horarios = generarHorariosPosibles(horaInicio, horaFin, servicio.duracion, citasActivas, horarioSucursal, horarioEmpleado);
-      // Log removido
       setHorariosDisponibles(horarios);
 
     } catch (error) {
@@ -386,7 +425,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     duracion: number, 
     citasOcupadas: Cita[],
     horarioSucursal: any,
-    horarioEmpleado: any
+    horarioEmpleado: any | null
   ): string[] => {
     const horarios: string[] = [];
     const [horaInicioH, horaInicioM] = horaInicio.split(':').map(Number);
@@ -419,7 +458,7 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
     horaFin: string, 
     citasOcupadas: Cita[],
     horarioSucursal: any,
-    horarioEmpleado: any
+    horarioEmpleado: any | null
   ): boolean => {
       // Log removido
     
@@ -459,8 +498,8 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       }
     }
 
-    // Verificar conflicto con descanso de empleado
-    if (horarioEmpleado.tieneDescanso) {
+    // Verificar conflicto con descanso de empleado (solo si hay horarioEmpleado)
+    if (horarioEmpleado && horarioEmpleado.tieneDescanso) {
       const descansoInicio = horarioEmpleado.descansoInicio;
       const descansoFin = horarioEmpleado.descansoFin;
       const enDescansoEmpleado = (
@@ -500,14 +539,10 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
       return;
     }
 
-    // Validar empleado (obligatorio si hay más de 1)
+    // Validar empleado (obligatorio solo si hay más de 1)
+    // Si hay 0 empleados, se asume que el dueño atenderá la cita
     if (empleados.length > 1 && !formData.empleadoId) {
       setErrors('Debes seleccionar un empleado');
-      return;
-    }
-
-    if (empleados.length === 0) {
-      setErrors('No hay empleados activos disponibles');
       return;
     }
 
@@ -1126,25 +1161,46 @@ export default function CrearCitaModal({ isOpen, onClose, onSubmit, loading }: C
                       </div>
                     </div>
 
-                    {/* Empleado */}
-                    <div className="bg-gray-50 rounded-xl p-3">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                          </svg>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Empleado</p>
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {empleados.find(e => e.id === formData.empleadoId)?.nombre}
-                          </p>
-                          <p className="text-xs text-gray-600 mt-0.5">
-                            {empleados.find(e => e.id === formData.empleadoId)?.cargo}
-                          </p>
+                    {/* Empleado (solo mostrar si hay empleados) */}
+                    {empleados.length > 0 && formData.empleadoId && (
+                      <div className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider mb-0.5">Empleado</p>
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {empleados.find(e => e.id === formData.empleadoId)?.nombre}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-0.5">
+                              {empleados.find(e => e.id === formData.empleadoId)?.cargo}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Mostrar mensaje cuando no hay empleados */}
+                    {empleados.length === 0 && (
+                      <div className="bg-blue-50 rounded-xl p-3 border border-blue-200">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-semibold text-blue-700 uppercase tracking-wider mb-0.5">Atención</p>
+                            <p className="text-xs text-blue-700">
+                              Esta cita será atendida por el dueño del negocio
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

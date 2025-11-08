@@ -18,16 +18,16 @@ function handleSubscriptionError(error: any): void {
     switch (error.code) {
       case 'SUBSCRIPTION_EXPIRED':
         // 🔄 NO borrar token - El usuario debe poder renovar su suscripción
-        // Solo redirigir a página de activación de código
+        // Solo redirigir a página de cuenta para activar código
         if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard-usuario/activar-codigo?expired=true';
+          window.location.href = '/dashboard-usuario/perfil?expired=true';
         }
         break;
       case 'NO_SUBSCRIPTION':
         // 🔄 NO borrar token - El usuario debe poder activar su primera suscripción
-        // Redirigir a página de activación
+        // Redirigir a página de cuenta para activar código
         if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard-usuario/activar-codigo';
+          window.location.href = '/dashboard-usuario/perfil';
         }
         break;
       case 'SUBSCRIPTION_BLOCKED':

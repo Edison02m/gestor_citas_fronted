@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import ClientesTable from '@/components/clientes/ClientesTable';
 import ClienteModal from '@/components/clientes/ClienteModal';
 import DeleteClienteModal from '@/components/clientes/DeleteClienteModal';
+import HistorialCitasModal from '@/components/clientes/HistorialCitasModal';
 import TableSkeleton from '@/components/shared/TableSkeleton';
 import { ClientesService } from '@/services/clientes.service';
 import { Cliente, CreateClienteDto, UpdateClienteDto } from '@/interfaces';
@@ -18,6 +19,7 @@ export default function ClientesPage() {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isHistorialModalOpen, setIsHistorialModalOpen] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -81,6 +83,11 @@ export default function ClientesPage() {
     setSelectedCliente(cliente);
     setDeleteError('');
     setIsDeleteModalOpen(true);
+  };
+
+  const handleVerHistorial = (cliente: Cliente) => {
+    setSelectedCliente(cliente);
+    setIsHistorialModalOpen(true);
   };
 
   const handleSubmit = async (data: CreateClienteDto | UpdateClienteDto) => {
@@ -197,6 +204,7 @@ export default function ClientesPage() {
             clientes={filteredClientes}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onVerHistorial={handleVerHistorial}
             loading={false}
           />
         )}
@@ -250,6 +258,15 @@ export default function ClientesPage() {
         cliente={selectedCliente}
         loading={modalLoading}
         error={deleteError}
+      />
+
+      <HistorialCitasModal
+        isOpen={isHistorialModalOpen}
+        onClose={() => {
+          setIsHistorialModalOpen(false);
+          setSelectedCliente(null);
+        }}
+        cliente={selectedCliente}
       />
     </DashboardLayout>
   );

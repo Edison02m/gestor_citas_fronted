@@ -3,6 +3,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { Usuario } from '@/interfaces';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -67,6 +68,15 @@ const menuItems = [
     )
   },
   {
+    name: 'Reportes',
+    path: '/dashboard-usuario/reportes',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    )
+  },
+  {
     name: 'Configuración',
     path: '/dashboard-usuario/configuracion',
     icon: (
@@ -86,23 +96,13 @@ const menuItems = [
     )
   },
   {
-    name: 'Perfil',
+    name: 'Cuenta',
     path: '/dashboard-usuario/perfil',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
       </svg>
     )
-  },
-  {
-    name: 'Activar Código',
-    path: '/dashboard-usuario/activar-codigo',
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-      </svg>
-    ),
-    badge: '🔑'
   }
 ];
 
@@ -116,6 +116,22 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
   };
 
   const negocioNombre = isUsuario(user) ? (user as any).negocio?.nombre : 'Dashboard';
+  
+  // Filtrar menú según características del negocio
+  const getFilteredMenuItems = () => {
+    if (!isUsuario(user)) return menuItems; // Super admin ve todo
+    
+    const usuario = user as Usuario;
+    const reportesHabilitados = usuario.negocio?.reportesAvanzados || false;
+    
+    // Filtrar el item de Reportes si no está habilitado
+    return menuItems.filter(item => {
+      if (item.name === 'Reportes') {
+        return reportesHabilitados;
+      }
+      return true;
+    });
+  };
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -183,7 +199,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
 
         {/* Menú - con scroll interno */}
         <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {menuItems.map((item) => {
+          {getFilteredMenuItems().map((item) => {
             // Para "Inicio", solo activar si la ruta es EXACTAMENTE /dashboard-usuario
             // Para los demás, activar si la ruta coincide o empieza con la ruta del item
             const isActive = item.path === '/dashboard-usuario' 

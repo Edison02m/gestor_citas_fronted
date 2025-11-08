@@ -7,8 +7,8 @@ export default function ActivarCodigoPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // 🔄 REDIRIGIR A LA NUEVA UBICACIÓN DENTRO DEL DASHBOARD
-    router.push('/dashboard-usuario/activar-codigo');
+    // 🔄 REDIRIGIR A LA PÁGINA DE CUENTA (integrada)
+    router.push('/dashboard-usuario/perfil');
   }, [router]);
 
   // Mostrar loading mientras redirige

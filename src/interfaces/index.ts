@@ -31,6 +31,8 @@ export interface Usuario {
     // 🎯 Plan pendiente (sistema de cola)
     planPendiente?: string | null;
     fechaInicioPendiente?: string | null;
+    // 🔥 Características habilitadas
+    reportesAvanzados?: boolean;
   };
   createdAt?: string;
   updatedAt?: string;

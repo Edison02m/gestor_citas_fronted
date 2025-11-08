@@ -63,9 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Caso 2: Usuario sin suscripción o vencida → Activar código
+      // Caso 2: Usuario sin suscripción o vencida → Cuenta
       if (response.data.requiereCodigoActivacion) {
-        router.push('/dashboard-usuario/activar-codigo');
+        router.push('/dashboard-usuario/perfil');
         return;
       }
 

@@ -117,12 +117,12 @@ export default function DashboardUsuarioPage() {
     // Redirigir si no tiene suscripción activa
     if (isUsuario(user)) {
       if (user.negocio?.estadoSuscripcion === 'SIN_SUSCRIPCION') {
-        router.push('/dashboard-usuario/activar-codigo');
+        router.push('/dashboard-usuario/perfil');
         return;
       }
 
       if (user.negocio?.estadoSuscripcion === 'VENCIDA') {
-        router.push('/dashboard-usuario/activar-codigo?expired=true');
+        router.push('/dashboard-usuario/perfil?expired=true');
         return;
       }
 
