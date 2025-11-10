@@ -230,11 +230,11 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-2xl w-full shadow-xl" style={{ maxWidth: empleado ? '600px' : '900px', maxHeight: '95vh' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
             {empleado ? 'Editar Empleado' : 'Nuevo Empleado'}
           </h2>
           <button
@@ -242,7 +242,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
             disabled={loading}
             className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -250,14 +250,14 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div className="px-6 py-4" style={{ maxHeight: 'calc(95vh - 140px)', overflowY: 'auto' }}>
+          <div className="px-3 sm:px-6 py-3 sm:py-4" style={{ maxHeight: 'calc(95vh - 140px)', overflowY: 'auto' }}>
             {empleado ? (
               // Layout 1 columna para edición
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Avatar y nombre en fila */}
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                   <div 
-                    className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 bg-gradient-to-br from-blue-500 to-cyan-600"
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 bg-gradient-to-br from-blue-500 to-cyan-600 mx-auto sm:mx-0"
                   >
                     {formData.foto && formData.foto.trim() ? (
                       <img 
@@ -301,7 +301,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                 </div>
 
                 {/* Teléfono y Email */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
                     <div className="flex gap-2">
@@ -428,9 +428,9 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
               </div>
             ) : (
               // Layout 2 columnas para creación
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Columna Izquierda: Datos del empleado */}
-                <div className="space-y-3.5">
+                <div className="space-y-3 sm:space-y-3.5">
                   {/* Avatar */}
                   <div className="flex items-center gap-4">
                     <div 
@@ -481,7 +481,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">
                         Teléfono <span className="text-red-500">*</span>
@@ -585,7 +585,7 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                 </div>
 
                 {/* Columna Derecha: Sucursales */}
-                <div className="border-l border-gray-200 pl-6">
+                <div className="border-t lg:border-t-0 lg:border-l border-gray-200 pt-4 lg:pt-0 lg:pl-6 mt-4 lg:mt-0">
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-xs font-medium text-gray-600">
                       ASIGNAR A SUCURSAL <span className="text-red-500">*</span> (SOLO UNA)
@@ -610,11 +610,11 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                       <p className="text-xs text-gray-500 mt-1">Crea una sucursal activa primero</p>
                     </div>
                   ) : (
-                    <div className="space-y-2" style={{ maxHeight: '420px', overflowY: 'auto' }}>
+                    <div className="space-y-2" style={{ maxHeight: '320px', overflowY: 'auto' }}>
                       {sucursales.map((sucursal) => (
                         <label
                           key={sucursal.id}
-                          className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all ${
+                          className={`flex items-start gap-2 sm:gap-2.5 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-all ${
                             sucursalSeleccionada === sucursal.id
                               ? 'bg-blue-50 border-2 border-[#0490C8] shadow-sm'
                               : 'bg-gray-50 border-2 border-gray-200 hover:border-gray-300 hover:bg-white'
@@ -642,9 +642,9 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
                     </div>
                   )}
                   
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-3">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4 mt-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <div className="text-xs text-blue-700">
@@ -659,14 +659,14 @@ export default function EmpleadoModal({ isOpen, onClose, onSubmit, empleado, loa
 
             {/* Error */}
             {errors && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-red-700">{errors}</p>
+              <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-xs sm:text-sm text-red-700">{errors}</p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex gap-3 px-6 py-4 border-t border-gray-200 bg-white">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-white">
             <button
               type="button"
               onClick={onClose}

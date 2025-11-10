@@ -188,12 +188,12 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
   const horarioDiaSeleccionado = horarios.find(h => h.diaSemana === diaSeleccionado);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-2xl max-w-5xl w-full shadow-xl max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Configurar Horarios</h2>
+            <h2 className="text-base sm:text-lg font-bold text-gray-900">Configurar Horarios</h2>
             <p className="text-xs text-gray-600 mt-0.5">{sucursal.nombre}</p>
           </div>
           <button
@@ -207,12 +207,12 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
           </button>
         </div>
 
-        <form id="horarios-form" onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto">
-          <div className="grid grid-cols-2 gap-6 h-full">
+        <form id="horarios-form" onSubmit={handleSubmit} className="p-3 sm:p-6 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-full">
             {/* Columna Izquierda: Selector de Días */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-700">Días de trabajo</h3>
-              <div className="grid grid-cols-4 gap-2">
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700">Días de trabajo</h3>
+              <div className="grid grid-cols-7 sm:grid-cols-4 gap-1.5 sm:gap-2">
                 {DIAS_SEMANA.map((dia) => {
                   const horario = horarios.find(h => h.diaSemana === dia.num);
                   const esSeleccionado = diaSeleccionado === dia.num;
@@ -223,7 +223,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                       key={dia.num}
                       type="button"
                       onClick={() => setDiaSeleccionado(dia.num)}
-                      className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl text-xs font-semibold transition-all ${
                         esSeleccionado
                           ? 'bg-[#0490C8] text-white shadow-md'
                           : estaActivo
@@ -233,7 +233,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                     >
                       <div className="text-center">
                         <div className="font-bold">{dia.letra}</div>
-                        <div className="text-[10px] mt-0.5 opacity-90">{dia.nombre.slice(0, 3)}</div>
+                        <div className="text-[10px] mt-0.5 opacity-90 hidden sm:block">{dia.nombre.slice(0, 3)}</div>
                       </div>
                     </button>
                   );
@@ -241,9 +241,9 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
               </div>
 
               {/* Resumen de Horarios */}
-              <div className="bg-gray-50 rounded-xl p-3">
+              <div className="bg-gray-50 rounded-xl p-2.5 sm:p-3">
                 <h3 className="text-xs font-semibold text-gray-700 mb-2">Resumen Semanal</h3>
-                <div className="space-y-1.5">
+                <div className="space-y-1 sm:space-y-1.5">
                   {DIAS_SEMANA.map(dia => {
                     const horario = horarios.find(h => h.diaSemana === dia.num);
                     if (!horario) return null;
@@ -251,18 +251,19 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                     return (
                       <div
                         key={dia.num}
-                        className="flex items-center justify-between text-xs px-2 py-1 rounded-xl hover:bg-white transition-colors cursor-pointer"
+                        className="flex items-center justify-between text-[10px] sm:text-xs px-1.5 sm:px-2 py-1 rounded-lg sm:rounded-xl hover:bg-white transition-colors cursor-pointer"
                         onClick={() => setDiaSeleccionado(dia.num)}
                       >
-                        <span className="font-medium text-gray-700 w-16">{dia.nombre.substring(0, 3)}</span>
+                        <span className="font-medium text-gray-700 w-10 sm:w-16">{dia.nombre.substring(0, 3)}</span>
                         {horario.abierto ? (
-                          <div className="flex items-center gap-1 font-mono text-[11px]">
+                          <div className="flex items-center gap-0.5 sm:gap-1 font-mono text-[9px] sm:text-[11px]">
                             <span className="text-gray-700">{horario.horaApertura}</span>
                             {horario.tieneDescanso ? (
                               <>
-                                <span className="text-gray-400">→</span>
-                                <span className="text-[#0490C8]">{horario.descansoInicio}-{horario.descansoFin}</span>
-                                <span className="text-gray-400">→</span>
+                                <span className="text-gray-400 hidden sm:inline">→</span>
+                                <span className="text-[#0490C8] hidden sm:inline">{horario.descansoInicio}-{horario.descansoFin}</span>
+                                <span className="text-gray-400 hidden sm:inline">→</span>
+                                <span className="text-gray-400 sm:hidden">-</span>
                               </>
                             ) : (
                               <span className="text-gray-400">━━</span>
@@ -270,7 +271,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                             <span className="text-gray-700">{horario.horaCierre}</span>
                           </div>
                         ) : (
-                          <span className="text-gray-400 italic text-[11px]">Cerrado</span>
+                          <span className="text-gray-400 italic text-[9px] sm:text-[11px]">Cerrado</span>
                         )}
                       </div>
                     );
@@ -280,9 +281,9 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
             </div>
 
             {/* Columna Derecha: Configuración del Día */}
-            <div>
+            <div className="mt-4 lg:mt-0">
               {horarioDiaSeleccionado && (
-                <div className="bg-gray-50 rounded-xl p-4 space-y-3 h-full">
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4 space-y-2.5 sm:space-y-3 h-full">
                   <div className="flex items-center justify-between pb-2 border-b border-gray-200">
                     <h3 className="text-sm font-semibold text-gray-900">
                       {DIAS_SEMANA.find(d => d.num === diaSeleccionado)?.nombre}
@@ -298,7 +299,7 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                           onChange={() => handleToggleAbierto(diaSeleccionado)}
                           className="sr-only peer"
                         />
-                        <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
+                        <div className="w-9 sm:w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#0490C8]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0490C8]"></div>
                       </div>
                     </label>
                   </div>
@@ -369,39 +370,42 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
                       {/* Acciones rápidas */}
                       <div className="pt-2 border-t border-gray-200">
                         <p className="text-xs text-gray-600 mb-2">Aplicar a otros días</p>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <button
                             type="button"
                             onClick={copiarATodos}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar a todos los días"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Toda la semana</span>
+                            <span className="hidden sm:inline">Toda la semana</span>
+                            <span className="sm:hidden">Todos</span>
                           </button>
                           <button
                             type="button"
                             onClick={copiarAEntreSemana}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar de Lunes a Viernes"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            <span>Entre semana</span>
+                            <span className="hidden sm:inline">Entre semana</span>
+                            <span className="sm:hidden">L-V</span>
                           </button>
                           <button
                             type="button"
                             onClick={copiarAFinSemana}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar Sábado y Domingo"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <span>Fin de semana</span>
+                            <span className="hidden sm:inline">Fin de semana</span>
+                            <span className="sm:hidden">S-D</span>
                           </button>
                         </div>
                       </div>
@@ -414,16 +418,16 @@ export default function HorariosModal({ isOpen, onClose, onSubmit, sucursal, loa
         </form>
 
         {/* Footer fijo */}
-        <div className="border-t border-gray-200 px-6 py-4 bg-white flex-shrink-0">
+        <div className="border-t border-gray-200 px-3 sm:px-6 py-3 sm:py-4 bg-white flex-shrink-0">
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm shadow-sm mb-3">
+            <div className="bg-red-50 border-2 border-red-300 text-red-800 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm shadow-sm mb-3">
               {error}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onClose}

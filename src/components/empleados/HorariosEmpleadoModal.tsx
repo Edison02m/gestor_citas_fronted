@@ -275,12 +275,12 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
   const horarioDiaSeleccionado = horarios.find(h => h.diaSemana === diaSeleccionado);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-2xl max-w-5xl w-full shadow-xl max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Configurar Horarios</h2>
+            <h2 className="text-base sm:text-lg font-bold text-gray-900">Configurar Horarios</h2>
             <p className="text-xs text-gray-600 mt-0.5">{empleado.nombre}</p>
           </div>
           <button
@@ -296,38 +296,40 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
 
         {/* Content - 2 columnas */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 p-3 sm:p-6">
             {/* Columna izquierda: Selector de días y resumen */}
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               {/* Selector de días - Grid compacto */}
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-gray-900">Días de trabajo</h3>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-gray-900">Días de trabajo</h3>
                   {sucursalId && (
                     <button
                       type="button"
                       onClick={sincronizarConSucursal}
                       disabled={loadingSucursal}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0490C8] text-white text-xs font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#0490C8] text-white text-xs font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50 w-full sm:w-auto justify-center"
                       title="Sincronizar con horario de la sucursal"
                     >
                       {loadingSucursal ? (
                         <>
                           <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Sincronizando...</span>
+                          <span className="hidden sm:inline">Sincronizando...</span>
+                          <span className="sm:hidden">Sync...</span>
                         </>
                       ) : (
                         <>
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
-                          <span>Igual a sucursal</span>
+                          <span className="hidden sm:inline">Igual a sucursal</span>
+                          <span className="sm:hidden">Sincronizar</span>
                         </>
                       )}
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-7 sm:grid-cols-4 gap-1.5 sm:gap-2">
                   {DIAS_SEMANA.map((dia) => {
                     const horario = horarios.find(h => h.diaSemana === dia.num);
                     const esSeleccionado = diaSeleccionado === dia.num;
@@ -338,7 +340,7 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
                         key={dia.num}
                         type="button"
                         onClick={() => setDiaSeleccionado(dia.num)}
-                        className={`p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                        className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl text-xs font-semibold transition-all ${
                           esSeleccionado
                             ? 'bg-[#0490C8] text-white shadow-md'
                             : estaActivo
@@ -348,7 +350,7 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
                       >
                         <div className="text-center">
                           <div className="font-bold">{dia.letra}</div>
-                          <div className="text-[10px] mt-0.5 opacity-90">{dia.nombre.slice(0, 3)}</div>
+                          <div className="text-[10px] mt-0.5 opacity-90 hidden sm:block">{dia.nombre.slice(0, 3)}</div>
                         </div>
                       </button>
                     );
@@ -358,17 +360,17 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
 
               {/* Resumen semanal */}
               <div>
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Resumen semanal</h3>
-                <div className="space-y-2">
+                <h3 className="text-xs sm:text-sm font-bold text-gray-900 mb-2 sm:mb-3">Resumen semanal</h3>
+                <div className="space-y-1.5 sm:space-y-2">
                   {horarios.map((horario) => {
                     const dia = DIAS_SEMANA.find(d => d.num === horario.diaSemana);
                     return (
-                      <div key={horario.diaSemana} className="text-xs">
-                        <span className="font-medium text-gray-700 inline-block w-20">{dia?.nombre}:</span>
+                      <div key={horario.diaSemana} className="text-[10px] sm:text-xs">
+                        <span className="font-medium text-gray-700 inline-block w-16 sm:w-20">{dia?.nombre}:</span>
                         {horario.activo ? (
                           <span className="text-gray-700">
                             {horario.horaInicio} → {horario.tieneDescanso && (
-                              <span className="text-[#0490C8] font-medium">{horario.descansoInicio}-{horario.descansoFin} → </span>
+                              <span className="text-[#0490C8] font-medium hidden sm:inline">{horario.descansoInicio}-{horario.descansoFin} → </span>
                             )}{horario.horaFin}
                           </span>
                         ) : (
@@ -382,7 +384,7 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
             </div>
 
             {/* Columna derecha: Configuración del día seleccionado */}
-            <div>
+            <div className="mt-4 lg:mt-0">
               {horarioDiaSeleccionado && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3 h-full">
                   <div className="flex items-center justify-between pb-2 border-b border-gray-200">
@@ -471,11 +473,11 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
                       {/* Acciones rápidas */}
                       <div className="pt-2 border-t border-gray-200">
                         <p className="text-xs text-gray-600 mb-2">Aplicar a otros días</p>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <button
                             type="button"
                             onClick={copiarATodos}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar a todos los días"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -486,24 +488,26 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
                           <button
                             type="button"
                             onClick={copiarAEntreSemana}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar de Lunes a Viernes"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            <span>Entre semana</span>
+                            <span className="hidden sm:inline">Entre semana</span>
+                            <span className="sm:hidden">L-V</span>
                           </button>
                           <button
                             type="button"
                             onClick={copiarAFinSemana}
-                            className="flex-1 px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                            className="flex-1 px-2 sm:px-3 py-2 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-1.5"
                             title="Aplicar Sábado y Domingo"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <span>Fin de semana</span>
+                            <span className="hidden sm:inline">Fin de semana</span>
+                            <span className="sm:hidden">S-D</span>
                           </button>
                         </div>
                       </div>
@@ -515,26 +519,26 @@ export default function HorariosEmpleadoModal({ isOpen, onClose, onSubmit, emple
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-200 bg-white flex-shrink-0">
+          <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-white flex-shrink-0">
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-xs sm:text-sm text-red-700">{error}</p>
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-4 py-2.5 bg-[#0490C8] text-white font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 bg-[#0490C8] text-white font-medium rounded-xl hover:bg-[#037ab0] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
               >
                 {loading ? (
                   <>
