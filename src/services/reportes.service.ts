@@ -104,11 +104,86 @@ export interface OcupacionEmpleado {
   servicioMasRealizadoId?: string;
 }
 
+// ============================================================================
+// NUEVAS ESTADÍSTICAS - PRIORIDAD ALTA
+// ============================================================================
+
+export interface TasaUtilizacion {
+  empleadoId?: string;
+  empleadoNombre?: string;
+  sucursalId?: string;
+  sucursalNombre?: string;
+  horasDisponibles: number;
+  horasTrabajadas: number;
+  tasaUtilizacion: number;
+  citasTotales: number;
+  espaciosVacios: number;
+}
+
+export interface IngresosPorHora {
+  empleadoId?: string;
+  empleadoNombre?: string;
+  ingresoTotal: number;
+  horasTrabajadas: number;
+  ingresoPorHora: number;
+  mejorDia: { dia: string; ingreso: number };
+  mejorHorario: { hora: string; ingreso: number };
+  tendencia: 'creciente' | 'estable' | 'decreciente';
+}
+
+export interface RankingEmpleado {
+  posicion: number;
+  empleadoId: string;
+  nombre: string;
+  foto?: string;
+  cargo: string;
+  totalCitas: number;
+  ingresoGenerado: number;
+  tasaCompletacion: number;
+  tasaUtilizacion: number;
+  ingresoPorHora: number;
+  calificacionPromedio?: number;
+  puntuacionTotal: number;
+}
+
+export interface HorasPico {
+  diaMasConcurrido: string;
+  diaMasConcurridoCitas: number;
+  horaMasConcurrida: string;
+  horaMasConcurridaCitas: number;
+  citasPorDia: { dia: string; citas: number; ingresos: number }[];
+  citasPorHora: { hora: string; citas: number; ingresos: number }[];
+  horasMenosConcurridas: string[];
+  recomendaciones?: string[];
+}
+
+export interface ValorVidaCliente {
+  clv: number;
+  clientesTotales: number;
+  clientesNuevos: number;
+  clientesRecurrentes: number;
+  tasaRetencion: number;
+  frecuenciaPromedio: number;
+  ticketPromedio: number;
+  topClientes: {
+    clienteId: string;
+    nombre: string;
+    totalGastado: number;
+    totalCitas: number;
+  }[];
+}
+
 export interface DashboardReportesResponse {
   dashboard: DashboardStats;
   clientesFrecuentes: ClienteFrecuente[];
   serviciosMasVendidos: ServicioVendido[];
   citasPorDia: DatoTemporal[];
+  // NUEVAS ESTADÍSTICAS
+  tasaUtilizacion?: TasaUtilizacion[];
+  ingresosPorHora?: IngresosPorHora[];
+  rankingEmpleados?: RankingEmpleado[];
+  horasPico?: HorasPico;
+  valorVidaCliente?: ValorVidaCliente;
 }
 
 // ============================================================================

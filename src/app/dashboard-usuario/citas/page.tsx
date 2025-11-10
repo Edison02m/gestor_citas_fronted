@@ -178,9 +178,9 @@ export default function CitasPage() {
   return (
     <DashboardLayout>
       <div className="h-full overflow-hidden flex flex-col">
-        <div className="p-4 sm:p-6 lg:p-8 flex-shrink-0">
+        <div className="p-3 sm:p-4 lg:p-5 flex-shrink-0">
         {/* Header */}
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Citas</h1>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">Gestiona todas las citas de tu negocio</p>
@@ -233,7 +233,7 @@ export default function CitasPage() {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-4 sm:mb-6 bg-green-50 border border-green-200 text-green-700 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2">
+          <div className="mb-3 sm:mb-4 bg-green-50 border border-green-200 text-green-700 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-2">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -243,7 +243,7 @@ export default function CitasPage() {
 
         {/* Error Message */}
         {errorMessage && (
-          <div className="mb-4 sm:mb-6 bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm">
+          <div className="mb-3 sm:mb-4 bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm">
             {errorMessage}
           </div>
         )}
@@ -253,7 +253,7 @@ export default function CitasPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
+        <div className="flex-1 overflow-hidden px-3 sm:px-4 lg:px-5 pb-3 sm:pb-4 lg:pb-5">
         {viewMode === 'mini' ? (
           /* Vista Compacta - Mini Calendario + Detalle */
           <div className="h-full">

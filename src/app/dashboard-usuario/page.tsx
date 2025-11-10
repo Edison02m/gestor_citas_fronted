@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Usuario } from '@/interfaces';
+import { Cita, EstadoCita, Usuario } from '@/interfaces';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import UsageDashboard from '@/components/dashboard/UsageDashboard';
 import LimitReachedModal from '@/components/dashboard/LimitReachedModal';
@@ -11,6 +11,8 @@ import { useTour } from '@/hooks/useTour';
 import { TOURS } from '@/utils/tours';
 import { DriveStep } from 'driver.js';
 import HelpButton from '@/components/shared/HelpButton';
+import CitasService from '@/services/citas.service';
+import { formatDateInput } from '@/utils/format';
 
 // Helper para verificar si es Usuario (no SuperAdmin)
 const isUsuario = (user: any): user is Usuario => {
@@ -21,10 +23,12 @@ export default function DashboardUsuarioPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [diasRestantes, setDiasRestantes] = useState<number | null>(null);
+  const [citasHoy, setCitasHoy] = useState<Cita[]>([]);
+  const [citasLoading, setCitasLoading] = useState<boolean>(false);
+  const [changingStatusCitaId, setChangingStatusCitaId] = useState<string | null>(null);
   
   // Estados para controlar los dropdowns
-  const [suscripcionOpen, setSuscripcionOpen] = useState(true);
-  const [negocioOpen, setNegocioOpen] = useState(true);
+  const [resumenOpen, setResumenOpen] = useState(true);
   const [usageOpen, setUsageOpen] = useState(true);
 
   // Definir pasos del tour general - simplificado
@@ -39,7 +43,7 @@ export default function DashboardUsuarioPage() {
     {
       element: '#menu-citas',
       popover: {
-        title: '📅 Citas',
+        title: ' Citas',
         description: 'Aquí podrás ver todas tus citas, crear nuevas y gestionar tu agenda diaria.',
         side: 'right',
       }
@@ -48,7 +52,7 @@ export default function DashboardUsuarioPage() {
     {
       element: '#menu-servicios',
       popover: {
-        title: '� Gestión del Negocio',
+        title: ' Gestión del Negocio',
         description: 'En estas secciones configurarás tus servicios, sucursales, empleados y clientes. Todo lo necesario para que tu negocio funcione.',
         side: 'right',
       }
@@ -57,8 +61,8 @@ export default function DashboardUsuarioPage() {
     {
       element: '#menu-configuracion',
       popover: {
-        title: '⚙️ Configuración',
-        description: 'Configura los datos básicos de tu negocio, link de agendamiento, notificaciones y mensajes personalizados.',
+        title: ' Configuración',
+        description: 'Configura los datos básicos de tu negocio, link de agendamiento, notificaciones',
         side: 'right',
       }
     },
@@ -66,8 +70,8 @@ export default function DashboardUsuarioPage() {
     {
       element: '#menu-whatsapp',
       popover: {
-        title: '💬 WhatsApp',
-        description: 'Vincula tu número de WhatsApp para enviar notificaciones automáticas a tus clientes.',
+        title: ' WhatsApp',
+        description: 'Vincula tu número de WhatsApp para enviar notificaciones automáticas a tus clientes y mensajes personalizados.',
         side: 'right',
       }
     },
@@ -75,14 +79,14 @@ export default function DashboardUsuarioPage() {
     {
       element: '#usage-dashboard',
       popover: {
-        title: '📊 Uso de Recursos',
+        title: ' Uso de Recursos',
         description: 'Monitorea cuántas citas, clientes, empleados y servicios has creado según los límites de tu plan.',
         side: 'top',
       }
     },
     {
       popover: {
-        title: '¡Listo para empezar! 🚀',
+        title: '¡Listo para empezar! ',
         description: '¡Ahora ya conoces las herramientas principales! Comienza a gestionar tu negocio con CitaYA.',
       }
     }
@@ -137,6 +141,30 @@ export default function DashboardUsuarioPage() {
     }
   }, [user, isLoading, router]);
 
+  const loadCitasHoy = useCallback(async () => {
+    if (!isUsuario(user)) {
+      setCitasHoy([]);
+      return;
+    }
+
+    setCitasLoading(true);
+    try {
+      const hoy = formatDateInput(new Date());
+      const citas = await CitasService.getCitasPorFecha(hoy);
+      const ordenadas = [...citas].sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+      setCitasHoy(ordenadas);
+    } catch (error) {
+      console.error('Error al cargar las citas del día:', error);
+      setCitasHoy([]);
+    } finally {
+      setCitasLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadCitasHoy();
+  }, [loadCitasHoy]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -153,11 +181,11 @@ export default function DashboardUsuarioPage() {
   }
 
   const estadoColor = {
-    ACTIVA: 'bg-green-100 text-green-800 border-green-200',
-    VENCIDA: 'bg-red-100 text-red-800 border-red-200',
-    SIN_SUSCRIPCION: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    BLOQUEADA: 'bg-gray-100 text-gray-800 border-gray-200',
-    CANCELADA: 'bg-gray-100 text-gray-800 border-gray-200',
+    ACTIVA: 'bg-green-100 text-green-800 border border-green-200',
+    VENCIDA: 'bg-red-100 text-red-800 border border-red-200',
+    SIN_SUSCRIPCION: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+    BLOQUEADA: 'bg-gray-100 text-gray-800 border border-gray-200',
+    CANCELADA: 'bg-gray-100 text-gray-800 border border-gray-200',
   };
 
   const estadoTexto = {
@@ -167,6 +195,73 @@ export default function DashboardUsuarioPage() {
     BLOQUEADA: 'Cuenta Bloqueada',
     CANCELADA: 'Suscripción Cancelada',
   };
+
+  const getEstadoBadgeStyles = (estado: EstadoCita) => {
+    switch (estado) {
+      case EstadoCita.PENDIENTE:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case EstadoCita.CONFIRMADA:
+        return 'bg-green-100 text-green-800 border-green-200';
+      case EstadoCita.COMPLETADA:
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case EstadoCita.CANCELADA:
+        return 'bg-red-100 text-red-800 border-red-200';
+      case EstadoCita.NO_ASISTIO:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getEstadoLabel = (estado: EstadoCita) => {
+    switch (estado) {
+      case EstadoCita.PENDIENTE:
+        return 'Pendiente';
+      case EstadoCita.CONFIRMADA:
+        return 'Confirmada';
+      case EstadoCita.COMPLETADA:
+        return 'Completada';
+      case EstadoCita.CANCELADA:
+        return 'Cancelada';
+      case EstadoCita.NO_ASISTIO:
+        return 'No asistió';
+      default:
+        return estado;
+    }
+  };
+
+  const handleEstadoChange = async (citaId: string, nuevoEstado: EstadoCita) => {
+    const citaActual = citasHoy.find((cita) => cita.id === citaId);
+    if (!citaActual || citaActual.estado === nuevoEstado) {
+      return;
+    }
+
+    setChangingStatusCitaId(citaId);
+    try {
+      const citaActualizada = await CitasService.cambiarEstado(citaId, nuevoEstado);
+      const citaConRelaciones = {
+        ...citaActual,
+        ...citaActualizada,
+        estado: citaActualizada?.estado ?? nuevoEstado,
+      };
+
+      setCitasHoy((prev) =>
+        prev.map((cita) => (cita.id === citaId ? citaConRelaciones : cita))
+      );
+    } catch (error) {
+      console.error('Error al actualizar el estado de la cita:', error);
+    } finally {
+      setChangingStatusCitaId(null);
+    }
+  };
+
+  const estadosDisponibles: EstadoCita[] = [
+    EstadoCita.PENDIENTE,
+    EstadoCita.CONFIRMADA,
+    EstadoCita.COMPLETADA,
+    EstadoCita.CANCELADA,
+    EstadoCita.NO_ASISTIO,
+  ];
 
   return (
     <DashboardLayout>
@@ -222,117 +317,146 @@ export default function DashboardUsuarioPage() {
           </div>
         )}
 
-        {/* Estado de Suscripción - Con Dropdown */}
+        {/* Resumen de Suscripción e Información del Negocio */}
         <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
-          <button
-            onClick={() => setSuscripcionOpen(!suscripcionOpen)}
-            className="w-full p-5 sm:p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
+          <div className="flex items-center justify-between p-4 sm:p-5 gap-3">
+            <button
+              onClick={() => setResumenOpen(!resumenOpen)}
+              className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity"
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
                 <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <div className="text-left">
-                <h2 className="text-base sm:text-lg font-bold text-gray-900">Estado de Suscripción</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Detalles de tu plan actual</p>
+              <div className="flex-1">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">Suscripción e Información del Negocio</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Estado actual y datos clave del negocio</p>
               </div>
-            </div>
-            <svg 
-              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${suscripcionOpen ? 'rotate-180' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${resumenOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => router.push('/dashboard-usuario/configuracion')}
+              className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#0490C8] hover:text-[#023664] bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all flex items-center gap-2"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {suscripcionOpen && (
-            <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100">
-              <div id="suscripcion-cards" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {/* Card Estado */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Estado</p>
-                <span
-                  className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                    estadoColor[user.negocio?.estadoSuscripcion as keyof typeof estadoColor] ||
-                    'bg-gray-100 text-gray-800 border border-gray-200'
-                  }`}
-                >
-                  {estadoTexto[user.negocio?.estadoSuscripcion as keyof typeof estadoTexto] ||
-                    user.negocio?.estadoSuscripcion}
-                </span>
-              </div>
-            </div>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Editar
+            </button>
           </div>
 
-          {/* Card Días Restantes */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Días Restantes</p>
-                {diasRestantes !== null && diasRestantes > 0 ? (
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-bold text-gray-900">{diasRestantes}</span>
-                    <span className="text-sm text-gray-600">
-                      {diasRestantes === 1 ? 'día' : 'días'}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-700">No disponible</p>
-                )}
-              </div>
-            </div>
-          </div>
+          {resumenOpen && (
+            <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-100">
+              <div className="flex flex-col xl:flex-row gap-4 xl:gap-6">
+                <section className="flex-1 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                  <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Estado de Suscripción</p>
+                        <span
+                          className={`mt-1 inline-flex items-center justify-center rounded-lg px-2.5 py-1.5 text-sm font-semibold ${
+                            estadoColor[user.negocio?.estadoSuscripcion as keyof typeof estadoColor] ||
+                            'bg-gray-100 text-gray-800 border border-gray-200'
+                          }`}
+                        >
+                          {estadoTexto[user.negocio?.estadoSuscripcion as keyof typeof estadoTexto] ||
+                            user.negocio?.estadoSuscripcion}
+                        </span>
+                      </div>
+                      {diasRestantes !== null && diasRestantes > 0 && (
+                        <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600">
+                          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {diasRestantes} {diasRestantes === 1 ? 'día restante' : 'días restantes'}
+                        </div>
+                      )}
+                    </div>
 
-          {/* Card Fecha Vencimiento */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all sm:col-span-2 lg:col-span-1">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Vencimiento</p>
-                {user.negocio?.fechaVencimiento ? (
-                  <div className="space-y-0.5">
-                    <p className="text-sm text-gray-900 font-semibold">
-                      {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(user.negocio.fechaVencimiento).toLocaleTimeString('es-ES', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })}
-                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="rounded-xl bg-gray-50 p-4">
+                        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Días restantes</p>
+                        {diasRestantes !== null && diasRestantes > 0 ? (
+                          <div className="mt-2 flex items-baseline gap-1.5">
+                            <span className="text-2xl font-bold text-gray-900">{diasRestantes}</span>
+                            <span className="text-xs text-gray-600">{diasRestantes === 1 ? 'día' : 'días'}</span>
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-sm text-gray-700">No disponible</p>
+                        )}
+                      </div>
+
+                      <div className="rounded-xl bg-gray-50 p-4">
+                        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Vencimiento</p>
+                        {user.negocio?.fechaVencimiento ? (
+                          <div className="mt-2 space-y-1">
+                            <p className="text-sm font-semibold text-gray-900">
+                              {new Date(user.negocio.fechaVencimiento).toLocaleDateString('es-ES', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(user.negocio.fechaVencimiento).toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                              })}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-sm text-gray-700">No disponible</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-700">No disponible</p>
-                )}
+                </section>
+
+                <section className="flex-1 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+                  <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Información del Negocio</p>
+                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-gray-50 p-4">
+                      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Nombre</p>
+                      <p className="mt-2 text-sm font-semibold text-gray-900 truncate">{user.negocio?.nombre}</p>
+                    </div>
+
+                    <div className="rounded-xl bg-gray-50 p-4">
+                      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Teléfono</p>
+                      <p className="mt-2 text-sm text-gray-900">{user.negocio?.telefono}</p>
+                    </div>
+
+                    <div className="rounded-xl bg-gray-50 p-4">
+                      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Email</p>
+                      <p className="mt-2 text-sm text-gray-900 break-all">{user.email}</p>
+                    </div>
+
+                    <div className="rounded-xl bg-gray-50 p-4">
+                      <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">ID del Negocio</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <p className="text-xs text-gray-900 break-all flex-1">{user.negocio?.id}</p>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(user.negocio?.id || '')}
+                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                          title="Copiar ID"
+                        >
+                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
               </div>
-            </div>
-          </div>
-        </div>
             </div>
           )}
         </div>
@@ -369,121 +493,139 @@ export default function DashboardUsuarioPage() {
           </div>
         )}
 
-        {/* Información del Negocio - Con Dropdown */}
+        {/* Citas de Hoy */}
         <div className="bg-white rounded-2xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden">
-          <div className="p-5 sm:p-6 flex items-center justify-between border-b border-gray-100">
-            <button
-              onClick={() => setNegocioOpen(!negocioOpen)}
-              className="flex-1 flex items-center gap-3 hover:opacity-80 transition-opacity"
-            >
-              <div className="w-10 h-10 bg-[#0490C8] bg-opacity-10 rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div className="text-left flex-1">
-                <h2 className="text-base sm:text-lg font-bold text-gray-900">Información del Negocio</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Detalles de tu empresa</p>
-              </div>
-              <svg 
-                className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${negocioOpen ? 'rotate-180' : ''}`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => router.push('/dashboard-usuario/configuracion')}
-              className="ml-3 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#0490C8] hover:text-[#023664] bg-white border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all flex items-center gap-2"
-            >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Editar
-              </button>
+          <div className="p-4 sm:p-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Citas de Hoy</h2>
+              <p className="text-xs text-gray-500">
+                {new Date().toLocaleDateString('es-ES', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+              <span className="inline-flex items-center px-2 py-1 rounded-lg bg-gray-100 text-gray-600 border border-gray-200">
+                {citasHoy.length} {citasHoy.length === 1 ? 'cita' : 'citas'}
+              </span>
+              {citasHoy.length > 4 && (
+                <span className="text-[11px] text-gray-500">Desplázate para ver citas adicionales</span>
+              )}
+            </div>
           </div>
 
-          {negocioOpen && (
-            <div className="p-5 sm:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Nombre del Negocio */}
-              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Nombre del Negocio</p>
-                    <p className="text-sm font-medium text-gray-900 truncate">{user.negocio?.nombre}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Teléfono */}
-              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Teléfono</p>
-                    <p className="text-sm text-gray-900">{user.negocio?.telefono}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Email</p>
-                    <p className="text-sm text-gray-900 break-all">{user.email}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* ID del Negocio */}
-              <div className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">ID del Negocio</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-900 break-all flex-1">{user.negocio?.id}</p>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(user.negocio?.id || '');
-                          // Opcional: mostrar toast de copiado
-                        }}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                        title="Copiar ID"
-                      >
-                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </button>
+          <div className="border-t border-gray-100">
+            {citasLoading ? (
+              <div className="p-4 sm:p-5">
+                <div className="space-y-3 animate-pulse">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-1.5 h-16 rounded-full bg-gray-100" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 bg-gray-100 rounded" />
+                        <div className="h-3 bg-gray-100 rounded w-2/3" />
+                        <div className="h-3 bg-gray-100 rounded w-1/2" />
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            </div>
-          )}
+            ) : citasHoy.length === 0 ? (
+              <div className="p-6 sm:p-8 text-center text-gray-500">
+                <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">No hay citas programadas hoy</h3>
+                <p className="text-xs text-gray-500">Tu agenda está libre por ahora.</p>
+              </div>
+            ) : (
+              <div className="p-4 sm:p-5">
+                <div className="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+                  {citasHoy.map((cita) => (
+                    <div
+                      key={cita.id}
+                      className="flex rounded-2xl border border-gray-200 hover:border-gray-300 transition-all bg-white shadow-sm"
+                    >
+                      <div
+                        className="w-1.5 flex-shrink-0 rounded-l-2xl"
+                        style={{ backgroundColor: cita.servicio?.color || '#0490C8' }}
+                      />
+                      <div className="flex-1 p-3 sm:p-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-900">
+                            <span>{cita.horaInicio}</span>
+                            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>{cita.horaFin}</span>
+                          </div>
+                          <div className="relative">
+                            <select
+                              value={cita.estado}
+                              onChange={(e) => handleEstadoChange(cita.id, e.target.value as EstadoCita)}
+                              disabled={changingStatusCitaId === cita.id}
+                              className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-all appearance-none pr-6 ${
+                                getEstadoBadgeStyles(cita.estado)
+                              } ${
+                                changingStatusCitaId === cita.id
+                                  ? 'opacity-60 cursor-wait'
+                                  : 'cursor-pointer hover:border-gray-300'
+                              }`}
+                            >
+                              {estadosDisponibles.map((estado) => (
+                                <option key={estado} value={estado} className="text-gray-900">
+                                  {getEstadoLabel(estado)}
+                                </option>
+                              ))}
+                            </select>
+                            <svg
+                              className="w-3 h-3 text-gray-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                            {changingStatusCitaId === cita.id && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3.5 h-3.5 border-[1.5px] border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-2">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {cita.cliente?.nombre || 'Cliente sin nombre'}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1 flex flex-wrap items-center gap-1">
+                            <span>{cita.servicio?.nombre || 'Servicio sin nombre'}</span>
+                            {cita.empleado?.nombre && (
+                              <>
+                                <span className="text-gray-400">•</span>
+                                <span>{cita.empleado.nombre}</span>
+                              </>
+                            )}
+                            {cita.sucursal?.nombre && (
+                              <>
+                                <span className="text-gray-400">•</span>
+                                <span>{cita.sucursal.nombre}</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Dashboard de uso de recursos - Con Dropdown */}
@@ -514,10 +656,8 @@ export default function DashboardUsuarioPage() {
           </button>
           
           {usageOpen && (
-            <div id="usage-dashboard" className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100">
-              <div className="mt-4">
-                <UsageDashboard />
-              </div>
+            <div id="usage-dashboard" className="px-5 sm:px-6 pb-5 sm:pb-6 pt-4 sm:pt-5 border-t border-gray-100">
+              <UsageDashboard variant="embedded" />
             </div>
           )}
         </div>

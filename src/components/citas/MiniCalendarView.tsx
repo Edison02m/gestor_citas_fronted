@@ -23,6 +23,12 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
   const [changingStatusCitaId, setChangingStatusCitaId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState<'list' | 'calendar'>('list');
+  const [localCitas, setLocalCitas] = useState<Cita[]>(citas);
+
+  // Sincronizar citas locales con las del padre solo cuando cambian
+  useEffect(() => {
+    setLocalCitas(citas);
+  }, [citas]);
 
   // Sincronizar con el mes del padre cuando cambie
   useEffect(() => {
@@ -62,11 +68,28 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
   const handleStatusChange = async (citaId: string, newStatus: EstadoCita) => {
     try {
       setChangingStatusCitaId(citaId);
+      
+      // Actualizar estado localmente de inmediato (optimistic update)
+      setLocalCitas(prevCitas => 
+        prevCitas.map(cita => 
+          cita.id === citaId 
+            ? { ...cita, estado: newStatus }
+            : cita
+        )
+      );
+      
+      // Hacer la petición al backend
       await CitasService.cambiarEstado(citaId, newStatus);
-      console.log('✅ Estado de cita cambiado - refrescando datos...');
-      onCitaUpdated?.();
+      console.log('✅ Estado de cita cambiado exitosamente');
+      
+      // NO llamamos onCitaUpdated para evitar recargar todo
+      // onCitaUpdated?.();
     } catch (error) {
       console.error('Error al cambiar estado de la cita:', error);
+      
+      // Si falla, revertir el cambio local
+      setLocalCitas(citas);
+      
       // Aquí podrías mostrar un toast de error si tienes un sistema de notificaciones
     } finally {
       setChangingStatusCitaId(null);
@@ -120,10 +143,10 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
     return days;
   }, [currentMonth]);
 
-  // Agrupar citas por fecha
+  // Agrupar citas por fecha (usar localCitas en lugar de citas)
   const citasByDate = useMemo(() => {
     const grouped: { [key: string]: Cita[] } = {};
-    citas.forEach(cita => {
+    localCitas.forEach(cita => {
       const date = toDate(cita.fecha);
       if (date) {
         const key = formatDateInput(date);
@@ -134,7 +157,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
       }
     });
     return grouped;
-  }, [citas]);
+  }, [localCitas]);
 
   // Obtener citas del día seleccionado
   const selectedDayCitas = useMemo(() => {
@@ -211,8 +234,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
 
   const calendarSection = (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full lg:w-1/3 xl:w-1/4">
-      <div className="bg-white border-b border-gray-200 p-4 sm:p-5 flex-shrink-0">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white border-b border-gray-200 p-3 sm:p-4 flex-shrink-0">
+        <div className="flex items-center justify-between mb-3">
           <button
             onClick={() => changeMonth('prev')}
             aria-label="Mes anterior"
@@ -248,7 +271,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
+      <div className="p-2 sm:p-3 flex-1 overflow-y-auto">
         <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {monthDays.map((day, index) => {
             const count = getCitasCount(day);
@@ -299,8 +322,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-3 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-        <p className="text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2 sm:mb-2.5">
+      <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+        <p className="text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5 sm:mb-2">
           Ocupación
         </p>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[11px] sm:text-xs text-gray-600">
@@ -323,8 +346,8 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
 
   const detailsSection = (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full lg:flex-1">
-      <div className="bg-white border-b border-gray-200 p-4 sm:p-5 flex-shrink-0">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="bg-white border-b border-gray-200 p-3 sm:p-4 flex-shrink-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-base sm:text-lg font-bold text-gray-900">
               {formatDate(selectedDate)}
@@ -341,7 +364,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
         </div>
       </div>
 
-  <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+  <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0490C8] mb-4" />
@@ -440,20 +463,6 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
                           <span className="truncate max-w-[140px] sm:max-w-none">{cita.empleado.nombre}</span>
                         </div>
                       )}
-
-                      {cita.cliente?.telefono && (
-                        <div className="flex items-center gap-1">
-                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                            />
-                          </svg>
-                          <span>{cita.cliente.telefono}</span>
-                        </div>
-                      )}
                     </div>
 
                     {cita.notas && (
@@ -476,7 +485,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
   return (
     <div className="w-full h-full">
       {isMobile ? (
-        <div className="flex flex-col gap-4 h-full">
+        <div className="flex flex-col gap-3 h-full">
           <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-1.5 flex gap-1 flex-shrink-0">
             <button
               type="button"
@@ -505,7 +514,7 @@ export default function MiniCalendarView({ citas, loading = false, onCitaClick, 
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-5 lg:flex-row h-full">
+        <div className="flex flex-col gap-4 lg:flex-row h-full">
           {calendarSection}
           {detailsSection}
         </div>

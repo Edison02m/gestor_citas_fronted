@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import EditarPerfilModal from '@/components/perfil/EditarPerfilModal';
+import CambiarPasswordModal from '@/components/perfil/CambiarPasswordModal';
 import api from '@/services/api';
+import planesService from '@/services/planes.service';
+import { Plan } from '@/interfaces';
 
-export default function PerfilPage() {
+function PerfilPageContent() {
   const { user, refreshUser } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -24,12 +28,37 @@ export default function PerfilPage() {
     planActual: string;
   } | null>(null);
 
+  // Estados para modales de edición
+  const [isEditarPerfilOpen, setIsEditarPerfilOpen] = useState(false);
+  const [isCambiarPasswordOpen, setIsCambiarPasswordOpen] = useState(false);
+
+  // Estados para planes dinámicos
+  const [planes, setPlanes] = useState<Plan[]>([]);
+  const [loadingPlanes, setLoadingPlanes] = useState(true);
+
   // Detectar si viene de una suscripción vencida
   useEffect(() => {
     const expired = searchParams.get('expired') === 'true';
     const estadoVencido = user && isUsuario(user) && (user as any).negocio?.estadoSuscripcion === 'VENCIDA';
     setSuscripcionVencida(expired || !!estadoVencido);
   }, [searchParams, user]);
+
+  // Cargar planes disponibles desde el backend
+  useEffect(() => {
+    cargarPlanes();
+  }, []);
+
+  const cargarPlanes = async () => {
+    try {
+      setLoadingPlanes(true);
+      const response = await planesService.getPlanesDisponibles();
+      setPlanes(response.data);
+    } catch (error) {
+      console.error('Error al cargar planes:', error);
+    } finally {
+      setLoadingPlanes(false);
+    }
+  };
 
   if (!isUsuario(user) || !user) return null;
 
@@ -148,12 +177,23 @@ export default function PerfilPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Columna Izquierda: Información de la Cuenta */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Datos del Usuario
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Datos del Usuario
+              </h3>
+              <button
+                onClick={() => setIsEditarPerfilOpen(true)}
+                className="text-[#0490C8] hover:text-[#037aa8] text-sm font-medium flex items-center gap-1 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Editar
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Nombre</label>
@@ -170,6 +210,19 @@ export default function PerfilPage() {
                     {usuarioData.rol === 'ADMIN_NEGOCIO' ? 'Administrador' : usuarioData.rol}
                   </span>
                 </div>
+              </div>
+              
+              {/* Botón para cambiar contraseña */}
+              <div className="pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => setIsCambiarPasswordOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0490C8] transition duration-150"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Cambiar Contraseña
+                </button>
               </div>
             </div>
           </div>
@@ -401,99 +454,165 @@ export default function PerfilPage() {
               Planes Disponibles
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              {/* Plan PRO */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">PRO</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-gray-900">Plan PRO</h4>
-                    <p className="text-xs text-gray-600">Para negocios en crecimiento</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 mt-4">
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Hasta 3 sucursales</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">10 empleados por sucursal</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Servicios ilimitados</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Clientes y citas ilimitadas</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Gestión completa de agenda</span>
-                  </div>
-                </div>
+            {loadingPlanes ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#0490C8]"></div>
               </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Plan PRO - Datos dinámicos */}
+                  {(() => {
+                    const planPro = planes.find(p => p.id.startsWith('PRO_') && !p.id.startsWith('PRO_PLUS'));
+                    if (!planPro) return null;
 
-              {/* Plan PRO PLUS */}
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border-2 border-[#0490C8]">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0490C8] flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">PRO+</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-gray-900">Plan PRO PLUS</h4>
-                    <p className="text-xs text-[#0490C8] font-medium">Para negocios profesionales</p>
-                  </div>
+                    return (
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center">
+                            <span className="text-white text-sm font-bold">PRO</span>
+                          </div>
+                          <div>
+                            <h4 className="text-base font-bold text-gray-900">Plan PRO</h4>
+                            <p className="text-xs text-gray-600">Para negocios en crecimiento</p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 mt-4">
+                          {planPro.limiteSucursales && planPro.limiteSucursales !== 'ilimitado' && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Hasta {planPro.limiteSucursales} sucursales</span>
+                            </div>
+                          )}
+                          {planPro.limiteEmpleados && planPro.limiteEmpleados !== 'ilimitado' && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Hasta {planPro.limiteEmpleados} empleados</span>
+                            </div>
+                          )}
+                          {planPro.limiteServicios && planPro.limiteServicios !== 'ilimitado' && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Hasta {planPro.limiteServicios} servicios</span>
+                            </div>
+                          )}
+                          {planPro.limiteClientes && planPro.limiteClientes !== 'ilimitado' && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Hasta {planPro.limiteClientes} clientes</span>
+                            </div>
+                          )}
+                          {(!planPro.limiteCitasMes || planPro.limiteCitasMes === 'ilimitado') && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Citas ilimitadas al mes</span>
+                            </div>
+                          )}
+                          {planPro.limiteWhatsAppMes && planPro.limiteWhatsAppMes !== 'ilimitado' && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">{planPro.limiteWhatsAppMes} mensajes WhatsApp/mes</span>
+                            </div>
+                          )}
+                          {planPro.reportesAvanzados && (
+                            <div className="flex items-start gap-2">
+                              <svg className="w-4 h-4 text-gray-700 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-xs text-gray-700">Reportes avanzados incluidos</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Plan PRO PLUS - Datos dinámicos */}
+                  {(() => {
+                    const planProPlus = planes.find(p => p.id.startsWith('PRO_PLUS'));
+                    if (!planProPlus) return null;
+
+                    return (
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border-2 border-[#0490C8]">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#0490C8] flex items-center justify-center">
+                            <span className="text-white text-sm font-bold">PRO+</span>
+                          </div>
+                          <div>
+                            <h4 className="text-base font-bold text-gray-900">Plan PRO PLUS</h4>
+                            <p className="text-xs text-[#0490C8] font-medium">Para negocios profesionales</p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 mt-4">
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700 font-semibold">¡Todo Ilimitado!</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Sucursales ilimitadas</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Empleados ilimitados</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Servicios ilimitados</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Clientes ilimitados</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">WhatsApp y emails ilimitados</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Reportes avanzados y exportación</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-700">Soporte prioritario 24/7</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-                
-                <div className="space-y-2 mt-4">
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700 font-medium">Todo lo del plan PRO, más:</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700"><span className="font-semibold">Reportes Avanzados</span> con análisis detallado</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Análisis de ingresos y tendencias</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Exportación a Excel</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#0490C8] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-xs text-gray-700">Soporte prioritario</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
 
             {/* Nota sobre acumulación */}
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
@@ -520,7 +639,43 @@ export default function PerfilPage() {
             </div>
           </div>
         </div>
+
+        {/* Modales */}
+        <EditarPerfilModal
+          isOpen={isEditarPerfilOpen}
+          onClose={() => setIsEditarPerfilOpen(false)}
+          currentNombre={usuarioData.nombre}
+          currentEmail={usuarioData.email}
+          onSuccess={async () => {
+            await refreshUser();
+          }}
+        />
+
+        <CambiarPasswordModal
+          isOpen={isCambiarPasswordOpen}
+          onClose={() => setIsCambiarPasswordOpen(false)}
+          onSuccess={() => {
+            // Opcional: podrías cerrar sesión o mostrar un mensaje
+          }}
+        />
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function PerfilPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    }>
+      <PerfilPageContent />
+    </Suspense>
   );
 }

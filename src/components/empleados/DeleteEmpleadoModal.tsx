@@ -63,8 +63,7 @@ export default function DeleteEmpleadoModal({
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div 
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                style={{ backgroundColor: empleado.color }}
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 bg-blue-500"
               >
                 {empleado.foto ? (
                   <img 

@@ -11,6 +11,11 @@ import DashboardStats from '@/components/reportes/DashboardStats';
 import ClientesFrecuentes from '@/components/reportes/ClientesFrecuentes';
 import ServiciosMasVendidos from '@/components/reportes/ServiciosMasVendidos';
 import GraficoIngresos from '@/components/reportes/GraficoIngresos';
+import TasaUtilizacionCard from '@/components/reportes/TasaUtilizacionCard';
+import IngresosPorHoraCard from '@/components/reportes/IngresosPorHoraCard';
+import RankingEmpleadosTable from '@/components/reportes/RankingEmpleadosTable';
+import HorasPicoChart from '@/components/reportes/HorasPicoChart';
+import ValorVidaClienteCard from '@/components/reportes/ValorVidaClienteCard';
 import reportesService, {
   FiltrosReportes as FiltrosReportesType,
   DashboardReportesResponse,
@@ -96,11 +101,11 @@ export default function ReportesPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              📊 Estadísticas y Reportes
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Estadísticas y Reportes
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-1 text-xs text-gray-600">
               Analiza el rendimiento de tu negocio con métricas detalladas
             </p>
           </div>
@@ -113,7 +118,7 @@ export default function ReportesPage() {
           )}
 
           {/* Filtros */}
-          <div className="mb-6">
+          <div className="mb-5">
             <FiltrosReportes
               filtros={filtros}
               onChange={setFiltros}
@@ -121,7 +126,7 @@ export default function ReportesPage() {
           </div>
 
           {/* Dashboard Stats (KPIs) */}
-          <div className="mb-8">
+          <div className="mb-6">
             {!loading && !dashboardData && !error && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
                 <p className="text-yellow-800 font-medium">⚠️ No se pudieron cargar los datos</p>
@@ -142,7 +147,7 @@ export default function ReportesPage() {
           </div>
 
           {/* Grid de 2 columnas para las listas */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Clientes Frecuentes */}
             <ClientesFrecuentes
               clientes={dashboardData?.clientesFrecuentes || []}
@@ -157,9 +162,74 @@ export default function ReportesPage() {
           </div>
 
           {/* Gráfico de Ingresos */}
-          <div className="mb-8">
+          <div className="mb-6">
             <GraficoIngresos
               datos={dashboardData?.citasPorDia || []}
+              loading={loading}
+            />
+          </div>
+
+          {/* NUEVAS ESTADÍSTICAS - PRIORIDAD ALTA */}
+          
+          {/* Sección 1: Análisis de Empleados - Grid 2 columnas */}
+          <div className="mb-6">
+            <h2 className="text-base font-bold text-gray-900 mb-3">Análisis de Empleados</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Tasa de Utilización */}
+              <TasaUtilizacionCard
+                data={dashboardData?.tasaUtilizacion || []}
+                loading={loading}
+              />
+
+              {/* Ranking de Empleados */}
+              <RankingEmpleadosTable
+                data={dashboardData?.rankingEmpleados || []}
+                loading={loading}
+              />
+            </div>
+          </div>
+
+          {/* Sección 2: Análisis de Ingresos - Grid 2 columnas */}
+          <div className="mb-6">
+            <h2 className="text-base font-bold text-gray-900 mb-3">Análisis de Ingresos</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Ingresos por Hora */}
+              <IngresosPorHoraCard
+                data={dashboardData?.ingresosPorHora || []}
+                loading={loading}
+              />
+
+              {/* Valor de Vida del Cliente */}
+              <ValorVidaClienteCard
+                data={dashboardData?.valorVidaCliente || {
+                  clv: 0,
+                  clientesTotales: 0,
+                  clientesNuevos: 0,
+                  clientesRecurrentes: 0,
+                  tasaRetencion: 0,
+                  frecuenciaPromedio: 0,
+                  ticketPromedio: 0,
+                  topClientes: [],
+                }}
+                loading={loading}
+              />
+            </div>
+          </div>
+
+          {/* Sección 3: Análisis de Demanda - Full width */}
+          <div className="mb-6">
+            <h2 className="text-base font-bold text-gray-900 mb-3">Análisis de Demanda</h2>
+            <HorasPicoChart
+              data={dashboardData?.horasPico || {
+                diaMasConcurrido: 'Sin datos',
+                diaMasConcurridoCitas: 0,
+                horaMasConcurrida: 'Sin datos',
+                horaMasConcurridaCitas: 0,
+                citasPorDia: [],
+                citasPorHora: [],
+                horasMenosConcurridas: [],
+                recomendaciones: [],
+              }}
               loading={loading}
             />
           </div>

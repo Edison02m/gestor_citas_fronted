@@ -12,7 +12,7 @@ import {
   Building2, Briefcase, ChevronDown, FileText,
   Settings, UserCheck, MapPin, DollarSign, PieChart, Activity,
   Layers,
-  Menu, X, Sparkles, Grid3x3
+  Menu, X, Sparkles, Grid3x3, Play, Star
 } from 'lucide-react';
 
 export default function Home() {
@@ -362,20 +362,22 @@ export default function Home() {
               transition={{ delay: 0.3 }}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-50 border border-gray-200"
             >
-              <span className="text-xs font-medium text-gray-600">Sistema Integral para Cualquier Negocio</span>
+              <span className="text-xs font-medium text-gray-600">Agendador y Gestor de Citas Profesional</span>
             </motion.div>
 
-            {/* Título simplificado */}
-            <div className="space-y-2">
+            {/* Título con enfoque en beneficio */}
+            <div className="space-y-3">
               <motion.h1 
                 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-gray-900"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                Administra tu Negocio
+                Reduce hasta un 60%
                 <br />
-                <span className="text-[#0490C8]">de manera Profesional</span>
+                <span className="text-[#0490C8]">las inasistencias</span>
+                <br />
+                <span className="text-gray-900 text-3xl sm:text-4xl lg:text-5xl">en tu negocio</span>
               </motion.h1>
 
               <motion.p 
@@ -384,7 +386,7 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                La plataforma completa para gestionar citas, clientes, empleados y sucursales.
+                <span className="font-semibold text-gray-900">Agendador de citas completo</span> con recordatorios automáticos por WhatsApp. Gestiona citas, clientes, empleados y reportes desde un solo lugar.
               </motion.p>
             </div>
 
@@ -537,6 +539,257 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* Sección "Cómo Funciona" - Proceso Simple - DISEÑO SOBRIO */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200 mb-5"
+              whileHover={{ scale: 1.05 }}
+            >
+              <span className="text-xs font-medium text-gray-700">Gestor de Citas Simple</span>
+            </motion.div>
+            
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+              ¿Cómo funciona nuestro agendador?
+            </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Configura tu sistema de gestión de citas en 3 pasos simples
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Paso 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative"
+            >
+              <div className="flex flex-col text-left">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <span className="text-lg font-bold text-gray-900">01</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      Crea tu cuenta gratis
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Regístrate en 30 segundos. Sin tarjeta de crédito, sin compromisos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Paso 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative"
+            >
+              <div className="flex flex-col text-left">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <span className="text-lg font-bold text-gray-900">02</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      Configura tu negocio
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Agrega servicios, empleados y horarios. Todo en menos de 5 minutos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Paso 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="relative"
+            >
+              <div className="flex flex-col text-left">
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <span className="text-lg font-bold text-gray-900">03</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      Listo para usar
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Comienza a agendar citas y envía recordatorios automáticos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* CTA secundario */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="text-center mt-12"
+          >
+            <motion.button
+              onClick={handleGetStarted}
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-[#0490C8] text-[#0490C8] font-bold hover:bg-[#0490C8] hover:text-white transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>Comenzar ahora gratis</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Sección Problema → Solución */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+              Deja de perder dinero por <span className="text-[#0490C8]">inasistencias</span>
+            </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Un gestor de citas eficiente es la diferencia entre perder dinero o maximizar tu agenda
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Problemas */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border border-red-100 mb-4">
+                <span className="text-sm font-bold text-red-600">Sin CitaYA</span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex gap-4 p-5 rounded-xl bg-white border border-gray-200">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                    <X className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">40-60% de inasistencias</h3>
+                    <p className="text-sm text-gray-600">Clientes olvidan sus citas y pierdes tiempo e ingresos</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-white border border-gray-200">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                    <X className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Agendas desorganizadas</h3>
+                    <p className="text-sm text-gray-600">Cuadernos, Excel o WhatsApp que generan confusión y dobles citas</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-white border border-gray-200">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                    <X className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Llamadas constantes</h3>
+                    <p className="text-sm text-gray-600">Pierdes horas recordando citas manualmente a cada cliente</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-white border border-gray-200">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                    <X className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Sin datos claros</h3>
+                    <p className="text-sm text-gray-600">No sabes qué servicios venden más ni cómo está tu negocio realmente</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Soluciones */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-4">
+                <span className="text-sm font-bold text-[#0490C8]">Con CitaYA</span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex gap-4 p-5 rounded-xl bg-gradient-to-br from-[#0490C8]/5 to-[#023664]/5 border border-[#0490C8]/20">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0490C8] flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Recordatorios automáticos</h3>
+                    <p className="text-sm text-gray-600">WhatsApp envía recordatorios y reduce inasistencias hasta 70%</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-gradient-to-br from-[#0490C8]/5 to-[#023664]/5 border border-[#0490C8]/20">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0490C8] flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Agenda centralizada</h3>
+                    <p className="text-sm text-gray-600">Todo en un solo lugar: citas, clientes, empleados y servicios organizados</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-gradient-to-br from-[#0490C8]/5 to-[#023664]/5 border border-[#0490C8]/20">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0490C8] flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Agenda pública 24/7</h3>
+                    <p className="text-sm text-gray-600">Tus clientes agendan solos cuando quieran, sin que tengas que atender</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 p-5 rounded-xl bg-gradient-to-br from-[#0490C8]/5 to-[#023664]/5 border border-[#0490C8]/20">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0490C8] flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-1">Reportes completos</h3>
+                    <p className="text-sm text-gray-600">Ingresos, clientes top, servicios más vendidos - todo visible en tiempo real</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section - Layout Bento Box */}
       <section id="features" className="relative py-24 px-4 sm:px-6 lg:px-8 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
@@ -551,19 +804,17 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 mb-5"
               whileHover={{ scale: 1.05 }}
             >
-              <span className="text-xs font-medium text-gray-700">Funcionalidades Destacadas</span>
+              <span className="text-xs font-medium text-gray-700">Sistema de Gestión de Citas</span>
             </motion.div>
             
-            <h2 className="text-4xl sm:text-5xl font-black mb-5">
-              <span className="bg-gradient-to-r from-gray-900 via-[#0490C8] to-[#59C7F3] bg-clip-text text-transparent">
-                Todo lo que necesitas
-              </span>
+            <h2 className="text-4xl sm:text-5xl font-black mb-5 text-gray-900">
+              Agendador de citas completo
               <br />
-              <span className="text-gray-900">en un solo lugar</span>
+              <span className="text-[#0490C8]">para tu negocio</span>
             </h2>
             
             <p className="text-base text-gray-600 max-w-2xl mx-auto">
-              Potencia tu negocio con herramientas diseñadas para la excelencia
+              Sistema profesional de gestión y agendamiento de citas con todas las herramientas que necesitas
             </p>
           </motion.div>
 
@@ -970,16 +1221,17 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#0490C8]/20 mb-5"
               whileHover={{ scale: 1.05 }}
             >
-              <span className="text-xs font-medium text-[#0490C8]">Sistema Completo</span>
+              <span className="text-xs font-medium text-[#0490C8]">Gestionador de Citas Completo</span>
             </motion.div>
             
-            <h2 className="text-4xl font-black mb-5">
-              <span className="text-[#023664]">Más Funcionalidades</span>
+            <h2 className="text-4xl font-black mb-5 text-gray-900">
+              Más módulos para gestionar
               <br />
-              <span className="text-[#0490C8]">
-                Para tu Negocio
-              </span>
+              <span className="text-[#0490C8]">tu agenda de citas</span>
             </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Todo lo que necesitas en un solo agendador profesional
+            </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -999,7 +1251,7 @@ export default function Home() {
               </div>
               
               <p className="text-xs text-gray-600 leading-relaxed">
-                Estados de cita, validación de horarios, canal de origen y control de no-show
+                5 estados de cita (pendiente, confirmada, completada, cancelada, no-asistió), validación automática de horarios y canal de origen
               </p>
             </motion.div>
 
@@ -1020,7 +1272,7 @@ export default function Home() {
               </div>
               
               <p className="text-xs text-gray-600 leading-relaxed">
-                Catálogo completo, precios configurables, extras opcionales por sucursal
+                Catálogo completo con fotos, precios configurables, duración estimada y extras opcionales por sucursal
               </p>
             </motion.div>
 
@@ -1104,7 +1356,7 @@ export default function Home() {
               </div>
               
               <p className="text-xs text-gray-600 leading-relaxed">
-                Ingresos por período, ticket promedio, ingresos por empleado/servicio y comparativas mensuales
+                Ingresos totales, ticket promedio, comparativas con período anterior e ingresos por empleado y servicio
               </p>
             </motion.div>
 
@@ -1125,7 +1377,7 @@ export default function Home() {
               </div>
               
               <p className="text-xs text-gray-600 leading-relaxed">
-                Clientes nuevos vs recurrentes, tasa de retención, ranking mejores clientes y clientes inactivos
+                Ranking de mejores clientes, historial completo de citas, servicio favorito e ingresos generados por cliente
               </p>
             </motion.div>
 
@@ -1146,114 +1398,315 @@ export default function Home() {
               </div>
               
               <p className="text-xs text-gray-600 leading-relaxed">
-                Citas atendidas, tasa de ocupación, ingresos generados y ranking de productividad
+                Total de citas atendidas, horas trabajadas, ingresos generados, citas por día y servicio más realizado
               </p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Sección de Precios y CTA */}
-      <section id="pricing" className="relative py-20 px-4 sm:px-6 lg:px-8 scroll-mt-16 bg-white">
+      {/* Sección Testimonios */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+              Historias de éxito
+            </h2>
+            <p className="text-base text-gray-600">
+              Negocios que han transformado su gestión con CitaYA
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Testimonio 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="p-8 rounded-2xl bg-white border border-gray-200"
+            >
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-[#0490C8]" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                "Desde que usamos CitaYA, las inasistencias bajaron un 70%. Los recordatorios por WhatsApp son increíbles, los clientes ya no olvidan sus citas."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0490C8] to-[#023664] flex items-center justify-center text-white font-bold">
+                  MC
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">María Castro</p>
+                  <p className="text-xs text-gray-600">Dueña, Salón Elegancia</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Testimonio 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-8 rounded-2xl bg-white border border-gray-200"
+            >
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-[#0490C8]" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                "Los reportes me permiten ver exactamente qué servicios generan más ingresos y qué empleados son más productivos. Ahora tomo decisiones basadas en datos."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0490C8] to-[#023664] flex items-center justify-center text-white font-bold">
+                  JR
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Jorge Ramírez</p>
+                  <p className="text-xs text-gray-600">Director, Clínica Dental Sonrisa</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Testimonio 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="p-8 rounded-2xl bg-white border border-gray-200"
+            >
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-[#0490C8]" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                "Manejo 3 sucursales y antes era un caos. Ahora con CitaYA veo todo desde un solo lugar. La agenda pública es genial, los clientes agendan solos."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0490C8] to-[#023664] flex items-center justify-center text-white font-bold">
+                  AL
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Ana López</p>
+                  <p className="text-xs text-gray-600">Propietaria, Spa & Wellness</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección FAQ - Preguntas Frecuentes */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+              Preguntas frecuentes
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* FAQ 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="p-6 rounded-xl bg-gray-50 border border-gray-200"
+            >
+              <h3 className="font-bold text-gray-900 mb-2 flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#0490C8] mt-0.5 flex-shrink-0" />
+                ¿Cómo funcionan los recordatorios?
+              </h3>
+              <p className="text-sm text-gray-600">
+                CitaYA envía automáticamente mensajes por WhatsApp antes de cada cita. Tú configuras cuándo y cómo.
+              </p>
+            </motion.div>
+
+            {/* FAQ 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-xl bg-gray-50 border border-gray-200"
+            >
+              <h3 className="font-bold text-gray-900 mb-2 flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#0490C8] mt-0.5 flex-shrink-0" />
+                ¿Puedo cancelar cuando quiera?
+              </h3>
+              <p className="text-sm text-gray-600">
+                Sí, sin compromiso. Cancelas desde tu panel cuando lo desees. Sin contratos ni penalizaciones.
+              </p>
+            </motion.div>
+
+            {/* FAQ 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-xl bg-gray-50 border border-gray-200"
+            >
+              <h3 className="font-bold text-gray-900 mb-2 flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#0490C8] mt-0.5 flex-shrink-0" />
+                ¿Qué incluye la prueba gratis?
+              </h3>
+              <p className="text-sm text-gray-600">
+                30 días con acceso completo a todas las funcionalidades. Sin tarjeta de crédito, sin limitaciones.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección de Precios y CTA - DISEÑO SOBRIO Y PROFESIONAL */}
+      <section id="pricing" className="relative py-20 px-4 sm:px-6 lg:px-8 scroll-mt-16 bg-gradient-to-br from-[#023664] to-[#0490C8]">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative p-8 sm:p-10 rounded-2xl bg-gray-50 border border-gray-200"
+            className="text-center"
           >
-            <div className="text-center">
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 border border-gray-200 mb-5"
-              >
-                <span className="text-xs font-medium text-gray-700">Prueba Gratis - Sin Compromiso</span>
-              </motion.div>
+            {/* Badge destacado - SOBRIO */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
+            >
+              <Zap className="w-4 h-4 text-white" />
+              <span className="text-sm font-bold text-white">
+                Oferta especial: 30 días gratis
+              </span>
+            </motion.div>
 
-              {/* Título */}
-              <motion.h2
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="text-3xl sm:text-4xl font-black text-gray-900 mb-4 leading-tight"
-              >
-                ¿Listo para transformar
-                <br />
-                <span className="text-[#0490C8]">tu negocio?</span>
-              </motion.h2>
+            {/* Título potente */}
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl sm:text-5xl font-black text-white mb-6 leading-tight"
+            >
+              Comienza a reducir
+              <br />
+              inasistencias <span className="text-white/90">hoy mismo</span>
+            </motion.h2>
 
-              {/* Descripción */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="text-base text-gray-600 mb-8 max-w-xl mx-auto"
-              >
-                Únete hoy y obtén <span className="font-semibold text-gray-900">30 días gratis</span> sin compromiso.
-                Cancela cuando quieras.
-              </motion.p>
+            {/* Descripción convincente */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-white/90 mb-8 max-w-2xl mx-auto"
+            >
+              Únete a cientos de negocios que ya optimizaron su gestión de citas y aumentaron sus ingresos con nuestro agendador profesional
+            </motion.p>
 
-              {/* CTA Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-              >
-                <motion.button
-                  onClick={handleGetStarted}
-                  className="group relative px-8 py-3 rounded-xl overflow-hidden inline-flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="absolute inset-0 bg-[#0490C8]" />
-                  <div className="absolute inset-0 bg-[#023664] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative text-white font-bold text-base">
-                    Comenzar Gratis
-                  </div>
-                  <ArrowRight className="relative w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-              </motion.div>
+            {/* Beneficios rápidos - SOBRIO */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="grid sm:grid-cols-3 gap-4 mb-10 max-w-3xl mx-auto"
+            >
+              <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/10">
+                <CheckCircle2 className="w-5 h-5 text-white flex-shrink-0" />
+                <span className="text-sm font-medium">Sin tarjeta de crédito</span>
+              </div>
+              <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/10">
+                <CheckCircle2 className="w-5 h-5 text-white flex-shrink-0" />
+                <span className="text-sm font-medium">Configuración en 5 minutos</span>
+              </div>
+              <div className="flex items-center gap-2 text-white bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/10">
+                <CheckCircle2 className="w-5 h-5 text-white flex-shrink-0" />
+                <span className="text-sm font-medium">Cancela cuando quieras</span>
+              </div>
+            </motion.div>
 
-              {/* Trust badges */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-wrap items-center justify-center gap-5 mt-8"
+            {/* CTA Buttons principales */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
+            >
+              <motion.button
+                onClick={handleGetStarted}
+                className="group relative px-8 py-4 rounded-xl overflow-hidden inline-flex items-center gap-2 bg-white hover:bg-gray-50 transition-colors shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0490C8]" />
-                  <span className="text-xs text-gray-600">Sin tarjeta de crédito</span>
+                <div className="relative text-[#0490C8] font-black text-lg">
+                  Comenzar Gratis - 30 Días
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0490C8]" />
-                  <span className="text-xs text-gray-600">Configuración en 5 minutos</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0490C8]" />
-                  <span className="text-xs text-gray-600">Soporte 24/7</span>
-                </div>
-              </motion.div>
-            </div>
+                <ArrowRight className="relative w-5 h-5 text-[#0490C8] group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+
+              <motion.button
+                onClick={() => router.push('/planes')}
+                className="px-8 py-4 rounded-xl border-2 border-white text-white font-bold hover:bg-white/10 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Ver Planes y Precios
+              </motion.button>
+            </motion.div>
+
+            {/* Garantía y seguridad */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-col items-center gap-3"
+            >
+              <div className="flex items-center gap-2 text-white/90 text-sm">
+                <Shield className="w-4 h-4" />
+                <span>Garantía de satisfacción - Cancela cuando quieras</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/80 text-xs">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Tus datos están 100% seguros y encriptados</span>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer moderno y estético */}
-      <footer className="relative bg-white pt-16 pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+      {/* Footer minimalista y real */}
+      <footer className="relative bg-gray-50 pt-16 pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           {/* Sección principal */}
-          <div className="grid md:grid-cols-5 gap-10 mb-12">
-            {/* Columna de marca - más ancha */}
+          <div className="grid md:grid-cols-4 gap-10 mb-12">
+            {/* Columna de marca */}
             <div className="md:col-span-2">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -1264,137 +1717,137 @@ export default function Home() {
                   <Image 
                     src="/Assets/logo_citaYA.png" 
                     alt="CitaYA Logo" 
-                    width={160} 
-                    height={56}
-                    className="h-12 w-auto"
+                    width={140} 
+                    height={50}
+                    className="h-10 w-auto"
                   />
                 </div>
-                <p className="text-gray-600 mb-6 leading-relaxed text-sm">
-                  Simplifica la gestión de citas de tu negocio con notificaciones automáticas, 
-                  recordatorios por WhatsApp y control total de tu agenda.
+                <p className="text-gray-600 mb-6 leading-relaxed text-sm max-w-md">
+                  Sistema completo de gestión de citas con recordatorios automáticos por WhatsApp. 
+                  Reduce inasistencias y optimiza tu agenda.
                 </p>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Shield className="w-4 h-4 text-[#0490C8]" />
+                  <span>Tus datos están seguros</span>
+                </div>
               </motion.div>
             </div>
 
-            {/* Columna de Producto */}
+            {/* Columna de Navegación */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-sm">
-                <BarChart3 className="w-3.5 h-3.5 text-[#0490C8]" />
-                Producto
+              <h4 className="font-bold text-gray-900 mb-4 text-sm">
+                Navegación
               </h4>
               <ul className="space-y-2.5">
-                {[
-                  { name: 'Características', icon: CheckCircle2 },
-                  { name: 'Precios', icon: DollarSign },
-                  { name: 'Integraciones', icon: Layers },
-                  { name: 'Actualizaciones', icon: TrendingUp }
-                ].map((item, i) => (
-                  <li key={i}>
-                    <motion.a
-                      href="#"
-                      className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors flex items-center gap-1.5 group"
-                      whileHover={{ x: 5 }}
-                    >
-                      <item.icon className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {item.name}
-                    </motion.a>
-                  </li>
-                ))}
+                <li>
+                  <motion.button
+                    onClick={() => {
+                      const element = document.getElementById('features');
+                      if (element) element.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Características
+                  </motion.button>
+                </li>
+                <li>
+                  <motion.button
+                    onClick={() => {
+                      const element = document.getElementById('modules');
+                      if (element) element.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Módulos
+                  </motion.button>
+                </li>
+                <li>
+                  <motion.button
+                    onClick={() => router.push('/planes')}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Planes y Precios
+                  </motion.button>
+                </li>
+                <li>
+                  <motion.button
+                    onClick={() => router.push('/auth')}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Iniciar Sesión
+                  </motion.button>
+                </li>
               </ul>
             </div>
 
-            {/* Columna de Recursos */}
+            {/* Columna de Soporte */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-sm">
-                <Briefcase className="w-3.5 h-3.5 text-[#0490C8]" />
-                Recursos
+              <h4 className="font-bold text-gray-900 mb-4 text-sm">
+                Soporte
               </h4>
               <ul className="space-y-2.5">
-                {[
-                  { name: 'Documentación', icon: FileText },
-                  { name: 'Guías', icon: CheckCircle2 },
-                  { name: 'API', icon: Settings },
-                  { name: 'Centro de ayuda', icon: Smartphone }
-                ].map((item, i) => (
-                  <li key={i}>
-                    <motion.a
-                      href="#"
-                      className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors flex items-center gap-1.5 group"
-                      whileHover={{ x: 5 }}
-                    >
-                      <item.icon className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {item.name}
-                    </motion.a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Columna de Empresa */}
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-sm">
-                <Building2 className="w-3.5 h-3.5 text-[#0490C8]" />
-                Empresa
-              </h4>
-              <ul className="space-y-2.5">
-                {[
-                  { name: 'Sobre nosotros', icon: Building2 },
-                  { name: 'Blog', icon: FileText },
-                  { name: 'Contacto', icon: Smartphone },
-                  { name: 'Privacidad', icon: Shield }
-                ].map((item, i) => (
-                  <li key={i}>
-                    <motion.a
-                      href="#"
-                      className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors flex items-center gap-1.5 group"
-                      whileHover={{ x: 5 }}
-                    >
-                      <item.icon className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {item.name}
-                    </motion.a>
-                  </li>
-                ))}
+                <li>
+                  <motion.button
+                    onClick={() => {
+                      const element = document.getElementById('pricing');
+                      if (element) element.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Preguntas Frecuentes
+                  </motion.button>
+                </li>
+                <li>
+                  <a
+                    href="mailto:soporte@citaya.com"
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors"
+                  >
+                    Contacto
+                  </a>
+                </li>
+                <li>
+                  <motion.button
+                    onClick={handleGetStarted}
+                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    whileHover={{ x: 5 }}
+                  >
+                    Comenzar Gratis
+                  </motion.button>
+                </li>
               </ul>
             </div>
           </div>
 
-          {/* Línea divisoria simple */}
+          {/* Línea divisoria */}
           <div className="mb-6 border-t border-gray-200"></div>
 
           {/* Sección inferior */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-5">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
-            <div className="flex items-center gap-2">
+            <div className="text-center md:text-left">
               <p className="text-xs text-gray-600">
                 © 2025 <span className="font-semibold text-gray-900">CitaYA</span>. Todos los derechos reservados.
               </p>
             </div>
 
-            {/* Certificaciones y badges */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <motion.div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200"
-                whileHover={{ scale: 1.05 }}
-              >
-                <Shield className="w-3 h-3 text-[#0490C8]" />
-                <span className="text-xs font-medium text-gray-900">Datos seguros</span>
-              </motion.div>
-              
-              <motion.div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200"
-                whileHover={{ scale: 1.05 }}
-              >
-                <CheckCircle2 className="w-3 h-3 text-[#59C7F3]" />
-                <span className="text-xs font-medium text-gray-900">99.9% Uptime</span>
-              </motion.div>
-              
-              <motion.div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200"
-                whileHover={{ scale: 1.05 }}
-              >
-                <Clock className="w-3 h-3 text-[#023664]" />
-                <span className="text-xs font-medium text-gray-900">Soporte 24/7</span>
-              </motion.div>
+            {/* Links legales */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600">
+              <a href="#" className="hover:text-[#0490C8] transition-colors">
+                Términos de Servicio
+              </a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-[#0490C8] transition-colors">
+                Política de Privacidad
+              </a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-[#0490C8] transition-colors">
+                Cookies
+              </a>
             </div>
           </div>
         </div>

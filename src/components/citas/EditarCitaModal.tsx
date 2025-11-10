@@ -91,8 +91,17 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
   }, [fechaSeleccionada]);
 
   // Calcular horarios disponibles cuando cambian los datos relevantes
+  // Si NO hay empleados (0), permitir continuar sin validar empleadoId
+  // En este caso, el dueño del negocio atenderá la cita
   useEffect(() => {
-    if (fechaSeleccionada && formData.empleadoId && formData.sucursalId && formData.servicioId) {
+    if (fechaSeleccionada && formData.sucursalId && formData.servicioId) {
+      // Si hay empleados, requerir que uno esté seleccionado
+      if (empleados.length > 0 && !formData.empleadoId) {
+        setHorariosDisponibles([]);
+        setCitasOcupadas([]);
+        return;
+      }
+      
       calcularHorariosDisponibles();
     } else {
       setHorariosDisponibles([]);
@@ -102,7 +111,11 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
 
   // Recalcular horarios cuando se cargan los datos (servicios, empleados, sucursales)
   useEffect(() => {
-    if (!loadingData && fechaSeleccionada && formData.empleadoId && formData.sucursalId && formData.servicioId) {
+    if (!loadingData && fechaSeleccionada && formData.sucursalId && formData.servicioId) {
+      // Si hay empleados, requerir que uno esté seleccionado
+      if (empleados.length > 0 && !formData.empleadoId) {
+        return;
+      }
       calcularHorariosDisponibles();
     }
   }, [loadingData]);
@@ -138,12 +151,78 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
   }, [formData.sucursalId, empleados]);
 
   const calcularHorariosDisponibles = async () => {
-    if (!fechaSeleccionada || !formData.empleadoId || !formData.sucursalId || !formData.servicioId) return;
+    if (!fechaSeleccionada || !formData.sucursalId || !formData.servicioId) return;
 
     try {
       setLoadingCitas(true);
       const fechaStr = formatDateInput(fechaSeleccionada);
       
+      // Obtener el servicio seleccionado para saber la duración
+      const servicio = servicios.find(s => s.id === formData.servicioId);
+      if (!servicio) return;
+
+      // Obtener la sucursal completa
+      const sucursal = sucursales.find(s => s.id === formData.sucursalId);
+      if (!sucursal) return;
+
+      // Obtener el día de la semana (0 = domingo, 6 = sábado)
+      const diaSemana = fechaSeleccionada.getDay();
+
+      console.log('🏢 EDITAR CITA - Día de la semana (0=domingo, 6=sábado):', diaSemana);
+
+      // Buscar el horario de la sucursal para ese día
+      const horarioSucursal = sucursal.horarios?.find(h => h.diaSemana === diaSemana && h.abierto);
+      if (!horarioSucursal) {
+        setHorariosDisponibles([]);
+        return;
+      }
+
+      // Si NO hay empleados registrados, usar solo el horario de la sucursal
+      if (empleados.length === 0 || !formData.empleadoId) {
+        console.log('⚠️ EDITAR CITA - Sin empleados, usando solo horario de sucursal');
+        
+        // Verificar que el horario de la sucursal tenga valores válidos
+        if (!horarioSucursal.horaApertura || !horarioSucursal.horaCierre) {
+          setHorariosDisponibles([]);
+          return;
+        }
+
+        // ✅ IMPORTANTE: Consultar citas de la sucursal (sin filtrar por empleado)
+        // El dueño atiende todas las citas, así que debemos evitar conflictos
+        const citasData = await CitasService.getCitas({
+          fechaInicio: fechaStr,
+          fechaFin: fechaStr,
+          sucursalId: formData.sucursalId
+          // NO incluir empleadoId - queremos TODAS las citas de la sucursal
+        });
+
+        // Filtrar solo las citas no canceladas y excluir la cita actual
+        const citasActivas = citasData.data.filter((c: Cita) => 
+          c.estado !== 'CANCELADA' && c.id !== cita?.id
+        );
+        setCitasOcupadas(citasActivas);
+
+        const horaInicio = horarioSucursal.horaApertura;
+        const horaFin = horarioSucursal.horaCierre;
+
+        console.log('Horario de sucursal - Inicio:', horaInicio, 'Fin:', horaFin);
+        console.log('Citas ocupadas en sucursal:', citasActivas.length);
+
+        // Generar horarios usando el horario de la sucursal
+        // Validar contra todas las citas existentes (el dueño atiende todo)
+        const horarios = generarHorariosPosibles(
+          horaInicio, 
+          horaFin, 
+          servicio.duracion, 
+          citasActivas, // ✅ Validar contra citas existentes
+          horarioSucursal,
+          null // Sin horario de empleado específico
+        );
+        setHorariosDisponibles(horarios);
+        return;
+      }
+
+      // Si HAY empleados, continuar con la lógica normal
       // Obtener las citas del empleado en esa fecha
       const citasData = await CitasService.getCitas({
         fechaInicio: fechaStr,
@@ -158,17 +237,9 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
       );
       setCitasOcupadas(citasActivas);
 
-      // Obtener el servicio seleccionado para saber la duración
-      const servicio = servicios.find(s => s.id === formData.servicioId);
-      if (!servicio) return;
-
-      // Obtener la sucursal y empleado completos
-      const sucursal = sucursales.find(s => s.id === formData.sucursalId);
+      // Obtener el empleado completo
       const empleado = empleados.find(e => e.id === formData.empleadoId);
-      if (!sucursal || !empleado) return;
-
-      // Obtener el día de la semana (0 = domingo, 6 = sábado)
-      const diaSemana = fechaSeleccionada.getDay();
+      if (!empleado) return;
 
       console.log('🏢 EDITAR CITA - INFORMACIÓN DE SUCURSAL Y EMPLEADO:');
       console.log('Fecha seleccionada:', fechaSeleccionada);
@@ -177,15 +248,6 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
       console.log('Horarios de la sucursal:', sucursal.horarios);
       console.log('Empleado seleccionado:', empleado.nombre);
       console.log('Horarios del empleado:', empleado.horarios);
-
-      // Buscar el horario de la sucursal para ese día
-      const horarioSucursal = sucursal.horarios?.find(h => h.diaSemana === diaSemana && h.abierto);
-      if (!horarioSucursal) {
-        console.warn('⚠️ EDITAR CITA - No se encontró horario de sucursal para el día', diaSemana);
-        setHorariosDisponibles([]);
-        return;
-      }
-
       console.log('✅ EDITAR CITA - Horario de sucursal encontrado:', horarioSucursal);
 
       // Buscar el horario del empleado para ese día
@@ -240,7 +302,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
     duracion: number, 
     citasOcupadas: Cita[],
     horarioSucursal: any,
-    horarioEmpleado: any
+    horarioEmpleado: any | null
   ): string[] => {
     const horarios: string[] = [];
     const [horaInicioH, horaInicioM] = horaInicio.split(':').map(Number);
@@ -273,7 +335,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
     horaFin: string, 
     citasOcupadas: Cita[],
     horarioSucursal: any,
-    horarioEmpleado: any
+    horarioEmpleado: any | null
   ): boolean => {
     console.log(`\n🔍 EDITAR - Verificando disponibilidad para ${horaInicio} - ${horaFin}`);
     
@@ -313,8 +375,8 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
       }
     }
 
-    // Verificar conflicto con descanso de empleado
-    if (horarioEmpleado.tieneDescanso) {
+    // Verificar conflicto con descanso de empleado (solo si hay horarioEmpleado)
+    if (horarioEmpleado && horarioEmpleado.tieneDescanso) {
       const descansoInicio = horarioEmpleado.descansoInicio;
       const descansoFin = horarioEmpleado.descansoFin;
       const enDescansoEmpleado = (
@@ -775,7 +837,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
 
                 {/* Columna Derecha: Horarios Disponibles */}
                 <div className="space-y-3">
-                  {fechaSeleccionada && formData.servicioId && formData.empleadoId ? (
+                  {fechaSeleccionada && formData.servicioId ? (
                     loadingCitas ? (
                       <div className="flex items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#0490C8]"></div>
@@ -819,7 +881,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
                           ⚠️ No hay horarios disponibles
                         </p>
                         <p className="text-[10px] text-yellow-600">
-                          El empleado no tiene espacios libres este día
+                          No hay espacios libres este día
                         </p>
                       </div>
                     )
@@ -829,7 +891,7 @@ export default function EditarCitaModal({ isOpen, onClose, cita, onSuccess }: Ed
                         ℹ️ Selecciona todos los datos
                       </p>
                       <p className="text-[10px] text-blue-600">
-                        Completa servicio, empleado y fecha para ver horarios disponibles
+                        Completa servicio y fecha para ver horarios disponibles
                       </p>
                     </div>
                   )}

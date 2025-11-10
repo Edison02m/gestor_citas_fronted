@@ -241,11 +241,11 @@ export default function CodigosPage() {
                 className="rounded-md border-gray-300 text-sm text-gray-900 bg-white"
               >
                 <option value="">Todos los planes</option>
-                <option value={PlanSuscripcion.PRUEBA}>Prueba</option>
-                <option value={PlanSuscripcion.MENSUAL}>Mensual</option>
-                <option value={PlanSuscripcion.TRIMESTRAL}>Trimestral</option>
-                <option value={PlanSuscripcion.SEMESTRAL}>Semestral</option>
-                <option value={PlanSuscripcion.ANUAL}>Anual</option>
+                <option value={PlanSuscripcion.GRATIS}>Gratis</option>
+                <option value={PlanSuscripcion.PRO_MENSUAL}>Pro Mensual</option>
+                <option value={PlanSuscripcion.PRO_ANUAL}>Pro Anual</option>
+                <option value={PlanSuscripcion.PRO_PLUS_MENSUAL}>Pro Plus Mensual</option>
+                <option value={PlanSuscripcion.PRO_PLUS_ANUAL}>Pro Plus Anual</option>
                 <option value={PlanSuscripcion.PERSONALIZADO}>Personalizado</option>
               </select>
 

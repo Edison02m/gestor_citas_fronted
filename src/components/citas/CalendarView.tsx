@@ -25,6 +25,14 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCita, setSelectedCita] = useState<Cita | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localCitas, setLocalCitas] = useState<Cita[]>(citasProp || []);
+
+  // Sincronizar citas locales con las del padre solo cuando cambian
+  useEffect(() => {
+    if (citasProp) {
+      setLocalCitas(citasProp);
+    }
+  }, [citasProp]);
 
   // Detectar si es móvil
   useEffect(() => {
@@ -43,14 +51,14 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
     try {
       setLoading(true);
       
-      // Si hay citas pre-filtradas desde el padre, usarlas
-      if (citasProp) {
-        console.log('📦 Usando citas pre-filtradas del padre:', {
-          total: citasProp.length
+      // Si hay citas locales, usarlas (incluye las actualizadas optimísticamente)
+      if (localCitas && localCitas.length > 0) {
+        console.log('📦 Usando citas locales:', {
+          total: localCitas.length
         });
         
         // Convertir citas a formato de eventos de FullCalendar
-        const events = citasProp.map(cita => {
+        const events = localCitas.map(cita => {
           const startDateTime = `${cita.fecha.split('T')[0]}T${cita.horaInicio}:00`;
           const endDateTime = `${cita.fecha.split('T')[0]}T${cita.horaFin}:00`;
           
@@ -137,7 +145,7 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
     } finally {
       setLoading(false);
     }
-  }, [citasProp]);
+  }, [localCitas]);
 
   // Handler para click en evento
   const handleEventClick = useCallback((clickInfo: any) => {
@@ -153,16 +161,39 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
   const handleStatusChange = async (citaId: string, newStatus: EstadoCita) => {
     try {
       setChangingStatusCitaId(citaId);
-      await CitasService.cambiarEstado(citaId, newStatus);
       
-      // Refrescar el calendario
+      // Actualizar estado localmente de inmediato (optimistic update)
+      setLocalCitas(prevCitas => 
+        prevCitas.map(cita => 
+          cita.id === citaId 
+            ? { ...cita, estado: newStatus }
+            : cita
+        )
+      );
+      
+      // Refrescar el calendario con las citas actualizadas
       if (calendarRef.current) {
         calendarRef.current.getApi().refetchEvents();
       }
       
-      onCitaUpdated?.();
+      // Hacer la petición al backend
+      await CitasService.cambiarEstado(citaId, newStatus);
+      console.log('✅ Estado de cita cambiado exitosamente');
+      
+      // NO llamamos onCitaUpdated para evitar recargar todo desde el padre
+      // onCitaUpdated?.();
     } catch (error) {
       console.error('Error al cambiar estado de la cita:', error);
+      
+      // Si falla, revertir el cambio local
+      if (citasProp) {
+        setLocalCitas(citasProp);
+      }
+      
+      // Refrescar calendario para mostrar el estado original
+      if (calendarRef.current) {
+        calendarRef.current.getApi().refetchEvents();
+      }
     } finally {
       setChangingStatusCitaId(null);
     }
@@ -234,27 +265,12 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
               </div>
               <div className="hidden md:flex items-center gap-3 text-xs text-gray-600">
                 {cita?.empleado && (
-                  <>
-                    <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span className="truncate">{cita.empleado.nombre}</span>
-                    </div>
-                    {cita.cliente?.telefono && (
-                      <span className="text-gray-300">|</span>
-                    )}
-                  </>
-                )}
-                
-                {cita?.cliente?.telefono && (
                   <div className="flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <span>{cita.cliente.telefono}</span>
+                    <span className="truncate">{cita.empleado.nombre}</span>
                   </div>
                 )}
               </div>
@@ -469,19 +485,19 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         
         /* ===== TOOLBAR (barra superior) ===== */
         .fc .fc-toolbar {
-          padding: 16px 20px !important;
+          padding: 12px 16px !important;
           background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%) !important;
           border-radius: 12px 12px 0 0 !important;
           border-bottom: 1px solid #e5e7eb !important;
           margin-bottom: 0 !important;
-          gap: 12px !important;
+          gap: 10px !important;
         }
         
         /* Toolbar en móvil - más compacto */
         @media (max-width: 767px) {
           .fc .fc-toolbar {
-            padding: 10px 12px !important;
-            gap: 10px !important;
+            padding: 8px 10px !important;
+            gap: 8px !important;
             display: flex !important;
             flex-wrap: wrap !important;
             justify-content: space-between !important;
@@ -679,7 +695,7 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         /* Header de fecha en lista */
         .fc-list-day-cushion {
           background: #f9fafb !important;
-          padding: 12px 16px !important;
+          padding: 10px 14px !important;
           border: none !important;
           border-bottom: 1px solid #e5e7eb !important;
         }
@@ -687,7 +703,7 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         /* Header más compacto en móvil */
         @media (max-width: 767px) {
           .fc-list-day-cushion {
-            padding: 8px 12px !important;
+            padding: 6px 10px !important;
           }
         }
         
@@ -734,7 +750,7 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         
         /* Celda de hora */
         .fc-list-event-time {
-          padding: 16px 16px !important;
+          padding: 12px 14px !important;
           width: 100px !important;
           font-size: 0.875rem !important;
           font-weight: 700 !important;
@@ -744,7 +760,7 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         /* Celda de hora más compacta en móvil */
         @media (max-width: 767px) {
           .fc-list-event-time {
-            padding: 12px 8px !important;
+            padding: 10px 8px !important;
             width: 70px !important;
             font-size: 0.75rem !important;
           }
@@ -757,12 +773,12 @@ export default function CalendarView({ citas: citasProp, onCitaClick, onCitaUpda
         
         /* Título del evento */
         .fc-list-event-title {
-          padding: 16px 16px 16px 0 !important;
+          padding: 12px 14px 12px 0 !important;
         }
         
         @media (max-width: 767px) {
           .fc-list-event-title {
-            padding: 12px 8px 12px 0 !important;
+            padding: 10px 8px 10px 0 !important;
           }
         }
         
