@@ -2,39 +2,52 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://citaya.site'
+  const currentDate = new Date()
   
-  return [
+  // Páginas estáticas principales
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'daily',
-      priority: 1,
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/planes`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/auth/login`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/auth/register`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/planes`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/recuperar-contrasena`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+      lastModified: currentDate,
+      changeFrequency: 'yearly',
       priority: 0.5,
     },
-    // Agendas públicas se pueden agregar dinámicamente aquí
-    // cuando tengas la lista de negocios con agendas públicas activas
   ]
+
+  // TODO: Agendas públicas dinámicas
+  // Cuando implementes la API para obtener negocios con agenda pública:
+  // const negocios = await fetch('API_URL/negocios-publicos').then(r => r.json())
+  // const agendasPublicas = negocios.map(negocio => ({
+  //   url: `${baseUrl}/agenda/${negocio.slug}`,
+  //   lastModified: new Date(negocio.updatedAt),
+  //   changeFrequency: 'daily' as const,
+  //   priority: 0.7,
+  // }))
+  // return [...staticPages, ...agendasPublicas]
+
+  return staticPages
 }

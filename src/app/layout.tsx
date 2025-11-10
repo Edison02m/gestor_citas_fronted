@@ -95,40 +95,119 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Structured Data (JSON-LD) para SEO
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'CitaYA',
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      description: 'Prueba gratis con planes premium disponibles'
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '250'
-    },
-    description: 'Sistema de gestión de citas online con recordatorios automáticos por WhatsApp, calendario inteligente y gestión de clientes.',
-    url: 'https://citaya.site',
-    image: 'https://citaya.site/Assets/logo_citaYA.png',
-    author: {
-      '@type': 'Organization',
-      name: 'CitaYA'
-    },
-    publisher: {
-      '@type': 'Organization',
+  // Structured Data (JSON-LD) para SEO - Schema múltiple mejorado
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
       name: 'CitaYA',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://citaya.site/Assets/logo_citaYA.png'
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        description: 'Prueba gratis con planes premium disponibles',
+        availability: 'https://schema.org/InStock'
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        reviewCount: '250',
+        bestRating: '5'
+      },
+      description: 'Sistema de gestión de citas online con recordatorios automáticos por WhatsApp, calendario inteligente y gestión de clientes.',
+      url: 'https://citaya.site',
+      image: 'https://citaya.site/Assets/logo_citaYA.png',
+      author: {
+        '@type': 'Organization',
+        name: 'CitaYA'
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'CitaYA',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://citaya.site/Assets/logo_citaYA.png'
+        }
+      },
+      featureList: [
+        'Agenda de citas online',
+        'Recordatorios automáticos por WhatsApp',
+        'Gestión de clientes y empleados',
+        'Múltiples sucursales',
+        'Reportes y estadísticas',
+        'Calendario inteligente'
+      ],
+      screenshot: 'https://citaya.site/Assets/logo_citaYA.png',
+      softwareVersion: '1.0',
+      releaseNotes: 'Versión inicial con todas las funcionalidades principales'
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      '@id': 'https://citaya.site/#organization',
+      name: 'CitaYA',
+      url: 'https://citaya.site',
+      logo: 'https://citaya.site/Assets/logo_citaYA.png',
+      description: 'Plataforma líder en gestión de citas online para negocios',
+      sameAs: [
+        'https://www.facebook.com/citaya',
+        'https://twitter.com/citaya',
+        'https://www.linkedin.com/company/citaya'
+      ],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'Customer Service',
+        availableLanguage: ['Spanish', 'English']
       }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      '@id': 'https://citaya.site/#website',
+      url: 'https://citaya.site',
+      name: 'CitaYA - Sistema de Gestión de Citas',
+      publisher: {
+        '@id': 'https://citaya.site/#organization'
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://citaya.site/buscar?q={search_term_string}',
+        'query-input': 'required name=search_term_string'
+      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Cómo funciona CitaYA?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'CitaYA es un sistema de gestión de citas que permite a los negocios administrar sus agendas, enviar recordatorios automáticos por WhatsApp, gestionar clientes y empleados, todo desde una plataforma intuitiva.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿CitaYA es gratis?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'CitaYA ofrece una prueba gratuita y planes premium con funcionalidades avanzadas para negocios de todos los tamaños.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué tipos de negocios pueden usar CitaYA?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'CitaYA es ideal para peluquerías, salones de belleza, consultorios médicos, spas, barberías, centros estéticos y cualquier negocio que trabaje con citas.'
+          }
+        }
+      ]
     }
-  }
+  ]
 
   return (
     <html lang="es" suppressHydrationWarning>
