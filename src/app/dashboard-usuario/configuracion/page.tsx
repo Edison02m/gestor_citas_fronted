@@ -357,8 +357,8 @@ export default function ConfiguracionPage() {
 
         {/* Tabs */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-          <div className="border-b border-gray-200 overflow-x-auto">
-            <nav className="flex -mb-px min-w-max sm:min-w-0">
+          <div className="border-b border-gray-200 overflow-x-auto hide-scrollbar">
+            <nav className="flex flex-row -mb-px min-w-max sm:min-w-0">
               <button
                 onClick={() => setActiveTab('basico')}
                 className={`px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
