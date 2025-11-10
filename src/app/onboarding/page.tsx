@@ -113,7 +113,7 @@ export default function OnboardingPage() {
             <svg className="w-3.5 h-3.5 text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-xs text-gray-700 font-medium">30 días de prueba gratis</span>
+            <span className="text-xs text-gray-700 font-medium">14 días de prueba gratis</span>
           </div>
         </div>
 

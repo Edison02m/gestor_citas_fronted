@@ -1574,7 +1574,7 @@ export default function Home() {
                 ¿Qué incluye la prueba gratis?
               </h3>
               <p className="text-sm text-gray-600">
-                30 días con acceso completo a todas las funcionalidades. Sin tarjeta de crédito, sin limitaciones.
+                14 días con acceso completo a todas las funcionalidades. Sin tarjeta de crédito, sin limitaciones.
               </p>
             </motion.div>
           </div>
@@ -1601,7 +1601,7 @@ export default function Home() {
             >
               <Zap className="w-4 h-4 text-white" />
               <span className="text-sm font-bold text-white">
-                Oferta especial: 30 días gratis
+                Oferta especial: 14 días gratis
               </span>
             </motion.div>
 
@@ -1666,7 +1666,7 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
               >
                 <div className="relative text-[#0490C8] font-black text-lg">
-                  Comenzar Gratis - 30 Días
+                  Comenzar Gratis - 14 Días
                 </div>
                 <ArrowRight className="relative w-5 h-5 text-[#0490C8] group-hover:translate-x-1 transition-transform" />
               </motion.button>

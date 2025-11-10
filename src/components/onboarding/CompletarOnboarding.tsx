@@ -92,7 +92,7 @@ export default function CompletarOnboarding() {
       {/* Mensaje de prueba */}
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
         <p className="text-sm text-gray-700">
-          Tienes <span className="font-semibold text-[#0490C8]">30 días de prueba gratis</span> para explorar todas las funcionalidades
+          Tienes <span className="font-semibold text-[#0490C8]">14 días de prueba gratis</span> para explorar todas las funcionalidades
         </p>
       </div>
 
