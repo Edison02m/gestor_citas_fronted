@@ -28,6 +28,14 @@ export const useTour = ({
     // No ejecutar en servidor
     if (typeof window === 'undefined') return;
     
+    // No ejecutar en dispositivos móviles (solo PC/Desktop)
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      // Marcar como visto para que no aparezca cuando cambien a desktop
+      markTourCompleted(tourKey);
+      return;
+    }
+    
     // No iniciar si ya fue visto o autoStart está desactivado
     if (!autoStart || hasSeenTour(tourKey)) return;
     
@@ -41,6 +49,7 @@ export const useTour = ({
       animate: true,
       overlayOpacity: 0, // Sin fondo oscuro
       smoothScroll: true,
+      popoverOffset: 10,
       onDestroyed: () => {
         markTourCompleted(tourKey);
         onComplete?.();
@@ -62,6 +71,13 @@ export const useTour = ({
  * Función para iniciar manualmente un tour
  */
 export const startTour = (tourKey: string, steps: DriveStep[], onComplete?: () => void) => {
+  // No ejecutar en dispositivos móviles (solo PC/Desktop)
+  const isMobile = window.innerWidth < 1024;
+  if (isMobile) {
+    console.log('El tour guiado solo está disponible en dispositivos de escritorio');
+    return;
+  }
+  
   const config: Config = {
     showProgress: true,
     showButtons: ['next', 'previous', 'close'],
@@ -69,6 +85,10 @@ export const startTour = (tourKey: string, steps: DriveStep[], onComplete?: () =
     prevBtnText: 'Anterior',
     doneBtnText: '¡Entendido!',
     steps: steps,
+    animate: true,
+    overlayOpacity: 0,
+    smoothScroll: true,
+    popoverOffset: 10,
     onDestroyed: () => {
       markTourCompleted(tourKey);
       onComplete?.();

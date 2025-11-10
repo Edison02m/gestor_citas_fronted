@@ -31,7 +31,7 @@ export default function DashboardUsuarioPage() {
   const [resumenOpen, setResumenOpen] = useState(true);
   const [usageOpen, setUsageOpen] = useState(true);
 
-  // Definir pasos del tour general - simplificado
+  // Definir pasos del tour general - solo para desktop
   const tourSteps: DriveStep[] = [
     {
       popover: {
@@ -43,50 +43,55 @@ export default function DashboardUsuarioPage() {
     {
       element: '#menu-citas',
       popover: {
-        title: ' Citas',
+        title: '📅 Citas',
         description: 'Aquí podrás ver todas tus citas, crear nuevas y gestionar tu agenda diaria.',
         side: 'right',
+        align: 'start'
       }
     },
     // Menú - Gestión del negocio (Servicios, Sucursales, Empleados, Clientes)
     {
       element: '#menu-servicios',
       popover: {
-        title: ' Gestión del Negocio',
+        title: '🏢 Gestión del Negocio',
         description: 'En estas secciones configurarás tus servicios, sucursales, empleados y clientes. Todo lo necesario para que tu negocio funcione.',
         side: 'right',
+        align: 'start'
       }
     },
     // Menú - Configuración
     {
       element: '#menu-configuracion',
       popover: {
-        title: ' Configuración',
+        title: '⚙️ Configuración',
         description: 'Configura los datos básicos de tu negocio, link de agendamiento, notificaciones',
         side: 'right',
+        align: 'start'
       }
     },
     // Menú - WhatsApp
     {
       element: '#menu-whatsapp',
       popover: {
-        title: ' WhatsApp',
+        title: '💬 WhatsApp',
         description: 'Vincula tu número de WhatsApp para enviar notificaciones automáticas a tus clientes y mensajes personalizados.',
         side: 'right',
+        align: 'start'
       }
     },
     // Dashboard - Uso de Recursos
     {
       element: '#usage-dashboard',
       popover: {
-        title: ' Uso de Recursos',
+        title: '📊 Uso de Recursos',
         description: 'Monitorea cuántas citas, clientes, empleados y servicios has creado según los límites de tu plan.',
         side: 'top',
+        align: 'center'
       }
     },
     {
       popover: {
-        title: '¡Listo para empezar! ',
+        title: '¡Listo para empezar! 🚀',
         description: '¡Ahora ya conoces las herramientas principales! Comienza a gestionar tu negocio con CitaYA.',
       }
     }

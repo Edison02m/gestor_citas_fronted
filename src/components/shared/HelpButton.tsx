@@ -1,6 +1,7 @@
 'use client';
 
 import { resetTour } from '@/utils/tours';
+import { useEffect, useState } from 'react';
 
 interface HelpButtonProps {
   tourKey: string;
@@ -9,12 +10,32 @@ interface HelpButtonProps {
 
 /**
  * Botón flotante de ayuda para reiniciar tours
+ * Solo visible en dispositivos de escritorio (>= 1024px)
  */
 export default function HelpButton({ tourKey, tooltip = 'Ver tutorial de esta página' }: HelpButtonProps) {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    // Verificar si es desktop
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    // Verificar inicialmente
+    checkIsDesktop();
+
+    // Escuchar cambios de tamaño
+    window.addEventListener('resize', checkIsDesktop);
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
+
   const handleClick = () => {
     resetTour(tourKey);
     window.location.reload();
   };
+
+  // No renderizar en móviles/tablets
+  if (!isDesktop) return null;
 
   return (
     <button
