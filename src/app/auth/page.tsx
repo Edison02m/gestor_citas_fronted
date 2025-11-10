@@ -323,11 +323,11 @@ function AuthPageContent() {
       </nav>
 
       {/* Contenedor principal con padding top para compensar el navbar */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 pt-24">
+      <div className="flex-1 flex items-center justify-center px-3 sm:px-4 py-6 sm:py-8 pt-20 sm:pt-24">
         <div className="w-full max-w-md">
 
         {/* Contenedor Principal - Diseño Centrado */}
-        <div className="bg-white rounded-3xl border border-gray-200 p-8 md:p-10 shadow-sm">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-6 sm:p-8 md:p-10 shadow-sm">
           <div
             className={`transition-all duration-500 ease-in-out ${
               isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
@@ -473,49 +473,49 @@ function AuthPageContent() {
               // FORMULARIO DE REGISTRO CENTRADO
               <div className="w-full">
                 {/* Ícono/Ilustración arriba */}
-                <div className="text-center mb-6">
-                  <div className="mb-4">
-                    <svg className="w-12 h-12 mx-auto text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center mb-5 sm:mb-6">
+                  <div className="mb-3 sm:mb-4">
+                    <svg className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-[#0490C8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Únete ahora!</h2>
-                  <p className="text-sm text-gray-600">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 sm:mb-2">¡Únete ahora!</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Comienza a gestionar tu negocio hoy
                   </p>
                 </div>
 
                 {/* Indicador de Progreso - 3 Pasos */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-center gap-2">
+                <div className="mb-5 sm:mb-6">
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                     {/* Paso 1 */}
                     <div className={`flex items-center ${registerStep >= 1 ? 'text-[#0490C8]' : 'text-gray-400'}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 1 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
+                      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 1 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
                         {registerStep > 1 ? '✓' : '1'}
                       </div>
-                      <span className="ml-1.5 text-xs font-medium hidden sm:inline">Personal</span>
+                      <span className="ml-1 sm:ml-1.5 text-[10px] sm:text-xs font-medium hidden xs:inline">Personal</span>
                     </div>
                     
                     {/* Línea conectora 1-2 */}
-                    <div className={`flex-1 h-0.5 max-w-[40px] rounded-full ${registerStep >= 2 ? 'bg-[#0490C8]' : 'bg-gray-200'} transition-all`}></div>
+                    <div className={`flex-1 h-0.5 max-w-[30px] sm:max-w-[40px] rounded-full ${registerStep >= 2 ? 'bg-[#0490C8]' : 'bg-gray-200'} transition-all`}></div>
                     
                     {/* Paso 2 */}
                     <div className={`flex items-center ${registerStep >= 2 ? 'text-[#0490C8]' : 'text-gray-400'}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 2 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
+                      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 2 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
                         {registerStep > 2 ? '✓' : '2'}
                       </div>
-                      <span className="ml-1.5 text-xs font-medium hidden sm:inline">Negocio</span>
+                      <span className="ml-1 sm:ml-1.5 text-[10px] sm:text-xs font-medium hidden xs:inline">Negocio</span>
                     </div>
                     
                     {/* Línea conectora 2-3 */}
-                    <div className={`flex-1 h-0.5 max-w-[40px] rounded-full ${registerStep >= 3 ? 'bg-[#0490C8]' : 'bg-gray-200'} transition-all`}></div>
+                    <div className={`flex-1 h-0.5 max-w-[30px] sm:max-w-[40px] rounded-full ${registerStep >= 3 ? 'bg-[#0490C8]' : 'bg-gray-200'} transition-all`}></div>
                     
                     {/* Paso 3 */}
                     <div className={`flex items-center ${registerStep >= 3 ? 'text-[#0490C8]' : 'text-gray-400'}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 3 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
+                      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs ${registerStep >= 3 ? 'bg-[#0490C8] text-white' : 'bg-gray-200 text-gray-500'} transition-all`}>
                         3
                       </div>
-                      <span className="ml-1.5 text-xs font-medium hidden sm:inline">Cuenta</span>
+                      <span className="ml-1 sm:ml-1.5 text-[10px] sm:text-xs font-medium hidden xs:inline">Cuenta</span>
                     </div>
                   </div>
                 </div>
@@ -544,9 +544,9 @@ function AuthPageContent() {
                         <label className="block text-sm font-medium text-gray-900 mb-2">
                           Teléfono de contacto *
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-stretch">
                           {/* Selector de código de país */}
-                          <div className="relative codigo-pais-dropdown-container">
+                          <div className="relative codigo-pais-dropdown-container flex-shrink-0">
                             <button
                               type="button"
                               onClick={(e) => {
@@ -554,14 +554,14 @@ function AuthPageContent() {
                                 setShowCodigoPaisDropdown(!showCodigoPaisDropdown);
                               }}
                               disabled={isLoading}
-                              className="flex items-center justify-between gap-1.5 px-3 py-3 bg-white border border-gray-200 rounded-2xl hover:bg-gray-50 focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                              className="h-full flex items-center justify-between gap-1 sm:gap-1.5 px-2 sm:px-3 py-3 bg-white border border-gray-200 rounded-2xl hover:bg-gray-50 focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap min-w-[85px] sm:min-w-[95px]"
                             >
-                              <span className="text-lg leading-none">
+                              <span className="text-base sm:text-lg leading-none">
                                 {codigosPaises.find(p => p.codigo === codigoPais)?.bandera}
                               </span>
-                              <span className="text-sm font-medium text-gray-700">{codigoPais}</span>
+                              <span className="text-xs sm:text-sm font-medium text-gray-700">{codigoPais}</span>
                               <svg 
-                                className={`w-4 h-4 text-gray-400 transition-transform ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} 
+                                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 transition-transform flex-shrink-0 ${showCodigoPaisDropdown ? 'rotate-180' : ''}`} 
                                 fill="none" 
                                 stroke="currentColor" 
                                 viewBox="0 0 24 24"
@@ -614,11 +614,14 @@ function AuthPageContent() {
                                 setRegisterData({ ...registerData, telefono: value });
                               }
                             }}
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 bg-white transition-all placeholder:text-gray-400"
+                            className="flex-1 min-w-0 px-3 sm:px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 text-gray-900 bg-white transition-all placeholder:text-gray-400 text-sm sm:text-base"
                             placeholder="999999999"
                             disabled={isLoading}
                           />
                         </div>
+                        <p className="mt-1.5 text-xs text-gray-500">
+                          Número sin el 0 inicial. Ej: 999999999
+                        </p>
                       </div>
                     </>
                   )}
@@ -767,23 +770,41 @@ function AuthPageContent() {
                   )}
 
                   {/* Botones de Navegación */}
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex gap-2 sm:gap-3 pt-2">
                     {registerStep > 1 && (
                       <button
                         type="button"
                         onClick={prevStep}
                         disabled={isLoading}
-                        className="flex-1 border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-4 rounded-2xl transition-all disabled:opacity-50"
+                        className="flex-1 border border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-3 sm:px-4 rounded-2xl transition-all disabled:opacity-50 text-sm sm:text-base"
                       >
-                        ← Atrás
+                        <span className="hidden sm:inline">← Atrás</span>
+                        <span className="sm:hidden">←</span>
                       </button>
                     )}
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`${registerStep === 1 ? 'w-full' : 'flex-1'} bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-4 rounded-2xl transition-all disabled:opacity-50 shadow-sm hover:shadow-md`}
+                      className={`${registerStep === 1 ? 'w-full' : 'flex-1'} bg-[#0490C8] hover:bg-[#023664] text-white font-semibold py-3 px-3 sm:px-4 rounded-2xl transition-all disabled:opacity-50 shadow-sm hover:shadow-md text-sm sm:text-base`}
                     >
-                      {isLoading ? 'Procesando...' : registerStep === 3 ? 'Crear Cuenta' : 'Siguiente →'}
+                      {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span className="hidden sm:inline">Procesando...</span>
+                        </span>
+                      ) : (
+                        <>
+                          {registerStep === 3 ? 'Crear Cuenta' : (
+                            <>
+                              <span className="hidden sm:inline">Siguiente →</span>
+                              <span className="sm:hidden">→</span>
+                            </>
+                          )}
+                        </>
+                      )}
                     </button>
                   </div>
 
