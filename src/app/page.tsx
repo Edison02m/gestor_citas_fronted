@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import Head from 'next/head';
 import { 
   Calendar, Clock, Users, Zap, Shield, 
   TrendingUp, ArrowRight, BarChart3,
@@ -1702,32 +1703,32 @@ export default function Home() {
       </section>
 
       {/* Footer minimalista y real */}
-      <footer className="relative bg-gray-50 pt-16 pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+      <footer className="relative bg-gray-50 pt-12 sm:pt-16 pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           {/* Sección principal */}
-          <div className="grid md:grid-cols-4 gap-10 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-8 sm:mb-12">
             {/* Columna de marca */}
-            <div className="md:col-span-2">
+            <div className="sm:col-span-2 md:col-span-2">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <div className="mb-5">
+                <div className="mb-4 sm:mb-5">
                   <Image 
                     src="/Assets/logo_citaYA.png" 
                     alt="CitaYA Logo" 
                     width={140} 
                     height={50}
-                    className="h-10 w-auto"
+                    className="h-8 sm:h-10 w-auto"
                   />
                 </div>
-                <p className="text-gray-600 mb-6 leading-relaxed text-sm max-w-md">
+                <p className="text-gray-600 mb-4 sm:mb-6 leading-relaxed text-xs sm:text-sm max-w-md">
                   Sistema completo de gestión de citas con recordatorios automáticos por WhatsApp. 
                   Reduce inasistencias y optimiza tu agenda.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Shield className="w-4 h-4 text-[#0490C8]" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0490C8]" />
                   <span>Tus datos están seguros</span>
                 </div>
               </motion.div>
@@ -1735,17 +1736,17 @@ export default function Home() {
 
             {/* Columna de Navegación */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-4 text-sm">
+              <h4 className="font-bold text-gray-900 mb-3 sm:mb-4 text-xs sm:text-sm">
                 Navegación
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-2 sm:space-y-2.5">
                 <li>
                   <motion.button
                     onClick={() => {
                       const element = document.getElementById('features');
                       if (element) element.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Características
@@ -1757,7 +1758,7 @@ export default function Home() {
                       const element = document.getElementById('modules');
                       if (element) element.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Módulos
@@ -1766,7 +1767,7 @@ export default function Home() {
                 <li>
                   <motion.button
                     onClick={() => router.push('/planes')}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Planes y Precios
@@ -1775,7 +1776,7 @@ export default function Home() {
                 <li>
                   <motion.button
                     onClick={() => router.push('/auth')}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Iniciar Sesión
@@ -1786,17 +1787,17 @@ export default function Home() {
 
             {/* Columna de Soporte */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-4 text-sm">
+              <h4 className="font-bold text-gray-900 mb-3 sm:mb-4 text-xs sm:text-sm">
                 Soporte
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-2 sm:space-y-2.5">
                 <li>
                   <motion.button
                     onClick={() => {
                       const element = document.getElementById('pricing');
                       if (element) element.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Preguntas Frecuentes
@@ -1805,7 +1806,7 @@ export default function Home() {
                 <li>
                   <a
                     href="mailto:soporte@citaya.com"
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors block"
                   >
                     Contacto
                   </a>
@@ -1813,7 +1814,7 @@ export default function Home() {
                 <li>
                   <motion.button
                     onClick={handleGetStarted}
-                    className="text-gray-600 hover:text-[#0490C8] text-xs transition-colors text-left"
+                    className="text-gray-600 hover:text-[#0490C8] text-[10px] sm:text-xs transition-colors text-left"
                     whileHover={{ x: 5 }}
                   >
                     Comenzar Gratis
@@ -1824,25 +1825,25 @@ export default function Home() {
           </div>
 
           {/* Línea divisoria */}
-          <div className="mb-6 border-t border-gray-200"></div>
+          <div className="mb-4 sm:mb-6 border-t border-gray-200"></div>
 
           {/* Sección inferior */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             {/* Copyright */}
             <div className="text-center md:text-left">
-              <p className="text-xs text-gray-600">
+              <p className="text-[10px] sm:text-xs text-gray-600">
                 © 2025 <span className="font-semibold text-gray-900">CitaYA</span>. Todos los derechos reservados.
               </p>
             </div>
 
             {/* Links legales */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-gray-600">
               <a href="#" className="hover:text-[#0490C8] transition-colors">
-                Términos de Servicio
+                Términos
               </a>
               <span className="text-gray-300">•</span>
               <a href="#" className="hover:text-[#0490C8] transition-colors">
-                Política de Privacidad
+                Privacidad
               </a>
               <span className="text-gray-300">•</span>
               <a href="#" className="hover:text-[#0490C8] transition-colors">

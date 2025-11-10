@@ -150,7 +150,8 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
           lg:transform-none
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           ${isCollapsed ? 'lg:w-20' : 'w-64 lg:w-64'}
-          h-screen flex flex-col
+          flex flex-col
+          max-h-screen
         `}
       >
         {/* Header con nombre del negocio */}
@@ -199,7 +200,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }: Sideba
         </div>
 
         {/* Menú - con scroll interno */}
-        <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <nav className="flex-1 p-3 sm:p-4 space-y-1 overflow-y-auto min-h-0">
           {getFilteredMenuItems().map((item) => {
             // Para "Inicio", solo activar si la ruta es EXACTAMENTE /dashboard-usuario
             // Para los demás, activar si la ruta coincide o empieza con la ruta del item

@@ -1,0 +1,42 @@
+# robots.txt para CitaYA
+# Permite el acceso a todos los bots de búsqueda
+
+User-agent: *
+Allow: /
+Allow: /agenda/*
+Disallow: /dashboard
+Disallow: /dashboard-usuario
+Disallow: /auth/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://citaya.site/sitemap.xml
+
+# Crawl-delay para evitar sobrecarga del servidor
+Crawl-delay: 1
+
+# Bots específicos
+User-agent: Googlebot
+Allow: /
+Allow: /agenda/*
+Disallow: /dashboard
+Disallow: /dashboard-usuario
+Disallow: /auth/
+Disallow: /api/
+
+User-agent: Googlebot-Image
+Allow: /Assets/
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+User-agent: Bingbot
+Allow: /
+Allow: /agenda/*
+Disallow: /dashboard
+Disallow: /dashboard-usuario
+Disallow: /auth/
+Disallow: /api/

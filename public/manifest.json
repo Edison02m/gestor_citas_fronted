@@ -1,0 +1,42 @@
+{
+  "name": "CitaYA - Sistema de Gestión de Citas",
+  "short_name": "CitaYA",
+  "description": "Gestiona las citas de tu negocio con recordatorios automáticos por WhatsApp",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0490C8",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Assets/logo_citaYA.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Assets/logo_citaYA.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nueva Cita",
+      "short_name": "Nueva",
+      "description": "Crear una nueva cita",
+      "url": "/dashboard-usuario/citas",
+      "icons": [{ "src": "/Assets/logo_citaYA.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Agenda",
+      "short_name": "Agenda",
+      "description": "Ver calendario de citas",
+      "url": "/dashboard-usuario/citas",
+      "icons": [{ "src": "/Assets/logo_citaYA.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": []
+}
