@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo circular gradiente -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0490C8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <circle cx="256" cy="256" r="256" fill="url(#bgGrad)"/>
+  
+  <!-- Letra C moderna y estilizada -->
+  <path d="M 350 140 
+           A 120 120 0 1 1 350 372
+           L 320 340
+           A 80 80 0 1 0 320 172
+           Z" 
+        fill="white"/>
+  
+  <!-- Punto de acento (representa "cita/appointment") -->
+  <circle cx="380" cy="256" r="25" fill="#023664"/>
+</svg>

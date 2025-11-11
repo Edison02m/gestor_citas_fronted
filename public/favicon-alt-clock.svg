@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo -->
+  <circle cx="256" cy="256" r="256" fill="#0490C8"/>
+  
+  <!-- Reloj + Calendario combinado (representa "citas/agendamiento") -->
+  <g transform="translate(256, 256)">
+    <!-- Círculo del reloj -->
+    <circle cx="0" cy="0" r="140" fill="white" stroke="#023664" stroke-width="8"/>
+    
+    <!-- Marca de las 12 -->
+    <rect x="-6" y="-130" width="12" height="30" rx="6" fill="#0490C8"/>
+    
+    <!-- Marca de las 3 -->
+    <rect x="100" y="-6" width="30" height="12" rx="6" fill="#0490C8"/>
+    
+    <!-- Marca de las 6 -->
+    <rect x="-6" y="100" width="12" height="30" rx="6" fill="#0490C8"/>
+    
+    <!-- Marca de las 9 -->
+    <rect x="-130" y="-6" width="30" height="12" rx="6" fill="#0490C8"/>
+    
+    <!-- Manecilla de hora (apuntando a las 10) -->
+    <line x1="0" y1="0" x2="-40" y2="-60" 
+          stroke="#023664" stroke-width="12" stroke-linecap="round"/>
+    
+    <!-- Manecilla de minuto (apuntando a las 2) -->
+    <line x1="0" y1="0" x2="50" y2="-80" 
+          stroke="#023664" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Centro del reloj -->
+    <circle cx="0" cy="0" r="15" fill="#0490C8"/>
+  </g>
+</svg>

@@ -73,10 +73,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/Assets/logo_citaYA.png',
-  },
+  // Next.js 15 detectará automáticamente icon.png y apple-icon.png en /app
   manifest: '/manifest.json',
   verification: {
     google: 'eM6fLyuJ__3Rz6NRqziaf0HZyPFIIHzS3cWjmkiT4rI',

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo circular con el color principal de CitaYA -->
+  <circle cx="256" cy="256" r="256" fill="#0490C8"/>
+  
+  <!-- Icono de calendario simplificado en blanco -->
+  <g transform="translate(256, 256)">
+    <!-- Rectángulo del calendario -->
+    <rect x="-120" y="-100" width="240" height="200" rx="20" fill="white"/>
+    
+    <!-- Header del calendario -->
+    <rect x="-120" y="-100" width="240" height="50" rx="20" fill="#023664"/>
+    <rect x="-120" y="-50" width="240" height="10" fill="#023664"/>
+    
+    <!-- Anillos de sujeción -->
+    <circle cx="-80" cy="-100" r="12" fill="white"/>
+    <circle cx="80" cy="-100" r="12" fill="white"/>
+    
+    <!-- Marca de verificación/check -->
+    <g transform="translate(0, 20)">
+      <path d="M -40 0 L -20 30 L 50 -40" 
+            stroke="#0490C8" 
+            stroke-width="20" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            fill="none"/>
+    </g>
+  </g>
+</svg>
