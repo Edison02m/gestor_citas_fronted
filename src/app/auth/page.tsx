@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { UsuariosService } from '@/services/usuarios.service';
 import Image from 'next/image';
@@ -32,6 +33,8 @@ function AuthPageContent() {
     logo: '',
     descripcion: '',
   });
+
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -211,6 +214,12 @@ function AuthPageContent() {
 
       if (registerData.password !== registerData.confirmPassword) {
         setError('Las contraseñas no coinciden');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!acceptedTerms) {
+        setError('Debes aceptar los Términos y Condiciones y la Política de Privacidad');
         setIsLoading(false);
         return;
       }
@@ -753,6 +762,39 @@ function AuthPageContent() {
                             )}
                           </button>
                         </div>
+                      </div>
+
+                      {/* Checkbox de Términos y Condiciones */}
+                      <div className="pt-2">
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                          <div className="relative flex items-center justify-center mt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={acceptedTerms}
+                              onChange={(e) => setAcceptedTerms(e.target.checked)}
+                              className="w-5 h-5 rounded border-2 border-gray-300 text-[#0490C8] focus:ring-2 focus:ring-[#0490C8]/20 focus:ring-offset-0 cursor-pointer transition-all"
+                              disabled={isLoading}
+                            />
+                          </div>
+                          <span className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                            Acepto los{' '}
+                            <Link 
+                              href="/terminos" 
+                              target="_blank"
+                              className="text-[#0490C8] hover:text-[#037ab0] font-semibold hover:underline transition-colors"
+                            >
+                              Términos y Condiciones
+                            </Link>
+                            {' '}y la{' '}
+                            <Link 
+                              href="/privacidad" 
+                              target="_blank"
+                              className="text-[#0490C8] hover:text-[#037ab0] font-semibold hover:underline transition-colors"
+                            >
+                              Política de Privacidad
+                            </Link>
+                          </span>
+                        </label>
                       </div>
                     </>
                   )}

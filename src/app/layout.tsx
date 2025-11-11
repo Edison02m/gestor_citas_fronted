@@ -84,6 +84,9 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
     'apple-mobile-web-app-title': 'CitaYA',
+    // Meta tags de seguridad para Google Safe Browsing
+    'referrer': 'origin-when-cross-origin',
+    'format-detection': 'telephone=no',
   }
 }
 
@@ -148,15 +151,25 @@ export default function RootLayout({
       url: 'https://citaya.site',
       logo: 'https://citaya.site/Assets/logo_citaYA.png',
       description: 'Plataforma líder en gestión de citas online para negocios',
+      email: 'citayaapp@gmail.com',
+      telephone: '+593993527322',
       sameAs: [
-        'https://www.facebook.com/citaya',
-        'https://twitter.com/citaya',
-        'https://www.linkedin.com/company/citaya'
+        'https://www.instagram.com/citaya.app',
+        'https://www.facebook.com/share/1FkrNyVV3e/',
+        'https://wa.me/593993527322'
       ],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Customer Service',
-        availableLanguage: ['Spanish', 'English']
+        telephone: '+593993527322',
+        email: 'citayaapp@gmail.com',
+        availableLanguage: ['Spanish', 'English'],
+        areaServed: 'EC'
+      },
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: 'EC',
+        addressLocality: 'Ecuador'
       }
     },
     {

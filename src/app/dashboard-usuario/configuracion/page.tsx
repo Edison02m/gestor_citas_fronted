@@ -639,7 +639,7 @@ export default function ConfiguracionPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                     <span>Tu link de agendamiento:</span>
-                    <span className="font-mono text-[#0490C8] break-all">https://citaya.com/agenda/{formAgenda.linkPublico || 'tu-link'}</span>
+                    <span className="font-mono text-[#0490C8] break-all">https://citaya.site/agenda/{formAgenda.linkPublico || 'tu-link'}</span>
                   </p>
                 </div>
 

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import Head from 'next/head';
@@ -1932,17 +1933,13 @@ export default function Home() {
 
             {/* Links legales */}
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-gray-600">
-              <a href="#" className="hover:text-[#0490C8] transition-colors">
-                Términos
-              </a>
+              <Link href="/terminos" className="hover:text-[#0490C8] transition-colors">
+                Términos y Condiciones
+              </Link>
               <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-[#0490C8] transition-colors">
-                Privacidad
-              </a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-[#0490C8] transition-colors">
-                Cookies
-              </a>
+              <Link href="/privacidad" className="hover:text-[#0490C8] transition-colors">
+                Política de Privacidad
+              </Link>
             </div>
           </div>
         </div>
