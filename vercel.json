@@ -21,12 +21,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "http://citaya.site/:path*",
-      "destination": "https://citaya.site/:path*",
-      "permanent": true
-    }
   ]
 }
