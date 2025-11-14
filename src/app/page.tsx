@@ -77,7 +77,7 @@ export default function Home() {
 
   const modules = [
     { 
-      name: 'Gestión de Citas', 
+      name: 'Sistema de Agendamiento de Citas', 
       icon: Calendar, 
       color: '#0490C8',
       features: ['Calendario interactivo', 'Drag & drop', 'Múltiples vistas', 'Recordatorios automáticos']
@@ -561,7 +561,7 @@ export default function Home() {
               ¿Cómo funciona nuestro agendador?
             </h2>
             <p className="text-base text-gray-600 max-w-2xl mx-auto">
-              Configura tu sistema de gestión de citas en 3 pasos simples
+              Configura tu sistema de agendamiento de citas en 3 pasos simples
             </p>
           </motion.div>
 
@@ -806,7 +806,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 mb-5"
               whileHover={{ scale: 1.05 }}
             >
-              <span className="text-xs font-medium text-gray-700">Sistema de Gestión de Citas</span>
+              <span className="text-xs font-medium text-gray-700">Sistema de Agendamiento de Citas</span>
             </motion.div>
             
             <h2 className="text-4xl sm:text-5xl font-black mb-5 text-gray-900">
@@ -833,7 +833,7 @@ export default function Home() {
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-2xl font-black text-[#023664]">
-                    Gestión Completa de Citas
+                    Agendamiento Completo de Citas
                   </h3>
                   <Calendar className="w-6 h-6 text-[#0490C8] opacity-40 flex-shrink-0 ml-3" />
                 </div>
@@ -1223,7 +1223,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#0490C8]/20 mb-5"
               whileHover={{ scale: 1.05 }}
             >
-              <span className="text-xs font-medium text-[#0490C8]">Gestionador de Citas Completo</span>
+              <span className="text-xs font-medium text-[#0490C8]">Sistema de Agendamiento Completo</span>
             </motion.div>
             
             <h2 className="text-4xl font-black mb-5 text-gray-900">
@@ -1237,7 +1237,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Gestión de Citas */}
+            {/* Sistema de Agendamiento de Citas */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1247,7 +1247,7 @@ export default function Home() {
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-base font-bold text-[#023664]">
-                  Gestión de Citas
+                  Sistema de Agendamiento de Citas
                 </h3>
                 <Calendar className="w-5 h-5 text-[#023664] opacity-40" />
               </div>
@@ -1627,7 +1627,7 @@ export default function Home() {
               transition={{ delay: 0.3 }}
               className="text-lg text-white/90 mb-8 max-w-2xl mx-auto"
             >
-              Únete a cientos de negocios que ya optimizaron su gestión de citas y aumentaron sus ingresos con nuestro agendador profesional
+              Únete a cientos de negocios que ya optimizaron su sistema de agendamiento de citas y aumentaron sus ingresos con nuestro agendador profesional
             </motion.p>
 
             {/* Beneficios rápidos - SOBRIO */}
@@ -1725,7 +1725,7 @@ export default function Home() {
                   />
                 </div>
                 <p className="text-gray-600 mb-4 sm:mb-6 leading-relaxed text-xs sm:text-sm max-w-md">
-                  Sistema completo de gestión de citas con recordatorios automáticos por WhatsApp. 
+                  Sistema completo de agendamiento de citas con recordatorios automáticos por WhatsApp. 
                   Reduce inasistencias y optimiza tu agenda.
                 </p>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">

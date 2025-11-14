@@ -1,6 +1,6 @@
 # 🗓️ Gestor de Citas - Frontend
 
-Sistema de gestión de citas para negocios con sistema de suscripciones basado en códigos.
+Sistema de agendamiento de citas para negocios con sistema de suscripciones basado en códigos.
 
 ## 🚀 Tecnologías
 

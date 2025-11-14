@@ -867,7 +867,7 @@ function AuthPageContent() {
         {/* Footer minimalista */}
         <div className="text-center mt-8">
           <p className="text-gray-500 text-sm">
-            © 2025 CitaYA. Sistema profesional de gestión de citas.
+            © 2025 CitaYA. Sistema profesional de agendamiento de citas.
           </p>
         </div>
         </div>

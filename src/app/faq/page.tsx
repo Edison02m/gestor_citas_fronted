@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Preguntas Frecuentes - CitaYA',
-  description: 'Encuentra respuestas a las preguntas más comunes sobre CitaYA. Aprende cómo funciona nuestro sistema de gestión de citas.',
+  description: 'Encuentra respuestas a las preguntas más comunes sobre CitaYA. Aprende cómo funciona nuestro sistema de agendamiento de citas.',
   alternates: {
     canonical: '/faq',
   },
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     question: '¿Qué es CitaYA?',
-    answer: 'CitaYA es un sistema de gestión de citas online diseñado para negocios que trabajan con agendamiento. Permite gestionar citas, clientes, empleados, servicios y enviar recordatorios automáticos por WhatsApp.'
+    answer: 'CitaYA es un sistema de agendamiento de citas online diseñado para negocios que trabajan con agendamiento. Permite gestionar citas, clientes, empleados, servicios y enviar recordatorios automáticos por WhatsApp.'
   },
   {
     question: '¿Cómo funciona CitaYA?',

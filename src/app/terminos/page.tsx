@@ -58,7 +58,7 @@ export default function TermsPage() {
             <ul className="space-y-2">
               <li className="flex items-start">
                 <CheckCircle className="w-5 h-5 text-[#0490C8] mr-2 mt-1 flex-shrink-0" />
-                <span className="text-gray-700">Gestión de citas y agenda digital</span>
+                <span className="text-gray-700">Sistema de agendamiento de citas y agenda digital</span>
               </li>
               <li className="flex items-start">
                 <CheckCircle className="w-5 h-5 text-[#0490C8] mr-2 mt-1 flex-shrink-0" />

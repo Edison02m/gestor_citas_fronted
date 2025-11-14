@@ -23,7 +23,7 @@ export function generatePageMetadata({
   return {
     title: fullTitle,
     description,
-    keywords: [...keywords, 'CitaYA', 'gestión de citas', 'agenda online'],
+    keywords: [...keywords, 'CitaYA', 'sistema de agendamiento de citas', 'agenda online'],
     alternates: {
       canonical: url,
     },
@@ -80,7 +80,7 @@ export const pageMetadata = {
     canonicalUrl: '/dashboard'
   },
   citas: {
-    title: 'Gestión de Citas - Calendario inteligente',
+    title: 'Sistema de Agendamiento de Citas - Calendario inteligente',
     description: 'Gestiona todas las citas de tu negocio con nuestro calendario inteligente. Drag & drop, recordatorios automáticos y más.',
     keywords: ['citas', 'calendario', 'agenda', 'appointments', 'bookings'],
     canonicalUrl: '/dashboard-usuario/citas'
